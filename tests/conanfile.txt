@@ -1,0 +1,4 @@
+[requires]
+catch2/2.13.0
+
+[options]
