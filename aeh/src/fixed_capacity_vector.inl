@@ -194,9 +194,15 @@ namespace aeh
 	}
 
 	template <typename T, size_t Capacity>
-	constexpr fixed_capacity_vector<T, Capacity>::operator span<T>() const noexcept
+	constexpr fixed_capacity_vector<T, Capacity>::operator span<T>() noexcept
 	{
-		return { data(), size() };
+		return span<T>(data(), size());
+	}
+
+	template <typename T, size_t Capacity>
+	constexpr fixed_capacity_vector<T, Capacity>::operator span<T const>() const noexcept
+	{
+		return span<T const>(data(), size());
 	}
 
 	template <typename T, size_t Capacity>

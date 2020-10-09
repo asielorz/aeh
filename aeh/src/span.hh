@@ -3,6 +3,7 @@
 #include "priority.hh"
 #include <type_traits>
 #include <initializer_list>
+#include <iterator>
 
 namespace aeh
 {

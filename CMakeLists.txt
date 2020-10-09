@@ -43,6 +43,13 @@ enable_testing()
 #)
 
 conan_cmake_run(
+	CONANFILE aeh/conanfile.txt
+	BASIC_SETUP
+	CMAKE_TARGETS # individual targets to link to
+	BUILD missing
+)
+
+conan_cmake_run(
 	CONANFILE tests/conanfile.txt
 	BASIC_SETUP
 	CMAKE_TARGETS # individual targets to link to

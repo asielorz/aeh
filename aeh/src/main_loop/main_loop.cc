@@ -1,7 +1,7 @@
 #include "main_loop.hh"
 
 #include "gl/gl_core_4_5.hh"
-#include <SDL2/SDL.h>
+#include <SDL.h>
 
 namespace
 {

@@ -1,6 +1,6 @@
 #include "imgui_plugin.hh"
 #include "main_loop.hh"
-#include <imgui/imgui.h>
+#include <imgui.h>
 
 namespace aeh::main_loop
 {
@@ -10,31 +10,31 @@ namespace aeh::main_loop
 		previous_context = ImGui::GetCurrentContext();
 		context = ImGui::CreateContext();
 		ImGui::SetCurrentContext(context);
-		ImGui::SDL::Init(renderer, window);
+		ImGui_SDL::Init(renderer, window);
 		ImGui::StyleColorsDark();
 	}
 
 	void ImGuiPlugin::update(UpdateInput i)
 	{
-		ImGui::SDL::NewFrame(renderer, i.window);
+		ImGui_SDL::NewFrame(renderer, i.window);
 	}
 
 	void ImGuiPlugin::post_render() const
 	{
 		ImGui::Render();
-		ImGui::SDL::RenderDrawData(renderer, ImGui::GetDrawData());
+		ImGui_SDL::RenderDrawData(renderer, ImGui::GetDrawData());
 	}
 
 	void ImGuiPlugin::shutdown()
 	{
-		ImGui::SDL::Shutdown(renderer);
+		ImGui_SDL::Shutdown(renderer);
 		ImGui::DestroyContext(context);
 		ImGui::SetCurrentContext(previous_context);
 	}
 
 	void ImGuiPlugin::process_event(SDL_Event const & event)
 	{
-		ImGui::SDL::ProcessEvent(renderer, &event);
+		ImGui_SDL::ProcessEvent(renderer, &event);
 	}
 
 } // namespace aeh::main_loop

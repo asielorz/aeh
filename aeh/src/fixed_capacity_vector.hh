@@ -66,7 +66,8 @@ namespace aeh
 		[[nodiscard]] constexpr auto crbegin() const noexcept -> const_reverse_iterator;
 		[[nodiscard]] constexpr auto crend() const noexcept -> const_reverse_iterator;
 
-		constexpr operator span<T>() const noexcept;
+		constexpr operator span<T>() noexcept;
+		constexpr operator span<T const>() const noexcept;
 
 		constexpr auto clear() noexcept -> void;
 		constexpr auto push_back(T const & t) noexcept(std::is_nothrow_copy_constructible_v<T>)->T &;

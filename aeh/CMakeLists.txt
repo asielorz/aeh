@@ -17,6 +17,7 @@ set(ROOT_FILES
 	src/out.hh
 	src/overload.hh
 	src/priority.hh
+	src/randomly_seeded.hh
 	src/span.hh
 	src/string.cc
 	src/string.hh
@@ -71,17 +72,8 @@ set(INPUT_FILES
 )
 
 set(IMGUI_FILES
-	src/imgui/imconfig.h
-	src/imgui/imgui.cpp
-	src/imgui/imgui.h
-	src/imgui/imgui_demo.cpp
-	src/imgui/imgui_draw.cpp
-	src/imgui/imgui_impl_sdl_gl3.cpp
-	src/imgui/imgui_impl_sdl_gl3.h
-	src/imgui/imgui_internal.h
-	src/imgui/stb_rect_pack.h
-	src/imgui/stb_textedit.h
-	src/imgui/stb_truetype.h
+	src/imgui/imgui_sdl_binding.cc
+	src/imgui/imgui_sdl_binding.hh
 )
 
 add_library(aeh_lib OBJECT
@@ -92,7 +84,7 @@ add_library(aeh_lib OBJECT
 	${INPUT_FILES}
 	${IMGUI_FILES}
 	
-	span.natvis
+	aeh.natvis
 )
 
 source_group("source" FILES	${ROOT_FILES})
@@ -105,6 +97,13 @@ source_group("imgui" FILES	${IMGUI_FILES})
 target_compile_features(aeh_lib
 	PUBLIC
 		cxx_std_17
+)
+
+target_link_libraries(aeh_lib
+	PRIVATE
+		opengl32
+		CONAN_PKG::sdl2
+		CONAN_PKG::imgui
 )
 
 target_compile_definitions(aeh_lib

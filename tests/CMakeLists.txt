@@ -1,6 +1,8 @@
 add_subdirectory(tests_main)
 
 add_executable(aeh_tests
+	src/fixed_capacity_vector.tests.cc
+	src/half.tests.cc
 	src/span.tests.cc
 	src/string.tests.cc
 )

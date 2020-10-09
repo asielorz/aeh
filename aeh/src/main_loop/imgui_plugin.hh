@@ -1,7 +1,6 @@
 #pragma once
 
-#define IMGUI_API
-#include "imgui/imgui_impl_sdl_gl3.h"
+#include "imgui/imgui_sdl_binding.hh"
 struct ImGuiContext;
 struct SDL_Window;
 union SDL_Event;
@@ -19,7 +18,7 @@ namespace aeh::main_loop
 		void process_event(SDL_Event const & event);
 
 	private:
-		ImGui::SDL::Renderer renderer;
+		ImGui_SDL::Renderer renderer;
 		ImGuiContext * context;
 		ImGuiContext * previous_context;
 	};
