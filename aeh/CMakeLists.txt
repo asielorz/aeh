@@ -1,6 +1,8 @@
 set(ROOT_FILES
 	src/align.cc
 	src/align.hh
+	src/batched_parallel_work.hh
+	src/batched_parallel_work.inl
 	src/binary_io.hh
 	src/binary_io.inl
 	src/change_stack.hh
