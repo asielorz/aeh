@@ -4,6 +4,7 @@ add_executable(aeh_tests
 	src/batched_parallel_work.tests.cc
 	src/fixed_capacity_vector.tests.cc
 	src/half.tests.cc
+	src/pointer_union.tests.cc
 	src/span.tests.cc
 	src/string.tests.cc
 )

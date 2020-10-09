@@ -1,6 +1,7 @@
 #pragma once
 
-#include "imgui/imgui_sdl_binding.hh"
+#include "imgui_sdl_binding.hh"
+
 struct ImGuiContext;
 struct SDL_Window;
 union SDL_Event;

@@ -14,10 +14,13 @@ set(ROOT_FILES
 	src/fixed_capacity_vector.inl
 	src/function_ptr.hh
 	src/half.hh
+	src/imgui_sdl_binding.cc
+	src/imgui_sdl_binding.hh
 	src/intcmp.hh
 	src/multicomparison.hh
 	src/out.hh
 	src/overload.hh
+	src/pointer_union.hh
 	src/priority.hh
 	src/randomly_seeded.hh
 	src/span.hh
@@ -73,9 +76,13 @@ set(INPUT_FILES
 	src/input/xm_mouse_buttons.hh
 )
 
-set(IMGUI_FILES
-	src/imgui/imgui_sdl_binding.cc
-	src/imgui/imgui_sdl_binding.hh
+set(MSP_FILES
+	src/msp/copy_on_write.hh
+	src/msp/copy_on_write.inl
+	src/msp/flexible_immutable_array.hh
+	src/msp/flexible_immutable_array.inl
+	src/msp/minimalistic_shared_ptr.hh
+	src/msp/minimalistic_shared_ptr.inl
 )
 
 add_library(aeh_lib OBJECT
@@ -84,7 +91,7 @@ add_library(aeh_lib OBJECT
 	${GL_FILES}
 	${MAIN_LOOP_FILES}
 	${INPUT_FILES}
-	${IMGUI_FILES}
+	${MSP_FILES}
 	
 	aeh.natvis
 )
@@ -94,7 +101,7 @@ source_group("debug" FILES	${DEBUG_FILES})
 source_group("gl" FILES	${GL_FILES})
 source_group("main_loop" FILES	${MAIN_LOOP_FILES})
 source_group("input" FILES	${INPUT_FILES})
-source_group("imgui" FILES	${IMGUI_FILES})
+source_group("msp" FILES	${MSP_FILES})
 
 target_compile_features(aeh_lib
 	PUBLIC
