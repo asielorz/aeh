@@ -1,3 +1,5 @@
+#ifdef AEH_HAS_SDL
+
 #include "main_loop.hh"
 
 #include "gl/gl_core_4_5.hh"
@@ -124,3 +126,5 @@ namespace aeh::main_loop::detail
 	}
 
 } // namespace demo_main_loop
+
+#endif // AEH_HAS_SDL

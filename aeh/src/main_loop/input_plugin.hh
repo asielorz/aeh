@@ -1,5 +1,7 @@
 #pragma once
 
+#ifdef AEH_HAS_SDL
+
 #include "input/input.hh"
 
 struct SDL_Window;
@@ -28,3 +30,5 @@ namespace aeh::main_loop
 	};
 
 } // namespace aeh::main_loop
+
+#endif // AEH_HAS_SDL

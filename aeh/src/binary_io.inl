@@ -15,13 +15,6 @@ namespace aeh
 		return is;
 	}
 
-	template <typename InputStream, typename T, typename Alloc>
-	InputStream & read_binary(InputStream & is, std::vector<T, Alloc> & v) noexcept
-	{
-		is.read(reinterpret_cast<char *>(v.data()), sizeof(T) * v.size());
-		return is;
-	}
-
 	template <typename OutputStream, typename T>
 	OutputStream & write_binary(OutputStream & os, const T & t) noexcept
 	{
@@ -33,13 +26,6 @@ namespace aeh
 	OutputStream & write_binary(OutputStream & os, const T t[], int n) noexcept
 	{
 		os.write(reinterpret_cast<const char *>(t), sizeof(T) * n);
-		return os;
-	}
-
-	template <typename OutputStream, typename T, typename Alloc>
-	OutputStream & write_binary(OutputStream & os, const std::vector<T, Alloc> & v) noexcept
-	{
-		os.write(reinterpret_cast<const char *>(v.data()), sizeof(T) * v.size());
 		return os;
 	}
 

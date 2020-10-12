@@ -1,5 +1,8 @@
 #pragma once
 
+#ifdef AEH_HAS_SDL
+#ifdef AEH_HAS_IMGUI
+
 struct SDL_Window;
 struct SDL_Cursor;
 typedef union SDL_Event SDL_Event;
@@ -34,3 +37,6 @@ namespace aeh::ImGui_SDL
 	void InvalidateDeviceObjects(Renderer & renderer);
 	bool CreateDeviceObjects(Renderer & renderer);
 } // namespace aeh::ImGui_SDL
+
+#endif // AEH_HAS_IMGUI
+#endif // AEH_HAS_SDL

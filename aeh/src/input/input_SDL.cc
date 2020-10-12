@@ -1,3 +1,5 @@
+#ifdef AEH_HAS_SDL
+
 #include "input_SDL.hh"
 #include "input.hh"
 #include "debug/unreachable.hh"
@@ -318,3 +320,5 @@ namespace aeh::in
 	}
 	
 } // namespace aeh::in
+
+#endif // AEH_HAS_SDL

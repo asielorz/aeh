@@ -1,5 +1,7 @@
 #pragma once
 
+#ifdef AEH_HAS_SDL
+
 #include "optional_customization_points.hh"
 #include <type_traits> // std::is_same_v
 #include <tuple>
@@ -111,3 +113,5 @@ namespace aeh::main_loop
 	}
 
 } // namespace demo_main_loop
+
+#endif // AEH_HAS_SDL

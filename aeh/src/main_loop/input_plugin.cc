@@ -1,3 +1,5 @@
+#ifdef AEH_HAS_SDL
+
 #include "input_plugin.hh"
 #include "input/input_SDL.hh"
 #include "main_loop.hh"
@@ -31,3 +33,5 @@ namespace aeh::main_loop
 	}
 
 } // namespace aeh::main_loop
+
+#endif // AEH_HAS_SDL

@@ -1,3 +1,6 @@
+#ifdef AEH_HAS_SDL
+#ifdef AEH_HAS_IMGUI
+
 #include "imgui_plugin.hh"
 #include "main_loop.hh"
 #include <imgui.h>
@@ -38,3 +41,6 @@ namespace aeh::main_loop
 	}
 
 } // namespace aeh::main_loop
+
+#endif // AEH_HAS_IMGUI
+#endif // AEH_HAS_SDL

@@ -21,8 +21,8 @@ namespace aeh
 		unique_handle(unique_handle &&) noexcept;
 		unique_handle & operator = (unique_handle &&) noexcept;
 
-		HandleT get() const noexcept;
-		HandleT release() noexcept;
+		[[nodiscard]] HandleT get() const noexcept;
+		[[nodiscard]] HandleT release() noexcept;
 		void reset(HandleT handle_ = null_value) noexcept;
 
 		explicit operator bool() const noexcept;
@@ -35,7 +35,7 @@ namespace aeh
 			view(const unique_handle & handle_) noexcept;
 
 			explicit operator HandleT() const noexcept;
-			HandleT get() const noexcept;
+			[[nodiscard]] HandleT get() const noexcept;
 
 			explicit operator bool() const noexcept;
 

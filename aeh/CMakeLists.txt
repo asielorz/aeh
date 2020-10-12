@@ -118,9 +118,11 @@ target_link_libraries(aeh_lib
 target_compile_definitions(aeh_lib
 	PUBLIC
 		NOMINMAX # For Windows.h not to defined 'min' and 'max' macros
+		AEH_HAS_IMGUI
+		AEH_HAS_SDL
 	PRIVATE
 		$<$<CONFIG:Debug>:AEH_DEBUG>
-		AFIL_BUILD_TYPE=$<CONFIG>
+		AEH_BUILD_TYPE=$<CONFIG>
 )
 
 if (MSVC)
