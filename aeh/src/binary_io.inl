@@ -1,7 +1,7 @@
 namespace aeh
 {
 
-	template <typename InputStream, typename T>
+	template <typename InputStream, typename T, typename = std::enable_if_t<std::is_trivially_copyable_v<T>>>
 	InputStream & read_binary(InputStream & is, T & t) noexcept
 	{
 		is.read(reinterpret_cast<char *>(std::addressof(t)), sizeof(T));
@@ -14,8 +14,14 @@ namespace aeh
 		is.read(reinterpret_cast<char *>(t), sizeof(T) * n);
 		return is;
 	}
+	
+	template <typename InputStream, typename T>
+	InputStream & read_binary(InputStream & is, span<T> t) noexcept
+	{
+		return read_binary(is, t.data(), t.size());
+	}
 
-	template <typename OutputStream, typename T>
+	template <typename OutputStream, typename T, typename = std::enable_if_t<std::is_trivially_copyable_v<T>>>
 	OutputStream & write_binary(OutputStream & os, const T & t) noexcept
 	{
 		os.write(reinterpret_cast<const char *>(std::addressof(t)), sizeof(T));
@@ -27,6 +33,12 @@ namespace aeh
 	{
 		os.write(reinterpret_cast<const char *>(t), sizeof(T) * n);
 		return os;
+	}
+
+	template <typename OutputStream, typename T>
+	OutputStream & write_binary(OutputStream & os, span<const T> t) noexcept
+	{
+		return write_binary(os, t.data(), t.size());
 	}
 
 	template <typename T, typename U>
