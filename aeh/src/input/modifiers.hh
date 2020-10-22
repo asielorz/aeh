@@ -10,7 +10,7 @@ namespace aeh::in
 
 		enum struct Modifier
 		{
-			none = 0, ctrl = 1, shift = 2, alt = 4
+			none = 0, ctrl = 1, shift = 2, alt = 4, windows = 8
 		};
 	} // inline namespace enums
 

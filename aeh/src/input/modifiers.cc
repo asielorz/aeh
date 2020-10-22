@@ -19,11 +19,13 @@ namespace aeh::in
 		bool const need_ctrl = mod & Modifier::ctrl;
 		bool const need_shift = mod & Modifier::shift;
 		bool const need_alt = mod & Modifier::alt;
+		bool const need_windows = mod & Modifier::windows;
 
 		return
 			((is_down(input, Key::left_control) || is_down(input, Key::right_control)) == need_ctrl) &&
 			((is_down(input, Key::left_shift) || is_down(input, Key::right_shift)) == need_shift) &&
-			((is_down(input, Key::left_alt) || is_down(input, Key::right_alt)) == need_alt);
+			((is_down(input, Key::left_alt) || is_down(input, Key::right_alt)) == need_alt) &&
+			((is_down(input, Key::left_windows) || is_down(input, Key::right_windows)) == need_windows);
 	}
 
 	auto is_pressed(Input const & input, Key key, Modifier mod) noexcept -> bool
