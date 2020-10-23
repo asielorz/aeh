@@ -2,13 +2,13 @@ namespace aeh
 {
 
 	template <typename Caller>
-	constexpr auto function_ref_base<Caller>::has_value() const noexcept -> bool
+	constexpr auto detail::function_ref_base<Caller>::has_value() const noexcept -> bool
 	{
 		return caller != nullptr;
 	}
 
 	template <typename Caller>
-	constexpr function_ref_base<Caller>::operator bool() const noexcept
+	constexpr detail::function_ref_base<Caller>::operator bool() const noexcept
 	{
 		return has_value();
 	}
@@ -44,13 +44,13 @@ namespace aeh
 	}
 
 	template <typename Caller>
-	constexpr auto function_ref_base<Caller>::operator == (function_ref_base other) const noexcept -> bool
+	constexpr auto detail::function_ref_base<Caller>::operator == (function_ref_base other) const noexcept -> bool
 	{
 		return context == other.context && caller == other.caller;
 	}
 
 	template <typename Caller>
-	constexpr auto function_ref_base<Caller>::operator != (function_ref_base other) const noexcept -> bool
+	constexpr auto detail::function_ref_base<Caller>::operator != (function_ref_base other) const noexcept -> bool
 	{
 		return !(*this == other);
 	}
