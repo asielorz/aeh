@@ -1,5 +1,7 @@
 #pragma once
 
+#ifdef AEH_HAS_GLM
+
 #include <glm/fwd.hpp>
 
 namespace aeh::in
@@ -11,3 +13,5 @@ namespace aeh::in
 	[[nodiscard]] auto mouse_move_ndc_aspect_ratio(in::Input const & input) noexcept -> glm::vec2;
 
 } // namespace aeh::in
+
+#endif // AEH_HAS_GLM

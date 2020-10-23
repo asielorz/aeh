@@ -56,6 +56,7 @@ set(MAIN_LOOP_FILES
 	src/main_loop/input_plugin.hh
 	src/main_loop/main_loop.cc
 	src/main_loop/main_loop.hh
+	src/main_loop/main_loop.inl
 	src/main_loop/optional_customization_points.hh
 )
 

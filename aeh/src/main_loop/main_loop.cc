@@ -55,7 +55,7 @@ namespace
 		return true;
 	}
 
-	aeh::main_loop::LoopVars create_window(aeh::main_loop::Options const & options)
+	aeh::main_loop::detail::LoopVars create_window(aeh::main_loop::Options const & options)
 	{
 		SDL_Window * const prev_window = SDL_GL_GetCurrentWindow();
 		SDL_GLContext const prev_context = SDL_GL_GetCurrentContext();

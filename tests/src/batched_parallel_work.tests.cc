@@ -1,5 +1,5 @@
 #include "batched_parallel_work.hh"
-#include <catch.hpp>
+#include <catch2/catch.hpp>
 #include <optional>
 
 namespace tests
