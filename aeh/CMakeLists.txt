@@ -13,6 +13,8 @@ set(ROOT_FILES
 	src/fixed_capacity_vector.hh
 	src/fixed_capacity_vector.inl
 	src/function_ptr.hh
+	src/function_ref.hh
+	src/function_ref.inl
 	src/half.hh
 	src/imgui_sdl_binding.cc
 	src/imgui_sdl_binding.hh

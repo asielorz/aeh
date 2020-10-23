@@ -25,7 +25,7 @@ namespace aeh::main_loop
 		};
 
 		LoopVars initialize(Options const & options);
-		std::tuple<bool, float> update(SDL_Window * window, std::function<void(SDL_Event const &)> demo_process_event);
+		std::tuple<bool, float> update(SDL_Window * window, function_ref<void(SDL_Event const &)> demo_process_event);
 		void pre_render(SDL_Window * window);
 		void post_render(SDL_Window * window);
 		void shutdown(LoopVars vars);

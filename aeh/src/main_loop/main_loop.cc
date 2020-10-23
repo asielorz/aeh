@@ -89,7 +89,7 @@ namespace aeh::main_loop::detail
 		return vars;
 	}
 
-	std::tuple<bool, float> update(SDL_Window * window, std::function<void(SDL_Event const &)> demo_process_event)
+	std::tuple<bool, float> update(SDL_Window * window, function_ref<void(SDL_Event const &)> demo_process_event)
 	{
 		bool done = false;
 

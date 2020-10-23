@@ -3,9 +3,9 @@
 #ifdef AEH_HAS_SDL
 
 #include "optional_customization_points.hh"
+#include "function_ref.hh"
 #include <type_traits> // std::is_same_v
 #include <tuple>
-#include <functional>
 
 struct SDL_Window;
 union SDL_Event;
