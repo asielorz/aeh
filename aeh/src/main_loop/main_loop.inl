@@ -28,7 +28,7 @@ namespace aeh::main_loop
 		std::tuple<bool, float> update(SDL_Window * window, std::function<void(SDL_Event const &)> demo_process_event);
 		void pre_render(SDL_Window * window);
 		void post_render(SDL_Window * window);
-		void shutdown(LoopVars & vars);
+		void shutdown(LoopVars vars);
 	} // namespace detail
 
 	template <typename Demo>

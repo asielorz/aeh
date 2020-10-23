@@ -117,7 +117,7 @@ namespace aeh::main_loop::detail
 		SDL_GL_SwapWindow(window);
 	}
 
-	void shutdown(LoopVars & vars)
+	void shutdown(LoopVars vars)
 	{
 		SDL_GL_DeleteContext(vars.opengl_context);
 		SDL_DestroyWindow(vars.window);
