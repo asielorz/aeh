@@ -78,7 +78,7 @@ namespace aeh
 	};
 
 	template <typename Ret, typename ... Args>
-	struct function_ref<Ret(Args...) noexcept> : public detail::function_ref_base<function_ptr<Ret(void *, Args...) noexcept>>
+	struct function_ref<Ret(Args...) noexcept> final : public detail::function_ref_base<function_ptr<Ret(void *, Args...) noexcept>>
 	{
 		constexpr function_ref() noexcept = default;
 		constexpr function_ref(std::nullptr_t) noexcept {};
