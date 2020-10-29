@@ -1,4 +1,4 @@
-#ifdef AEH_HAS_SDL
+#ifdef AEH_WITH_SDL2
 
 #include "input_SDL.hh"
 #include "input.hh"
@@ -321,4 +321,4 @@ namespace aeh::in
 	
 } // namespace aeh::in
 
-#endif // AEH_HAS_SDL
+#endif // AEH_WITH_SDL2

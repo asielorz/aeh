@@ -1,4 +1,4 @@
-#ifdef AEH_HAS_SDL
+#ifdef AEH_WITH_SDL2
 
 #include "main_loop.hh"
 
@@ -127,4 +127,4 @@ namespace aeh::main_loop::detail
 
 } // namespace demo_main_loop
 
-#endif // AEH_HAS_SDL
+#endif // AEH_WITH_SDL2

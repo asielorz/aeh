@@ -1,6 +1,6 @@
 #pragma once
 
-#ifdef AEH_HAS_SDL
+#ifdef AEH_WITH_SDL2
 
 #include "priority.hh"
 #include <utility> // forward
@@ -218,4 +218,4 @@ namespace aeh::main_loop::detail
 
 #undef AEH_MAIN_LOOP_DECLARE_CALL_IF_EXISTS
 
-#endif // AEH_HAS_SDL
+#endif // AEH_WITH_SDL2

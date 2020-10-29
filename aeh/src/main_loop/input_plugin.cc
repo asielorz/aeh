@@ -1,4 +1,4 @@
-#ifdef AEH_HAS_SDL
+#ifdef AEH_WITH_SDL2
 
 #include "input_plugin.hh"
 #include "input/input_SDL.hh"
@@ -34,4 +34,4 @@ namespace aeh::main_loop
 
 } // namespace aeh::main_loop
 
-#endif // AEH_HAS_SDL
+#endif // AEH_WITH_SDL2

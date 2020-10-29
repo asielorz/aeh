@@ -1,6 +1,6 @@
 #pragma once
 
-#ifdef AEH_HAS_GLM
+#ifdef AEH_WITH_GLM
 
 #include <glm/fwd.hpp>
 
@@ -14,4 +14,4 @@ namespace aeh::in
 
 } // namespace aeh::in
 
-#endif // AEH_HAS_GLM
+#endif // AEH_WITH_GLM

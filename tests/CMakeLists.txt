@@ -1,3 +1,4 @@
+find_package(Catch2 REQUIRED)
 add_subdirectory(tests_main)
 
 add_executable(aeh_tests
@@ -10,16 +11,16 @@ add_executable(aeh_tests
 	src/string.tests.cc
 )
 
-target_include_directories(aeh_lib
+target_include_directories(aeh
     PUBLIC
         "${CMAKE_SOURCE_DIR}/aeh/src/"
 )
 
 target_link_libraries(aeh_tests
 	PRIVATE
-		aeh_lib
+		aeh
 		tests_main
-		CONAN_PKG::catch2
+		Catch2::Catch2
 )
 
 target_compile_definitions(aeh_tests

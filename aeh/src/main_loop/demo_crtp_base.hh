@@ -1,6 +1,6 @@
 #pragma once
 
-#ifdef AEH_HAS_SDL
+#ifdef AEH_WITH_SDL2
 
 #include "main_loop.hh"
 #include "tuple.hh"
@@ -44,4 +44,4 @@ namespace aeh::main_loop
 
 #include "demo_crtp_base.inl"
 
-#endif // AEH_HAS_SDL
+#endif // AEH_WITH_SDL2

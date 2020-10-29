@@ -4,9 +4,9 @@ add_library(tests_main OBJECT
 
 target_link_libraries(tests_main
     PUBLIC
-        CONAN_PKG::catch2
+        Catch2::Catch2
     PRIVATE
-        aeh_lib
+        aeh
 )
 
 target_compile_features(tests_main

@@ -1,6 +1,6 @@
 #pragma once
 
-#ifdef AEH_HAS_SDL
+#ifdef AEH_WITH_SDL2
 
 union SDL_Event;
 
@@ -15,4 +15,4 @@ namespace aeh::in
 
 } // namespace aeh::in
 
-#endif // AEH_HAS_SDL
+#endif // AEH_WITH_SDL2

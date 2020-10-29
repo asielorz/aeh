@@ -1,6 +1,6 @@
 #pragma once
 
-#ifdef AEH_HAS_SDL
+#ifdef AEH_WITH_SDL2
 
 #include "optional_customization_points.hh"
 #include "function_ref.hh"
@@ -49,4 +49,4 @@ namespace aeh::main_loop
 
 #include "main_loop.inl"
 
-#endif // AEH_HAS_SDL
+#endif // AEH_WITH_SDL2

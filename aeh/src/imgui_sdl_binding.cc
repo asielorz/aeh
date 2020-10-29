@@ -1,5 +1,4 @@
-#ifdef AEH_HAS_SDL
-#ifdef AEH_HAS_IMGUI
+#if defined AEH_WITH_SDL2 && defined AEH_WITH_IMGUI
 
 #if defined(_MSC_VER) && !defined(_CRT_SECURE_NO_WARNINGS)
 #define _CRT_SECURE_NO_WARNINGS
@@ -447,5 +446,4 @@ namespace aeh::ImGui_SDL
 
 } // namespace aeh::ImGui_SDL
 
-#endif // AEH_HAS_IMGUI
-#endif // AEH_HAS_SDL
+#endif // AEH_WITH_SDL2 && AEH_WITH_IMGUI
