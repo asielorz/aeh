@@ -4,7 +4,9 @@
 #define _CRT_SECURE_NO_WARNINGS
 #endif
 
-#pragma warning(disable : 4121)
+#ifdef _MSC_VER
+#pragma warning(disable : 4121) // alignment of a member was sensitive to packing
+#endif
 
 #include "imgui_sdl_binding.hh"
 #include <imgui.h>
@@ -371,8 +373,8 @@ namespace aeh::ImGui_SDL
 	void Shutdown(Renderer & renderer)
 	{
 		// Destroy SDL mouse cursors
-		for (ImGuiMouseCursor cursor_n = 0; cursor_n < ImGuiMouseCursor_COUNT; cursor_n++)
-			SDL_FreeCursor(renderer.MouseCursors[cursor_n]);
+		for (SDL_Cursor * const cursor : renderer.MouseCursors)
+			SDL_FreeCursor(cursor);
 		memset(renderer.MouseCursors, 0, sizeof(renderer.MouseCursors));
 
 		// Destroy OpenGL objects

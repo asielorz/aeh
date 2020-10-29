@@ -26,7 +26,7 @@ namespace aeh::ImGui_SDL
 		unsigned int VboHandle = 0, ElementsHandle = 0;
 	};
 
-	bool Init(Renderer & renderer, SDL_Window * window, const char * glsl_version = NULL);
+	bool Init(Renderer & renderer, SDL_Window * window, const char * glsl_version = nullptr);
 	void Shutdown(Renderer & renderer);
 	void NewFrame(Renderer & renderer, SDL_Window * window);
 	void RenderDrawData(Renderer const & renderer, ImDrawData * draw_data);
