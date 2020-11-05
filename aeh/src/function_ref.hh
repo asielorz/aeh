@@ -63,6 +63,9 @@ namespace aeh
 		template <typename Callable, typename = std::enable_if_t<std::is_invocable_r_v<Ret, Callable &, Args...>>>
 		constexpr function_ref(Callable & c) noexcept;
 
+		template <typename Callable, typename = std::enable_if_t<std::is_invocable_r_v<Ret, Callable const &, Args...>>>
+		constexpr function_ref(Callable const & c) noexcept;
+
 		template <auto F>
 		static constexpr function_ref to_constant = []()
 		{

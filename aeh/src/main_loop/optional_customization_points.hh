@@ -70,7 +70,7 @@ namespace aeh::main_loop::detail
 		return z_call_start_frame(t, priority_tag_v<1>);
 	}
 
-	template <typename T, typename = decltype(std::declval<T>().start_frame())>
+	template <typename T, typename = decltype(std::declval<T>().start_frame_impl())>
 	auto z_call_start_frame_impl(T & t, priority_tag<1>)
 	{
 		if constexpr (std::is_same_v<decltype(t.start_frame_impl()), void>)
@@ -93,7 +93,7 @@ namespace aeh::main_loop::detail
 	template <typename T>
 	auto call_start_frame_impl(T & t)
 	{
-		return z_call_start_frame(t, priority_tag_v<1>);
+		return z_call_start_frame_impl(t, priority_tag_v<1>);
 	}
 
 	template <typename T, typename UpdateInput, typename Locals>

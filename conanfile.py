@@ -88,4 +88,15 @@ class AehConan(conans.ConanFile):
 
     def package_info(self):
         self.cpp_info.libs = ["aeh"]
+        
+        self.cpp_info.includedirs = ["include", os.path.join("include", "aeh")]
+        
+        if self.options.with_glm:
+            self.cpp_info.defines.append("AEH_WITH_GLM")
+        
+        if self.options.with_imgui:
+            self.cpp_info.defines.append("AEH_WITH_IMGUI")
+        
+        if self.options.with_sdl2:
+            self.cpp_info.defines.append("AEH_WITH_SDL2")
 

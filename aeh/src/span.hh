@@ -47,7 +47,7 @@ namespace aeh
 
 		template <typename T, typename ResultType = decltype(std::declval<T>().size())>
 		constexpr bool has_size(priority_tag<1>) { return std::is_same_v<ResultType, size_t>; }
-		template <typename T, typename ValueType>
+		template <typename T>
 		constexpr bool has_size(priority_tag<0>) { return false; }
 
 	} // namespace detail
@@ -55,7 +55,7 @@ namespace aeh
 	template <typename T, typename ValueType>
 	struct is_array_like
 	{
-		static constexpr bool value = detail::has_data<T, ValueType>(priority_tag_v<1>) && detail::has_size<T, ValueType>(priority_tag_v<1>);
+		static constexpr bool value = detail::has_data<T, ValueType>(priority_tag_v<1>) && detail::has_size<T>(priority_tag_v<1>);
 	};
 	template <typename T, typename ValueType>
 	constexpr bool is_array_like_v = is_array_like<T, ValueType>::value;
@@ -63,26 +63,34 @@ namespace aeh
 	template <typename T>
 	struct span : public ::aeh::detail::span_impl<T>
 	{
-		constexpr span() noexcept : detail::span_impl<T>(nullptr, 0) {}
-		constexpr span(T data_[], size_t size_) noexcept : detail::span_impl<T>(data_, size_) {}
-		template <size_t N>	constexpr span(T(&array)[N]) noexcept : detail::span_impl<T>(array, N) {}
+	private:
+		using Base = ::aeh::detail::span_impl<T>;
+	public:
+
+		constexpr span() noexcept : Base(nullptr, 0) {}
+		constexpr span(T data_[], size_t size_) noexcept : Base(data_, size_) {}
+		template <size_t N>	constexpr span(T(&array)[N]) noexcept : Base(array, N) {}
 
 		template <typename ArrayLike, typename = std::enable_if_t<is_array_like_v<ArrayLike, T>>>
-		constexpr span(ArrayLike && array) noexcept : detail::span_impl<T>(array.data(), array.size()) {}
+		constexpr span(ArrayLike && array) noexcept : Base(array.data(), array.size()) {}
 	};
 
 	template <typename T>
 	struct span<T const> : public ::aeh::detail::span_impl<T const>
 	{
-		constexpr span() noexcept : detail::span_impl<T const>(nullptr, 0) {}
-		constexpr span(T const data_[], size_t size_) noexcept : detail::span_impl<T const>(data_, size_) {}
-		constexpr span(span<T> s) noexcept : detail::span_impl<T const>(s.data(), s.size()) {}
-		template <size_t N>	constexpr span(T(&data_)[N]) noexcept : detail::span_impl<T const>(data_, N) {}
-		template <size_t N>	constexpr span(T const(&data_)[N]) noexcept : detail::span_impl<T const>(data_, N) {}
-		constexpr span(std::initializer_list<T> ilist) noexcept : detail::span_impl<T const>(std::data(ilist), std::size(ilist)) {}
+	private:
+		using Base = ::aeh::detail::span_impl<T const>;
+	public:
+
+		constexpr span() noexcept : Base(nullptr, 0) {}
+		constexpr span(T const data_[], size_t size_) noexcept : Base(data_, size_) {}
+		constexpr span(span<T> s) noexcept : Base(s.data(), s.size()) {}
+		template <size_t N>	constexpr span(T(&data_)[N]) noexcept : Base(data_, N) {}
+		template <size_t N>	constexpr span(T const(&data_)[N]) noexcept : Base(data_, N) {}
+		constexpr span(std::initializer_list<T> ilist) noexcept : Base(std::data(ilist), std::size(ilist)) {}
 
 		template <typename ArrayLike, typename = std::enable_if_t<is_array_like_v<ArrayLike, T const>>>
-		constexpr span(ArrayLike && array) noexcept : detail::span_impl<T>(array.data(), array.size()) {}
+		constexpr span(ArrayLike && array) noexcept : Base(array.data(), array.size()) {}
 	};
 
 } // namespace aeh

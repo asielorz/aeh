@@ -8,6 +8,7 @@ endif()
 target_include_directories(aeh
 	PUBLIC  
     	$<INSTALL_INTERFACE:include>
+    	$<INSTALL_INTERFACE:include/aeh>
 		$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/src>
 )
 
