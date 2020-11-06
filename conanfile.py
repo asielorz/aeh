@@ -51,6 +51,7 @@ class AehConan(conans.ConanFile):
 
         if self.options.with_sdl2:
             self.requires("sdl2/2.0.12@bincrafters/stable")
+            self.requires("opengl/system")
 
             if self.settings.os == "Linux":
                 # Audio stuff we don't use

@@ -16,6 +16,9 @@ if (AEH_WITH_SDL2)
 	find_package(SDL2 REQUIRED)
 	target_link_libraries(aeh PUBLIC SDL2::SDL2)
 	target_compile_definitions(aeh PUBLIC AEH_WITH_SDL2)
+	
+	find_package(OpenGL REQUIRED)
+	target_link_libraries(aeh PUBLIC OpenGL::GL)
 endif()
 
 if (AEH_WITH_IMGUI)

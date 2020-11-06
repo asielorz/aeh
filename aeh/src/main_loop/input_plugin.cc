@@ -16,18 +16,18 @@ namespace aeh::main_loop
 		input.current.window_height = static_cast<uint16_t>(window_height);
 	}
 
-	auto InputPlugin::start_frame() const -> in::Frame
+	auto InputPlugin::start_frame() const noexcept -> in::Frame
 	{
-		return prepare_frame_to_process_SDL_events(input.previous);
+		return prepare_frame_to_process_SDL_events(input.current);
 	}
 
-	auto InputPlugin::update(UpdateInput, in::Frame const & current_frame) -> InputExtension
+	auto InputPlugin::update(UpdateInput, in::Frame const & current_frame) noexcept -> InputExtension
 	{
 		input = in::update(input, current_frame);
 		return InputExtension{input};
 	}
 	
-	auto InputPlugin::process_event(SDL_Event const & event, in::Frame & current_frame) -> void
+	auto InputPlugin::process_event(SDL_Event const & event, in::Frame & current_frame) noexcept -> void
 	{
 		process_SDL_event(current_frame, event);
 	}
