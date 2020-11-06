@@ -47,6 +47,15 @@ namespace aeh
 	{}
 
 	template <typename Ret, typename ... Args>
+	template <typename Callable, typename>
+	constexpr function_ref<Ret(Args...) noexcept>::function_ref(Callable const & c) noexcept
+		: Base(
+			(void *)std::addressof(c),
+			[](void * context, Args ... args) noexcept -> Ret { return std::invoke(*static_cast<Callable const *>(context), args...); }
+		)
+	{}
+
+	template <typename Ret, typename ... Args>
 	constexpr Ret function_ref<Ret(Args...) noexcept>::operator () (Args ... args) const noexcept
 	{
 		return this->caller(this->context, args...);
