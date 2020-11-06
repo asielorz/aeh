@@ -2,4 +2,6 @@ This project aims to be a library where I collect all the utility code that I en
 
 The name stands for my own name, Asier Elorz Hernáez.
 
-The current status of the project is not usable. It is a repo just because I need to work on it from different locations. I aim to add wider testing coverage, conan package support and opting in and out of dependencies.
+Bintray repository link: https://api.bintray.com/conan/asielorz/aeh
+
+This library is mainly for personal use. I do not promise anything regarding documentation, bugs, platform portability or supported features. If you are thinking of using it, consider using other better mantained libraries instead.
