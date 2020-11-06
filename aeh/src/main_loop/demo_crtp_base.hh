@@ -10,6 +10,11 @@ union SDL_Event;
 
 namespace aeh::main_loop
 {
+	namespace detail
+	{
+		template <typename ... Ts>
+		struct UpdateInputImpl : public Ts... {};
+	} // namespace detail
 
 	template <typename Impl, typename ... Plugins>
 	struct CRTPBase
@@ -17,13 +22,13 @@ namespace aeh::main_loop
 		template <typename Plugin>
 		using plugin_update_input_extension = detail::void_to_empty<
 			decltype(detail::call_update(
-				std::declval<Plugin &>(), 
-				std::declval<aeh::main_loop::UpdateInput>(), 
+				std::declval<Plugin &>(),
+				std::declval<aeh::main_loop::UpdateInput>(),
 				std::declval<std::add_lvalue_reference_t<decltype(detail::call_start_frame(std::declval<Plugin &>()))>>()
 			))
 		>;
 
-		struct UpdateInput : aeh::main_loop::UpdateInput, plugin_update_input_extension<Plugins>... {};
+		using UpdateInput = detail::UpdateInputImpl<aeh::main_loop::UpdateInput, plugin_update_input_extension<Plugins>...>;
 
 		void initialize(SDL_Window * window);
 		auto start_frame();
