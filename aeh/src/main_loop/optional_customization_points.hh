@@ -155,7 +155,7 @@ namespace aeh::main_loop::detail
 	{
 		return demo.render_impl(locals);
 	}
-	template <typename Demo, typename Locals>
+	template <typename Demo>
 	auto z_call_render_impl(priority_tag<1>, Demo const & demo, empty_t) -> decltype(demo.render_impl())
 	{
 		return demo.render_impl();
@@ -177,7 +177,7 @@ namespace aeh::main_loop::detail
 	{
 		return demo.process_event(event, locals);
 	}
-	template <typename Demo, typename Locals>
+	template <typename Demo>
 	auto z_call_process_event(priority_tag<1>, Demo const & demo, SDL_Event const & event, empty_t) -> decltype(demo.process_event(event))
 	{
 		return demo.process_event(event);
@@ -199,7 +199,7 @@ namespace aeh::main_loop::detail
 	{
 		return demo.process_event_impl(event, locals);
 	}
-	template <typename Demo, typename Locals>
+	template <typename Demo>
 	auto z_call_process_event_impl(priority_tag<1>, Demo const & demo, SDL_Event const & event, empty_t) -> decltype(demo.process_event_impl(event))
 	{
 		return demo.process_event_impl(event);
