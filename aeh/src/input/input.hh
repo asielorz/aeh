@@ -157,6 +157,17 @@ namespace aeh::in
 	[[nodiscard]] auto is_released(Input const & input, BoundControllerInput control, float threshold) noexcept -> bool;
 	[[nodiscard]] auto is_released(Input const & input, Control control, float threshold) noexcept -> bool;
 
+	enum struct ControlState { up = 0, released = 1, pressed = 2, down = 3 };
+	[[nodiscard]] auto make_control_state(bool currently_down, bool previously_down) noexcept -> ControlState;
+
+	[[nodiscard]] auto current_state(Input const & input, Key key) noexcept -> ControlState;
+	[[nodiscard]] auto current_state(Input const & input, MouseButton button) noexcept -> ControlState;
+	[[nodiscard]] auto current_state(Input const & input, KeyOrMouseButton control) noexcept -> ControlState;
+	[[nodiscard]] auto current_state(Input const & input, BoundControllerButton button) noexcept -> ControlState;
+	[[nodiscard]] auto current_state(Input const & input, BoundControllerAxis axis, float threshold) noexcept -> ControlState;
+	[[nodiscard]] auto current_state(Input const & input, BoundControllerInput control, float threshold) noexcept -> ControlState;
+	[[nodiscard]] auto current_state(Input const & input, Control control, float threshold) noexcept -> ControlState;
+
 	[[nodiscard]] auto is_pressed_or_repeated(Input const & input, Key key) noexcept -> bool;
 	[[nodiscard]] auto axis_state(Input const & input, BoundControllerAxis axis) noexcept -> float;
 	[[nodiscard]] auto axis_state(Input const & input, BoundControllerAxis axis, float dead_zone) noexcept -> float;

@@ -99,55 +99,59 @@ namespace aeh::in
 
 	//*****************************************************************************************************************
 
-#define IMPL_FOR_KEY(function_name)																				\
-	auto function_name(Input const & input, Key key) noexcept -> bool											\
-	{																											\
-		return function_name(input, static_cast<KeyOrMouseButton>(key));										\
+#define IMPL_FOR_KEY(function_name, return_type)																	\
+	auto function_name(Input const & input, Key key) noexcept -> return_type										\
+	{																												\
+		return function_name(input, static_cast<KeyOrMouseButton>(key));											\
 	}
 
-#define IMPL_FOR_MOUSE_BUTTON(function_name)																	\
-	auto function_name(Input const & input, MouseButton button) noexcept -> bool								\
-	{																											\
-		return function_name(input, static_cast<KeyOrMouseButton>(button));										\
+#define IMPL_FOR_MOUSE_BUTTON(function_name, return_type)															\
+	auto function_name(Input const & input, MouseButton button) noexcept -> return_type								\
+	{																												\
+		return function_name(input, static_cast<KeyOrMouseButton>(button));											\
 	}
 
-#define IMPL_FOR_CONTROLLER_INPUT(function_name)																\
-	auto function_name(Input const & input, BoundControllerInput control, float threshold) noexcept -> bool		\
-	{																											\
-		if (is_axis(control))																					\
-			return function_name(input, static_cast<BoundControllerAxis>(control), threshold);					\
-		else																									\
-			return function_name(input, static_cast<BoundControllerButton>(control));							\
+#define IMPL_FOR_CONTROLLER_INPUT(function_name, return_type)														\
+	auto function_name(Input const & input, BoundControllerInput control, float threshold) noexcept -> return_type	\
+	{																												\
+		if (is_axis(control))																						\
+			return function_name(input, static_cast<BoundControllerAxis>(control), threshold);						\
+		else																										\
+			return function_name(input, static_cast<BoundControllerButton>(control));								\
 	}
 
-#define IMPL_FOR_CONTROL(function_name)																			\
-	auto function_name(Input const & input, Control control, float threshold) noexcept -> bool					\
-	{																											\
-		if (is_controller_input(control))																		\
-			return function_name(input, static_cast<BoundControllerInput>(control), threshold);					\
-		else																									\
-			return function_name(input, static_cast<KeyOrMouseButton>(control));								\
+#define IMPL_FOR_CONTROL(function_name, return_type)																\
+	auto function_name(Input const & input, Control control, float threshold) noexcept -> return_type				\
+	{																												\
+		if (is_controller_input(control))																			\
+			return function_name(input, static_cast<BoundControllerInput>(control), threshold);						\
+		else																										\
+			return function_name(input, static_cast<KeyOrMouseButton>(control));									\
 	}
 
-	IMPL_FOR_KEY(is_down);
-	IMPL_FOR_KEY(is_up);
-	IMPL_FOR_KEY(is_pressed);
-	IMPL_FOR_KEY(is_released);
+	IMPL_FOR_KEY(is_down, bool);
+	IMPL_FOR_KEY(is_up, bool);
+	IMPL_FOR_KEY(is_pressed, bool);
+	IMPL_FOR_KEY(is_released, bool);
+	IMPL_FOR_KEY(current_state, ControlState);
 
-	IMPL_FOR_MOUSE_BUTTON(is_down);
-	IMPL_FOR_MOUSE_BUTTON(is_up);
-	IMPL_FOR_MOUSE_BUTTON(is_pressed);
-	IMPL_FOR_MOUSE_BUTTON(is_released);
+	IMPL_FOR_MOUSE_BUTTON(is_down, bool);
+	IMPL_FOR_MOUSE_BUTTON(is_up, bool);
+	IMPL_FOR_MOUSE_BUTTON(is_pressed, bool);
+	IMPL_FOR_MOUSE_BUTTON(is_released, bool);
+	IMPL_FOR_MOUSE_BUTTON(current_state, ControlState);
 
-	IMPL_FOR_CONTROLLER_INPUT(is_down);
-	IMPL_FOR_CONTROLLER_INPUT(is_up);
-	IMPL_FOR_CONTROLLER_INPUT(is_pressed);
-	IMPL_FOR_CONTROLLER_INPUT(is_released);
+	IMPL_FOR_CONTROLLER_INPUT(is_down, bool);
+	IMPL_FOR_CONTROLLER_INPUT(is_up, bool);
+	IMPL_FOR_CONTROLLER_INPUT(is_pressed, bool);
+	IMPL_FOR_CONTROLLER_INPUT(is_released, bool);
+	IMPL_FOR_CONTROLLER_INPUT(current_state, ControlState);
 
-	IMPL_FOR_CONTROL(is_down);
-	IMPL_FOR_CONTROL(is_up);
-	IMPL_FOR_CONTROL(is_pressed);
-	IMPL_FOR_CONTROL(is_released);
+	IMPL_FOR_CONTROL(is_down, bool);
+	IMPL_FOR_CONTROL(is_up, bool);
+	IMPL_FOR_CONTROL(is_pressed, bool);
+	IMPL_FOR_CONTROL(is_released, bool);
+	IMPL_FOR_CONTROL(current_state, ControlState);
 
 	auto is_down(Input const & input, KeyOrMouseButton control) noexcept -> bool
 	{
@@ -165,7 +169,7 @@ namespace aeh::in
 		if (threshold >= 0)
 			return input.current.controller_axes[controller_index][axis_index] >= threshold;
 		else
-			return input.current.controller_axes[controller_index][axis_index] < threshold;
+			return input.current.controller_axes[controller_index][axis_index] <= threshold;
 	}
 
 	auto is_up(Input const & input, KeyOrMouseButton control) noexcept -> bool
@@ -227,6 +231,48 @@ namespace aeh::in
 		else
 			return input.current.controller_axes[controller_index][axis_index] > threshold &&
 				   input.previous.controller_axes[controller_index][axis_index] <= threshold;
+	}
+	
+	auto make_control_state(bool currently_down, bool previously_down) noexcept -> ControlState
+	{
+		return ControlState((int(currently_down) << 1) | int(previously_down));
+	}
+
+	auto current_state(Input const & input, KeyOrMouseButton control) noexcept -> ControlState
+	{
+		bool const currently_down = input.current.buttons_down[static_cast<uint16_t>(control)];
+		bool const previously_down = input.previous.buttons_down[static_cast<uint16_t>(control)];
+
+		return make_control_state(currently_down, previously_down);
+	}
+
+	auto current_state(Input const & input, BoundControllerButton button) noexcept -> ControlState
+	{
+		auto const index = controller_button_index(button);
+		bool const currently_down = input.current.controller_buttons[index];
+		bool const previously_down = input.previous.controller_buttons[index];
+
+		return make_control_state(currently_down, previously_down);
+	}
+
+	auto current_state(Input const & input, BoundControllerAxis axis, float threshold) noexcept -> ControlState
+	{
+		auto const [controller_index, axis_index] = controller_axis_index(axis);
+
+		if (threshold >= 0)
+		{
+			bool const currently_down = input.current.controller_axes[controller_index][axis_index] >= threshold;
+			bool const previously_down = input.previous.controller_axes[controller_index][axis_index] >= threshold;
+			
+			return make_control_state(currently_down, previously_down);
+		}
+		else
+		{
+			bool const currently_down = input.current.controller_axes[controller_index][axis_index] <= threshold;
+			bool const previously_down = input.previous.controller_axes[controller_index][axis_index] <= threshold;
+
+			return make_control_state(currently_down, previously_down);
+		}
 	}
 
 	auto is_pressed_or_repeated(Input const & input, Key key) noexcept -> bool

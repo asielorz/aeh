@@ -6,6 +6,7 @@ add_executable(aeh_tests
 	src/fixed_capacity_vector.tests.cc
 	src/function_ref.tests.cc
 	src/half.tests.cc
+	src/input.tests.cc
 	src/pointer_union.tests.cc
 	src/span.tests.cc
 	src/string.tests.cc
