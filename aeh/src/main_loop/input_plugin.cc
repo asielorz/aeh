@@ -21,10 +21,11 @@ namespace aeh::main_loop
 		return prepare_frame_to_process_SDL_events(input.current);
 	}
 
-	auto InputPlugin::update(UpdateInput, in::Frame const & current_frame) noexcept -> InputExtension
+	auto InputPlugin::update(UpdateInput update_in, in::Frame const & current_frame) noexcept -> InputExtension
 	{
 		input = in::update(input, current_frame);
-		return InputExtension{input};
+		in::update(controller_repeater, update_in.dt, input);
+		return InputExtension{input, controller_repeater};
 	}
 	
 	auto InputPlugin::process_event(SDL_Event const & event, in::Frame & current_frame) noexcept -> void

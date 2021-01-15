@@ -3,6 +3,7 @@
 #ifdef AEH_WITH_SDL2
 
 #include "input/input.hh"
+#include "input/repeat_controller.hh"
 
 struct SDL_Window;
 union SDL_Event;
@@ -16,6 +17,7 @@ namespace aeh::main_loop
 		struct InputExtension
 		{
 			in::Input const & input;
+			in::ControllerRepeater const & controller_repeater;
 		};
 
 		auto initialize(SDL_Window * window) -> void;
@@ -25,6 +27,7 @@ namespace aeh::main_loop
 
 	private:
 		in::Input input;
+		in::ControllerRepeater controller_repeater;
 	};
 
 } // namespace aeh::main_loop
