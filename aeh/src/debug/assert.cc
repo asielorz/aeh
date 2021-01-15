@@ -5,12 +5,12 @@
 namespace aeh::debug
 {
 
-	int message_box(const char * title, const char * message, unsigned flags) noexcept
+	MBRet message_box(const char * title, const char * message, MBFlags flags) noexcept
 	{
-		return ::MessageBoxA(nullptr, message, title, flags);
+		return MBRet(::MessageBoxA(nullptr, message, title, static_cast<int>(flags)));
 	}
 
-	int message_box_abort_retry_ignore(const char * title, const char * message) noexcept
+	MBRet message_box_abort_retry_ignore(const char * title, const char * message) noexcept
 	{
 		const auto message_box_opt = message_box(title, message, MBType::AbortRetryIgnore | MBIcon::Error);
 
@@ -35,7 +35,7 @@ namespace aeh::debug
 		return message_box_opt == MBRet::Yes;
 	}
 
-	int not_implemented(char const location[])
+	MBRet not_implemented(char const location[])
 	{
 		if (location)
 		{

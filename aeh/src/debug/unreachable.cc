@@ -14,7 +14,7 @@ namespace aeh::debug
 	{
 		[[noreturn]] static void handle_unreachable(char const * title, char const * message) noexcept
 		{
-			int const ret = message_box(title, message, MBType::RetryCancel | MBIcon::Error);
+			MBRet const ret = message_box(title, message, MBType::RetryCancel | MBIcon::Error);
 			if (ret == MBRet::Retry)
 				__debugbreak();
 
