@@ -55,7 +55,7 @@ namespace
 		return true;
 	}
 
-	aeh::main_loop::detail::LoopVars create_window(aeh::main_loop::Options const & options)
+	aeh::main_loop::detail::LoopVars create_window(aeh::main_loop::WindowOptions const & options)
 	{
 		SDL_Window * const prev_window = SDL_GL_GetCurrentWindow();
 		SDL_GLContext const prev_context = SDL_GL_GetCurrentContext();
@@ -71,7 +71,7 @@ namespace
 namespace aeh::main_loop::detail
 {
 
-	LoopVars initialize(Options const & options)
+	LoopVars initialize(WindowOptions const & options)
 	{
 		static bool sdl_init_ok = initialize_SDL();
 		if (!sdl_init_ok)
@@ -104,12 +104,13 @@ namespace aeh::main_loop::detail
 		return {done, 0.01666f};
 	}
 
-	void pre_render(SDL_Window * window)
+	void pre_render(SDL_Window * window, Options const & options)
 	{
 		int window_width, window_height;
 		SDL_GetWindowSize(window, &window_width, &window_height);
 		gl::Viewport(0, 0, window_width, window_height);
-		gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
+		if (options.clear_every_frame)
+			gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
 	}
 
 	void post_render(SDL_Window * window)

@@ -6,6 +6,7 @@
 #include "function_ref.hh"
 #include <type_traits> // std::is_same_v
 #include <tuple>
+#include <optional>
 
 struct SDL_Window;
 union SDL_Event;
@@ -13,6 +14,11 @@ union SDL_Event;
 namespace aeh::main_loop
 {
 	struct Options
+	{
+		bool clear_every_frame = true;
+	};
+
+	struct WindowOptions : Options
 	{
 		char const * window_name = "New window";
 		int window_width = 1280;
@@ -40,10 +46,10 @@ namespace aeh::main_loop
 	};
 
 	template <typename Demo>
-	int run(Demo & demo, SDL_Window * window);
+	int run(Demo & demo, SDL_Window * window, Options const & options);
 
 	template <typename Demo>
-	int run(Demo & demo, Options const & options = Options());
+	int run(Demo & demo, WindowOptions const & options = WindowOptions());
 
 } // namespace demo_main_loop
 

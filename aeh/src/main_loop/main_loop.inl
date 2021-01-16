@@ -24,15 +24,15 @@ namespace aeh::main_loop
 			void * previous_opengl_context = nullptr;
 		};
 
-		LoopVars initialize(Options const & options);
+		LoopVars initialize(WindowOptions const & options);
 		std::tuple<bool, float> update(SDL_Window * window, function_ref<void(SDL_Event const &)> demo_process_event);
-		void pre_render(SDL_Window * window);
+		void pre_render(SDL_Window * window, Options const & options);
 		void post_render(SDL_Window * window);
 		void shutdown(LoopVars vars);
 	} // namespace detail
 
 	template <typename Demo>
-	int run(Demo & demo, SDL_Window * window)
+	int run(Demo & demo, SDL_Window * window, Options const & options)
 	{
 		main_loop::detail::call_initialize(demo, window);
 
@@ -52,7 +52,7 @@ namespace aeh::main_loop
 			main_loop::detail::call_update(demo, controller, locals);
 
 			// Rendering
-			main_loop::detail::pre_render(window);
+			main_loop::detail::pre_render(window, options);
 			main_loop::detail::render_demo(demo, locals);
 			main_loop::detail::post_render(window);
 		}
@@ -63,14 +63,14 @@ namespace aeh::main_loop
 	}
 
 	template <typename Demo>
-	int run(Demo & demo, Options const & options)
+	int run(Demo & demo, WindowOptions const & options)
 	{
 		// Initialize
 		main_loop::detail::LoopVars loop_vars = main_loop::detail::initialize(options);
 		if (!loop_vars.window)
 			return -1;
 
-		int const result = run(demo, loop_vars.window);
+		int const result = run(demo, loop_vars.window, options);
 		main_loop::detail::shutdown(loop_vars);
 		return result;
 	}
