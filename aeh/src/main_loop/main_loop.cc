@@ -55,7 +55,7 @@ namespace
 		return true;
 	}
 
-	aeh::main_loop::detail::LoopVars create_window(aeh::main_loop::WindowOptions const & options)
+	aeh::main_loop::detail::LoopVars create_window(aeh::main_loop::NewWindowOptions const & options)
 	{
 		SDL_Window * const prev_window = SDL_GL_GetCurrentWindow();
 		SDL_GLContext const prev_context = SDL_GL_GetCurrentContext();
@@ -71,7 +71,7 @@ namespace
 namespace aeh::main_loop::detail
 {
 
-	LoopVars initialize(WindowOptions const & options)
+	LoopVars initialize(NewWindowOptions const & options)
 	{
 		static bool sdl_init_ok = initialize_SDL();
 		if (!sdl_init_ok)
@@ -99,6 +99,13 @@ namespace aeh::main_loop::detail
 			demo_process_event(event);
 			if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID(window))
 				done = true;
+
+			if (event.type == SDL_QUIT)
+			{
+				done = true;
+				SDL_PushEvent(&event);
+				break;
+			}
 		}
 
 		return {done, 0.01666f};

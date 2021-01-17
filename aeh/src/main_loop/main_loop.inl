@@ -24,7 +24,7 @@ namespace aeh::main_loop
 			void * previous_opengl_context = nullptr;
 		};
 
-		LoopVars initialize(WindowOptions const & options);
+		LoopVars initialize(NewWindowOptions const & options);
 		std::tuple<bool, float> update(SDL_Window * window, function_ref<void(SDL_Event const &)> demo_process_event);
 		void pre_render(SDL_Window * window, Options const & options);
 		void post_render(SDL_Window * window);
@@ -63,7 +63,7 @@ namespace aeh::main_loop
 	}
 
 	template <typename Demo>
-	int run(Demo & demo, WindowOptions const & options)
+	int run(Demo & demo, NewWindowOptions const & options)
 	{
 		// Initialize
 		main_loop::detail::LoopVars loop_vars = main_loop::detail::initialize(options);

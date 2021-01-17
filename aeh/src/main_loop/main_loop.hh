@@ -18,7 +18,7 @@ namespace aeh::main_loop
 		bool clear_every_frame = true;
 	};
 
-	struct WindowOptions : Options
+	struct NewWindowOptions : Options
 	{
 		char const * window_name = "New window";
 		int window_width = 1280;
@@ -46,10 +46,10 @@ namespace aeh::main_loop
 	};
 
 	template <typename Demo>
-	int run(Demo & demo, SDL_Window * window, Options const & options);
+	int run(Demo & demo, SDL_Window * window, Options const & options = Options());
 
 	template <typename Demo>
-	int run(Demo & demo, WindowOptions const & options = WindowOptions());
+	int run(Demo & demo, NewWindowOptions const & options = NewWindowOptions());
 
 } // namespace demo_main_loop
 
