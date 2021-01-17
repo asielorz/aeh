@@ -6,7 +6,7 @@ required_conan_version = ">=1.30.2" # The version I had when I first wrote the r
 
 class AehConan(conans.ConanFile):
     name = "aeh"
-    version = "0.2.0"
+    version = "0.2.1"
     license = "MIT"
     author = "Asier Elorz Hernáez (https://github.com/asielorz)"
     url = "https://github.com/asielorz/aeh" # Package repository, not library repository

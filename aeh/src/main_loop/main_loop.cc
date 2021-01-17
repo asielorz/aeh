@@ -4,6 +4,7 @@
 
 #include "gl/gl_core_4_5.hh"
 #include <SDL.h>
+#include <thread>
 
 namespace
 {
@@ -123,6 +124,13 @@ namespace aeh::main_loop::detail
 	void post_render(SDL_Window * window)
 	{
 		SDL_GL_SwapWindow(window);
+	}
+
+	void cap_fps(std::chrono::steady_clock::time_point time_start) noexcept
+	{
+		constexpr auto frame_duration = std::chrono::duration_cast<std::chrono::steady_clock::duration>(std::chrono::duration<double>(1.0 / 60.0));
+		while ((std::chrono::steady_clock::now() - time_start) < frame_duration)
+			std::this_thread::yield();
 	}
 
 	void shutdown(LoopVars vars)

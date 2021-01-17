@@ -7,6 +7,7 @@
 #include <type_traits> // std::is_same_v
 #include <tuple>
 #include <optional>
+#include <chrono>
 
 struct SDL_Window;
 union SDL_Event;

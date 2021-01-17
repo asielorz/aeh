@@ -28,6 +28,7 @@ namespace aeh::main_loop
 		std::tuple<bool, float> update(SDL_Window * window, function_ref<void(SDL_Event const &)> demo_process_event);
 		void pre_render(SDL_Window * window, Options const & options);
 		void post_render(SDL_Window * window);
+		void cap_fps(std::chrono::steady_clock::time_point time_start) noexcept;
 		void shutdown(LoopVars vars);
 	} // namespace detail
 
@@ -41,6 +42,8 @@ namespace aeh::main_loop
 		int exit_code = 0;
 		while (!done)
 		{
+			auto const time_start = std::chrono::steady_clock::now();
+
 			auto locals = main_loop::detail::call_start_frame(demo);
 
 			// Update
@@ -55,6 +58,8 @@ namespace aeh::main_loop
 			main_loop::detail::pre_render(window, options);
 			main_loop::detail::render_demo(demo, locals);
 			main_loop::detail::post_render(window);
+
+			main_loop::detail::cap_fps(time_start);
 		}
 
 		main_loop::detail::call_shutdown(demo);
