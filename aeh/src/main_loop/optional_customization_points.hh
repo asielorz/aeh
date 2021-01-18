@@ -39,8 +39,6 @@ namespace aeh::main_loop::detail
 	AEH_MAIN_LOOP_DECLARE_CALL_IF_EXISTS(initialize_impl)
 	AEH_MAIN_LOOP_DECLARE_CALL_IF_EXISTS(shutdown)
 	AEH_MAIN_LOOP_DECLARE_CALL_IF_EXISTS(shutdown_impl)
-	AEH_MAIN_LOOP_DECLARE_CALL_IF_EXISTS(process_event)
-	AEH_MAIN_LOOP_DECLARE_CALL_IF_EXISTS(process_event_impl)
 	AEH_MAIN_LOOP_DECLARE_CALL_IF_EXISTS(pre_render)
 	AEH_MAIN_LOOP_DECLARE_CALL_IF_EXISTS(post_render)
 
@@ -173,21 +171,21 @@ namespace aeh::main_loop::detail
 	//****************************************************************
 
 	template <typename Demo, typename Locals>
-	auto z_call_process_event(priority_tag<1>, Demo const & demo, SDL_Event const & event, Locals && locals) -> decltype(demo.process_event(event, locals))
+	auto z_call_process_event(priority_tag<1>, Demo && demo, SDL_Event const & event, Locals && locals) -> decltype(demo.process_event(event, locals))
 	{
 		return demo.process_event(event, locals);
 	}
 	template <typename Demo>
-	auto z_call_process_event(priority_tag<1>, Demo const & demo, SDL_Event const & event, empty_t) -> decltype(demo.process_event(event))
+	auto z_call_process_event(priority_tag<1>, Demo && demo, SDL_Event const & event, empty_t) -> decltype(demo.process_event(event))
 	{
 		return demo.process_event(event);
 	}
 	template <typename Demo, typename Locals>
-	void z_call_process_event(priority_tag<0>, Demo const &, SDL_Event const &, Locals &&)
+	void z_call_process_event(priority_tag<0>, Demo &&, SDL_Event const &, Locals &&)
 	{}
 
 	template <typename Demo, typename Locals>
-	void call_process_event(Demo const & demo, SDL_Event const & event, Locals && locals)
+	void call_process_event(Demo && demo, SDL_Event const & event, Locals && locals)
 	{
 		z_call_process_event(priority_tag_v<1>, demo, event, locals);
 	}
@@ -195,21 +193,21 @@ namespace aeh::main_loop::detail
 	//****************************************************************
 
 	template <typename Demo, typename Locals>
-	auto z_call_process_event_impl(priority_tag<1>, Demo const & demo, SDL_Event const & event, Locals && locals) -> decltype(demo.process_event_impl(event, locals))
+	auto z_call_process_event_impl(priority_tag<1>, Demo && demo, SDL_Event const & event, Locals && locals) -> decltype(demo.process_event_impl(event, locals))
 	{
 		return demo.process_event_impl(event, locals);
 	}
 	template <typename Demo>
-	auto z_call_process_event_impl(priority_tag<1>, Demo const & demo, SDL_Event const & event, empty_t) -> decltype(demo.process_event_impl(event))
+	auto z_call_process_event_impl(priority_tag<1>, Demo && demo, SDL_Event const & event, empty_t) -> decltype(demo.process_event_impl(event))
 	{
 		return demo.process_event_impl(event);
 	}
 	template <typename Demo, typename Locals>
-	void z_call_process_event_impl(priority_tag<0>, Demo const &, SDL_Event const &, Locals &&)
+	void z_call_process_event_impl(priority_tag<0>, Demo &&, SDL_Event const &, Locals &&)
 	{}
 
 	template <typename Demo, typename Locals>
-	void call_process_event_impl(Demo const & demo, SDL_Event const & event, Locals && locals)
+	void call_process_event_impl(Demo && demo, SDL_Event const & event, Locals && locals)
 	{
 		z_call_process_event_impl(priority_tag_v<1>, demo, event, locals);
 	}
