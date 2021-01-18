@@ -55,11 +55,14 @@ namespace aeh::main_loop
 			main_loop::detail::call_update(demo, controller, locals);
 
 			// Rendering
-			main_loop::detail::pre_render(window, options);
-			main_loop::detail::render_demo(demo, locals);
-			main_loop::detail::post_render(window);
+			if (!done)
+			{
+				main_loop::detail::pre_render(window, options);
+				main_loop::detail::render_demo(demo, locals);
+				main_loop::detail::post_render(window);
 
-			main_loop::detail::cap_fps(time_start);
+				main_loop::detail::cap_fps(time_start);
+			}
 		}
 
 		main_loop::detail::call_shutdown(demo);
