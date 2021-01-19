@@ -56,8 +56,9 @@ namespace aeh::debug
 	//! Shows a message box with information icon and yes and no buttons. Returns true if yes is clicked.
 	bool message_box_yes_no(const char* title, const char* message) noexcept;
 
-	//! Shows a message box alerting that the called function has not been implemented.
+	//! Shows a message box alerting that the called function has not been implemented. First shows an abort-retry-ignore message box, second uses an ok message box.
 	MBRet not_implemented(char const location[] = nullptr);
+	void not_implemented_ok(char const location[] = nullptr);
 
 	namespace detail
 	{

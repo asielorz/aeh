@@ -49,6 +49,20 @@ namespace aeh::debug
 		}
 	}
 
+	void not_implemented_ok(char const location[])
+	{
+		if (location)
+		{
+			char buffer[2048];
+			sprintf_s(buffer, "The functionality at %s has not been implemented.", location);
+			message_box("Not implemented", buffer);
+		}
+		else
+		{
+			message_box("Not implemented", "The functionality has not been implemented.");
+		}
+	}
+
 	namespace detail
 	{
 		void handle_debug_assert(bool expression, const char * expression_str, const char * msg, const char * file, const char * function, int line)
