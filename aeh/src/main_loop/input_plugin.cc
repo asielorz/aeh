@@ -21,10 +21,20 @@ namespace aeh::main_loop
 		return prepare_frame_to_process_SDL_events(input.current);
 	}
 
-	auto InputPlugin::update(UpdateInput update_in, in::Frame const & current_frame) noexcept -> InputExtension
+	auto InputPlugin::update(UpdateInput loop, in::Frame const & current_frame) noexcept -> InputExtension
 	{
-		input = in::update(input, current_frame);
-		in::update(controller_repeater, update_in.dt, input);
+		// If a frame takes too long (for an arbitrary definition of too long), reset the input to compensate for possible missed input events.
+		constexpr float frame_duration = 1.0f / 60.0f;
+		if (loop.dt > 10 * frame_duration)
+		{
+			input = {};
+			controller_repeater = {};
+		}
+		else
+		{
+			input = in::update(input, current_frame);
+			in::update(controller_repeater, loop.dt, input);
+		}
 		return InputExtension{input, controller_repeater};
 	}
 	

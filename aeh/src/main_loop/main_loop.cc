@@ -90,7 +90,7 @@ namespace aeh::main_loop::detail
 		return vars;
 	}
 
-	std::tuple<bool, float> update(SDL_Window * window, function_ref<void(SDL_Event const &)> demo_process_event)
+	bool update(SDL_Window * window, function_ref<void(SDL_Event const &)> demo_process_event)
 	{
 		bool done = false;
 
@@ -109,7 +109,7 @@ namespace aeh::main_loop::detail
 			}
 		}
 
-		return {done, 0.01666f};
+		return done;
 	}
 
 	void pre_render(SDL_Window * window, Options const & options)
@@ -126,11 +126,18 @@ namespace aeh::main_loop::detail
 		SDL_GL_SwapWindow(window);
 	}
 
-	void cap_fps(std::chrono::steady_clock::time_point time_start) noexcept
+	float cap_fps(std::chrono::steady_clock::time_point time_start) noexcept
 	{
-		constexpr auto frame_duration = std::chrono::duration_cast<std::chrono::steady_clock::duration>(std::chrono::duration<double>(1.0 / 60.0));
-		while ((std::chrono::steady_clock::now() - time_start) < frame_duration)
-			std::this_thread::yield();
+		constexpr auto minimum_frame_duration = std::chrono::duration_cast<std::chrono::steady_clock::duration>(std::chrono::duration<double>(1.0 / 60.0));
+
+		for (;;)
+		{
+			auto const frame_duration = std::chrono::steady_clock::now() - time_start;
+			if (frame_duration < minimum_frame_duration)
+				std::this_thread::yield();
+			else
+				return std::chrono::duration<float>(frame_duration).count();
+		}
 	}
 
 	void shutdown(LoopVars vars)

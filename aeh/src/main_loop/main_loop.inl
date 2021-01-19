@@ -25,10 +25,10 @@ namespace aeh::main_loop
 		};
 
 		LoopVars initialize(NewWindowOptions const & options);
-		std::tuple<bool, float> update(SDL_Window * window, function_ref<void(SDL_Event const &)> demo_process_event);
+		bool update(SDL_Window * window, function_ref<void(SDL_Event const &)> demo_process_event);
 		void pre_render(SDL_Window * window, Options const & options);
 		void post_render(SDL_Window * window);
-		void cap_fps(std::chrono::steady_clock::time_point time_start) noexcept;
+		float cap_fps(std::chrono::steady_clock::time_point time_start) noexcept;
 		void shutdown(LoopVars vars);
 	} // namespace detail
 
@@ -40,6 +40,7 @@ namespace aeh::main_loop
 		// Loop
 		bool done = false;
 		int exit_code = 0;
+		float dt = 1.0f / 60.0f;
 		while (!done)
 		{
 			auto const time_start = std::chrono::steady_clock::now();
@@ -47,10 +48,9 @@ namespace aeh::main_loop
 			auto locals = main_loop::detail::call_start_frame(demo);
 
 			// Update
-			auto const [done_, dt] = main_loop::detail::update(window,
+			done = main_loop::detail::update(window,
 				[&demo, &locals](SDL_Event const & ev) { main_loop::detail::call_process_event(demo, ev, locals); });
 
-			done = done_;
 			auto controller = main_loop::UpdateInput(dt, window, done, exit_code);
 			main_loop::detail::call_update(demo, controller, locals);
 
@@ -61,7 +61,7 @@ namespace aeh::main_loop
 				main_loop::detail::render_demo(demo, locals);
 				main_loop::detail::post_render(window);
 
-				main_loop::detail::cap_fps(time_start);
+				dt = main_loop::detail::cap_fps(time_start);
 			}
 		}
 
