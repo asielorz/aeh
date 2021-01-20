@@ -72,4 +72,18 @@ namespace aeh::main_loop
 		for_each_in_tuple_reversed(plugins, [](auto & plugin) { detail::call_shutdown(plugin); });
 	}
 
+	template <typename Impl, typename ... Plugins>
+	template <typename Plugin>
+	Plugin & CRTPBase<Impl, Plugins...>::get_plugin() noexcept
+	{
+		return std::get<Plugin>(plugins);
+	}
+
+	template <typename Impl, typename ... Plugins>
+	template <typename Plugin>
+	Plugin const & CRTPBase<Impl, Plugins...>::get_plugin() const noexcept
+	{
+		return std::get<Plugin>(plugins);
+	}
+
 } // namespace aeh::main_loop

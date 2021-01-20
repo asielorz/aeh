@@ -37,6 +37,8 @@ namespace aeh::main_loop
 		template <typename Locals> void process_event(SDL_Event const & event, Locals && locals);
 		void shutdown();
 
+		template <typename Plugin> Plugin & get_plugin() noexcept;
+		template <typename Plugin> Plugin const & get_plugin() const noexcept;
 
 	private:
 		Impl & implementation() noexcept { return static_cast<Impl &>(*this); }

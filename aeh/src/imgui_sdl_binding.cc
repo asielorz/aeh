@@ -220,6 +220,12 @@ namespace aeh::ImGui_SDL
 		gl::BindTexture(gl::TEXTURE_2D, last_texture);
 	}
 
+	void RefreshFontsTexture(Renderer & renderer)
+	{
+		InvalidateFontsTexture(renderer);
+		CreateFontsTexture(renderer);
+	}
+
 	bool CreateDeviceObjects(Renderer & renderer)
 	{
 		// Backup GL state
@@ -315,6 +321,11 @@ namespace aeh::ImGui_SDL
 		InvalidateFontsTexture(renderer);
 	}
 
+	bool HasDeviceObjects(Renderer const & renderer)
+	{
+		return renderer.ShaderHandle != 0;
+	}
+
 	bool Init(Renderer & renderer, SDL_Window * window, const char * glsl_version)
 	{
 		// Store GL version string so we can refer to it later in case we recreate shaders.
@@ -388,7 +399,7 @@ namespace aeh::ImGui_SDL
 
 	void NewFrame(Renderer & renderer, SDL_Window * window)
 	{
-		if (!renderer.FontTexture)
+		if (!HasDeviceObjects(renderer))
 			ImGui_SDL::CreateDeviceObjects(renderer);
 
 		ImGuiIO & io = ImGui::GetIO();
