@@ -222,8 +222,17 @@ namespace aeh::ImGui_SDL
 
 	void RefreshFontsTexture(Renderer & renderer)
 	{
-		InvalidateFontsTexture(renderer);
-		CreateFontsTexture(renderer);
+		if (!HasDeviceObjects(renderer))
+		{
+			// No device objects them. Create them.
+			CreateDeviceObjects(renderer);
+		}
+		else
+		{
+			// Already has device objecs. Just reset the font texture.
+			InvalidateFontsTexture(renderer);
+			CreateFontsTexture(renderer);
+		}
 	}
 
 	bool CreateDeviceObjects(Renderer & renderer)
