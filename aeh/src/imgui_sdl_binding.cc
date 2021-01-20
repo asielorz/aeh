@@ -285,6 +285,16 @@ namespace aeh::ImGui_SDL
 		return true;
 	}
 
+	void InvalidateFontsTexture(Renderer & renderer)
+	{
+		if (renderer.FontTexture)
+		{
+			gl::DeleteTextures(1, &renderer.FontTexture);
+			ImGui::GetIO().Fonts->TexID = 0;
+			renderer.FontTexture = 0;
+		}
+	}
+
 	void InvalidateDeviceObjects(Renderer & renderer)
 	{
 		if (renderer.VboHandle) gl::DeleteBuffers(1, &renderer.VboHandle);
@@ -302,12 +312,7 @@ namespace aeh::ImGui_SDL
 		if (renderer.ShaderHandle) gl::DeleteProgram(renderer.ShaderHandle);
 		renderer.ShaderHandle = 0;
 
-		if (renderer.FontTexture)
-		{
-			gl::DeleteTextures(1, &renderer.FontTexture);
-			ImGui::GetIO().Fonts->TexID = 0;
-			renderer.FontTexture = 0;
-		}
+		InvalidateFontsTexture(renderer);
 	}
 
 	bool Init(Renderer & renderer, SDL_Window * window, const char * glsl_version)

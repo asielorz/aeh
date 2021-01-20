@@ -1,1 +1,1 @@
-conan create . aeh/0.3.0@asielorz/testing -s compiler.version=16
+conan create . aeh/0.4.0@asielorz/testing -s compiler.version=16

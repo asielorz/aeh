@@ -20,7 +20,7 @@ namespace aeh::main_loop
 		void shutdown();
 		void process_event(SDL_Event const & event);
 
-	private:
+	protected:
 		ImGui_SDL::Renderer renderer;
 		ImGuiContext * context;
 		ImGuiContext * previous_context;

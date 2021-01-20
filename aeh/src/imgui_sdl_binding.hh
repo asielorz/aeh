@@ -35,6 +35,11 @@ namespace aeh::ImGui_SDL
 	// Use if you want to reset your rendering device without losing ImGui state.
 	void InvalidateDeviceObjects(Renderer & renderer);
 	bool CreateDeviceObjects(Renderer & renderer);
+
+	// Substep of Invalidate/CreateDeviceObjects that invalidate and create the fonts texture. Used to add fonts at runtime.
+	void InvalidateFontsTexture(Renderer & renderer);
+	void CreateFontsTexture(Renderer & renderer);
+
 } // namespace aeh::ImGui_SDL
 
 #endif // AEH_WITH_SDL2 && AEH_WITH_IMGUI
