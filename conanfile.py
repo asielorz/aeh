@@ -50,7 +50,7 @@ class AehConan(conans.ConanFile):
             self.requires("imgui/1.79")
 
         if self.options.with_sdl2:
-            self.requires("sdl2/2.0.12@bincrafters/stable")
+            self.requires("sdl2/2.0.10@bincrafters/stable")
             self.requires("opengl/system")
 
             if self.settings.os == "Linux":
