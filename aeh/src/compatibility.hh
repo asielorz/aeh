@@ -12,6 +12,10 @@
 #define AEH_EXPAND_IMPL(x) x
 #define AEH_EXPAND(x) AEH_EXPAND_IMPL(x)
 
+#define AEH_CONCAT_IMPL(a, b) a##b
+#define AEH_CONCAT(a, b) AEH_CONCAT_IMPL(a, b)
+#define AEH_UNIQUE_IDENTIFIER(prefix) AEH_CONCAT(prefix, __LINE__)
+
 #define AEH_MESSAGE_LEVEL_DISABLED 0
 #define AEH_MESSAGE_LEVEL_INFO 1
 #define AEH_MESSAGE_LEVEL_DEBUG 2

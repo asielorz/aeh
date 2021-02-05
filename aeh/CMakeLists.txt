@@ -49,6 +49,8 @@ if (MSVC)
 endif()
 
 target_sources(aeh PRIVATE
+	src/algorithm.hh	
+	src/algorithm.inl
 	src/align.cc
 	src/align.hh
 	src/batched_parallel_work.hh
@@ -69,6 +71,9 @@ target_sources(aeh PRIVATE
 	src/imgui_sdl_binding.cc
 	src/imgui_sdl_binding.hh
 	src/intcmp.hh
+	src/map.hh
+	src/math.cc
+	src/math.hh
 	src/multicomparison.hh
 	src/out.hh
 	src/overload.hh

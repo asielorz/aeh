@@ -5,6 +5,7 @@
 #include <type_traits> // aligned_storage
 #include <new> // launder
 #include <iterator> // reverse_iterator
+#include <algorithm> // rotate
 #include <memory> // destroy
 
 namespace aeh
@@ -66,6 +67,9 @@ namespace aeh
 		[[nodiscard]] constexpr auto crbegin() const noexcept -> const_reverse_iterator;
 		[[nodiscard]] constexpr auto crend() const noexcept -> const_reverse_iterator;
 
+		[[nodiscard]] constexpr auto nth(size_t i) noexcept -> iterator;
+		[[nodiscard]] constexpr auto nth(size_t i) const noexcept -> const_iterator;
+
 		constexpr operator span<T>() noexcept;
 		constexpr operator span<T const>() const noexcept;
 
@@ -76,6 +80,8 @@ namespace aeh
 		constexpr auto pop_back() noexcept -> void;
 		constexpr auto resize(size_t new_size) noexcept -> void;
 		constexpr auto resize(size_t new_size, T const & value) noexcept -> void;
+		constexpr auto erase(const_iterator pos) noexcept -> iterator;
+		constexpr auto erase(const_iterator first, const_iterator last) noexcept -> const_iterator;
 
 	private:
 		std::aligned_storage_t<sizeof(T) * Capacity, alignof(T)> buffer;

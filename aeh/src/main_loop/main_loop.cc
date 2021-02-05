@@ -56,7 +56,7 @@ namespace
 		return true;
 	}
 
-	aeh::main_loop::detail::LoopVars create_window(aeh::main_loop::NewWindowOptions const & options)
+	aeh::main_loop::Window create_window(aeh::main_loop::NewWindowOptions const & options)
 	{
 		SDL_Window * const prev_window = SDL_GL_GetCurrentWindow();
 		SDL_GLContext const prev_context = SDL_GL_GetCurrentContext();
@@ -71,24 +71,6 @@ namespace
 
 namespace aeh::main_loop::detail
 {
-
-	LoopVars initialize(NewWindowOptions const & options)
-	{
-		static bool sdl_init_ok = initialize_SDL();
-		if (!sdl_init_ok)
-			return {};
-
-		LoopVars const vars = create_window(options);
-
-		if ((!vars.window) || (!vars.opengl_context))
-			return {};
-
-		static bool gl_init_ok = load_opengl_functions();
-		if (!gl_init_ok)
-			return {};
-
-		return vars;
-	}
 
 	bool update(SDL_Window * window, function_ref<void(SDL_Event const &)> demo_process_event)
 	{
@@ -140,14 +122,64 @@ namespace aeh::main_loop::detail
 		}
 	}
 
-	void shutdown(LoopVars vars)
+} // namespace aeh::main_loop::detail
+
+namespace aeh::main_loop
+{
+	Window Window::open_new(NewWindowOptions const & options)
 	{
-		SDL_GL_DeleteContext(vars.opengl_context);
-		SDL_DestroyWindow(vars.window);
-		if (vars.previous_opengl_window && vars.previous_opengl_context)
-			SDL_GL_MakeCurrent(vars.previous_opengl_window, vars.previous_opengl_context);
+		static bool sdl_init_ok = initialize_SDL();
+		if (!sdl_init_ok)
+			return {};
+
+		Window new_window = create_window(options);
+
+		if ((!new_window.window) || (!new_window.opengl_context))
+			return {};
+
+		static bool gl_init_ok = load_opengl_functions();
+		if (!gl_init_ok)
+			return {};
+
+		return new_window;
 	}
 
-} // namespace demo_main_loop
+	Window::~Window()
+	{
+		if (is_open())
+		{
+			SDL_GL_DeleteContext(opengl_context);
+			SDL_DestroyWindow(window);
+			if (previous_opengl_window && previous_opengl_context)
+				SDL_GL_MakeCurrent(previous_opengl_window, previous_opengl_context);
+		}
+	}
+
+	Window::Window(Window && other) noexcept
+		: window(other.window)
+		, opengl_context(other.opengl_context)
+		, previous_opengl_window(other.previous_opengl_window)
+		, previous_opengl_context(other.previous_opengl_context)
+	{
+		other.window = nullptr;
+		other.opengl_context = nullptr;
+		other.previous_opengl_window = nullptr;
+		other.previous_opengl_context = nullptr;
+	}
+
+	Window & Window::operator = (Window && other) noexcept
+	{
+		window = other.window;
+		opengl_context = other.opengl_context;
+		previous_opengl_window = other.previous_opengl_window;
+		previous_opengl_context = other.previous_opengl_context;
+		other.window = nullptr;
+		other.opengl_context = nullptr;
+		other.previous_opengl_window = nullptr;
+		other.previous_opengl_context = nullptr;
+
+		return *this;
+	}
+}
 
 #endif // AEH_WITH_SDL2

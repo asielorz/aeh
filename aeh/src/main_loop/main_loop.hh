@@ -26,6 +26,39 @@ namespace aeh::main_loop
 		int window_height = 720;
 		bool can_resize_window = true;
 	};
+
+	struct Window
+	{
+		Window() noexcept = default;
+		Window(
+			SDL_Window * window_,
+			void * opengl_context_,
+			SDL_Window * previous_opengl_window_,
+			void * previous_opengl_context_
+		) noexcept
+			: window(window_)
+			, opengl_context(opengl_context_)
+			, previous_opengl_window(previous_opengl_window_)
+			, previous_opengl_context(previous_opengl_context_)
+		{}
+
+		static Window open_new(NewWindowOptions const &);
+		~Window();
+
+		Window(Window const &) noexcept = delete;
+		Window & operator = (Window const &) noexcept = delete;
+
+		Window(Window && other) noexcept;
+		Window & operator = (Window && other) noexcept;
+
+		bool is_open() const noexcept { return window != nullptr; }
+		bool has_previous_window() const noexcept { return previous_opengl_window != nullptr; }
+
+		SDL_Window * window = nullptr;
+		void * opengl_context = nullptr;
+		SDL_Window * previous_opengl_window = nullptr;
+		void * previous_opengl_context = nullptr;
+	};
 	
 	struct UpdateInput
 	{
@@ -49,8 +82,14 @@ namespace aeh::main_loop
 	template <typename Demo>
 	int run(Demo & demo, SDL_Window * window, Options const & options = Options());
 
+	template <typename Demo, typename>
+	int run(Demo && demo, SDL_Window * window, Options const & options = Options());
+
 	template <typename Demo>
 	int run(Demo & demo, NewWindowOptions const & options = NewWindowOptions());
+
+	template <typename Demo, typename>
+	int run(Demo && demo, NewWindowOptions const & options = NewWindowOptions());
 
 } // namespace demo_main_loop
 

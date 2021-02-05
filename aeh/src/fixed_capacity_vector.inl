@@ -11,7 +11,7 @@ namespace aeh
 	constexpr fixed_capacity_vector<T, Capacity>::fixed_capacity_vector(std::initializer_list<T> ilist) noexcept
 		: size_(ilist.size())
 	{
-		debug_assert(ilist.size() < capacity());
+		debug_assert(ilist.size() <= capacity());
 		std::uninitialized_copy(ilist.begin(), ilist.end(), data());
 	}
 
@@ -194,6 +194,20 @@ namespace aeh
 	}
 
 	template <typename T, size_t Capacity>
+	constexpr auto fixed_capacity_vector<T, Capacity>::nth(size_t i) noexcept -> iterator
+	{
+		debug_assert(i <= size());
+		return begin() + i;
+	}
+
+	template <typename T, size_t Capacity>
+	constexpr auto fixed_capacity_vector<T, Capacity>::nth(size_t i) const noexcept -> const_iterator
+	{
+		debug_assert(i <= size());
+		return begin() + i;
+	}
+
+	template <typename T, size_t Capacity>
 	constexpr fixed_capacity_vector<T, Capacity>::operator span<T>() noexcept
 	{
 		return span<T>(data(), size());
@@ -263,6 +277,34 @@ namespace aeh
 			std::uninitialized_fill(begin() + size(), begin() + new_size, value);
 
 		size_ = new_size;
+	}
+
+	template <typename T, size_t Capacity>
+	constexpr auto fixed_capacity_vector<T, Capacity>::erase(const_iterator pos) noexcept -> iterator
+	{
+		debug_assert(pos >= begin() && pos < end());
+		iterator const pos_mutable = nth(pos - begin());
+		std::rotate(pos_mutable, pos_mutable + 1, end());
+		std::destroy_at(&back());
+		size_--;
+		return pos_mutable;
+	}
+
+	template <typename T, size_t Capacity>
+	constexpr auto fixed_capacity_vector<T, Capacity>::erase(const_iterator first, const_iterator last) noexcept -> const_iterator
+	{
+		ptrdiff_t const n = std::distance(first, last);
+		if (std::distance(first, last) <= 0)
+			return nth(first - begin());
+
+		debug_assert(first < last);
+		debug_assert(first >= begin() && first < end());
+		debug_assert(last > begin() && last <= end());
+		iterator const first_mutable = nth(first - begin());
+		iterator const first_to_destroy = std::rotate(first_mutable, first_mutable + n, end());
+		std::destroy_n(first_to_destroy, n);
+		size_ -= n;
+		return first_mutable;
 	}
 
 	template <typename T, size_t Capacity>

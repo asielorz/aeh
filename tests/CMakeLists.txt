@@ -2,6 +2,7 @@ find_package(Catch2 REQUIRED)
 add_subdirectory(tests_main)
 
 add_executable(aeh_tests
+	src/algorithm.tests.cc
 	src/batched_parallel_work.tests.cc
 	src/fixed_capacity_vector.tests.cc
 	src/function_ref.tests.cc
