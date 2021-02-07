@@ -1,6 +1,7 @@
 add_library(tests_main OBJECT
     main.tests.cc
 )
+add_library(aeh::tests_main ALIAS tests_main)
 
 target_link_libraries(tests_main
     PUBLIC

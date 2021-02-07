@@ -23,8 +23,14 @@ endif()
 
 if (AEH_WITH_IMGUI)
 	find_package(imgui REQUIRED)
-	target_link_libraries(aeh PRIVATE imgui::imgui)
+	target_link_libraries(aeh PUBLIC imgui::imgui)
 	target_compile_definitions(aeh PUBLIC AEH_WITH_IMGUI)
+endif()
+
+if (AEH_WITH_GLM)
+	find_package(glm REQUIRED)
+	target_link_libraries(aeh PUBLIC glm::glm)
+	target_compile_definitions(aeh PUBLIC AEH_WITH_GLM)
 endif()
 
 target_compile_features(aeh

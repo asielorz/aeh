@@ -12,10 +12,11 @@ add_executable(aeh_tests
 	src/span.tests.cc
 	src/string.tests.cc
 )
+add_executable(aeh::aeh_tests ALIAS aeh_tests)
 
 target_include_directories(aeh
     PUBLIC
-        "${CMAKE_SOURCE_DIR}/aeh/src/"
+        "${CMAKE_CURRENT_SOURCE_DIR}/aeh/src/"
 )
 
 target_link_libraries(aeh_tests
