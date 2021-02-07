@@ -30,7 +30,11 @@ endif()
 if (AEH_WITH_GLM)
 	find_package(glm REQUIRED)
 	target_link_libraries(aeh PUBLIC glm::glm)
-	target_compile_definitions(aeh PUBLIC AEH_WITH_GLM)
+	target_compile_definitions(aeh PUBLIC AEH_WITH_GLM
+		# https://github.com/g-truc/glm/blob/master/manual.md
+		GLM_FORCE_SILENT_WARNINGS # Silence warnings for nameless struct/union, etc
+		GLM_FORCE_EXPLICIT_CTOR # Make make conversion constructors explicit; vec4 foo = ...; vec3 bar = foo; // Now it fails to compile
+	)
 endif()
 
 target_compile_features(aeh

@@ -93,7 +93,7 @@ class AehConan(conans.ConanFile):
         self.cpp_info.includedirs = ["include", os.path.join("include", "aeh")]
         
         if self.options.with_glm:
-            self.cpp_info.defines.append("AEH_WITH_GLM")
+            self.cpp_info.defines.extend(["AEH_WITH_GLM", "GLM_FORCE_SILENT_WARNINGS", "GLM_FORCE_EXPLICIT_CTOR"])
         
         if self.options.with_imgui:
             self.cpp_info.defines.append("AEH_WITH_IMGUI")
