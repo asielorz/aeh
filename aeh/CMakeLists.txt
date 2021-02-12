@@ -88,6 +88,7 @@ target_sources(aeh PRIVATE
 	src/out.hh
 	src/overload.hh
 	src/pointer_union.hh
+	src/polymorphic_range_view.hh
 	src/priority.hh
 	src/randomly_seeded.hh
 	src/span.hh
