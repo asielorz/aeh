@@ -1,13 +1,13 @@
 #pragma once
 
-#include "function_ref.hh"
+#include <functional>
 #include "debug/assert.hh"
 
 template <typename T>
-struct polymorphic_range_view
+struct range_function
 {
-	template <std::convertible_to<aeh::function_ref<T(int)>> F>
-	constexpr polymorphic_range_view(F const & subscript_, int size__) noexcept
+	template <std::convertible_to<std::function<T(int)>> F>
+	constexpr range_function(F const & subscript_, int size__) noexcept
 		: subscript(subscript_)
 		, size_(size__)
 	{}
@@ -16,6 +16,6 @@ struct polymorphic_range_view
 	[[nodiscard]] constexpr auto operator[] (int i) const noexcept -> T { debug_assert(i < size()); return subscript(i); }
 
 private:
-	aeh::function_ref<T(int)> subscript;
+	std::function<T(int)> subscript;
 	int size_;
 };

@@ -30,6 +30,9 @@ namespace aeh::main_loop
 
 		using UpdateInput = detail::UpdateInputImpl<aeh::main_loop::UpdateInput, plugin_update_input_extension<Plugins>...>;
 
+		CRTPBase() noexcept((std::is_nothrow_default_constructible_v<Plugins> && ...)) = default;
+		explicit CRTPBase(Plugins ... plugins_) noexcept((std::is_nothrow_move_constructible_v<Plugins> && ...)) : plugins(std::move(plugins_)...) {}
+
 		void initialize(SDL_Window * window);
 		auto start_frame();
 		template <typename Locals> void update(aeh::main_loop::UpdateInput input, Locals && local);
