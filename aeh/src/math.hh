@@ -85,6 +85,9 @@ namespace aeh::math
 	int inc_circular(int i, int size) noexcept;
 	int dec_circular(int i, int size) noexcept;
 
+	//! Returns dividend / divisor. If remainder is not 0, rounds up instead of down.
+	int div_round_up(int dividend, int divisor) noexcept;
+
 	//! Represents a 3D rotation in spherical coordinates.
 	//! Zenith is vector (0, 1, 0) and azimuth is vector (1, 0, 0).
 	//! Latitude is the angle between the forward vector and the zenith, in the range [-pi, pi].

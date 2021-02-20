@@ -197,6 +197,12 @@ namespace aeh::math
 		return i;
 	}
 
+	int div_round_up(int dividend, int divisor) noexcept
+	{
+		auto const [result, remainder] = std::div(dividend, divisor);
+		return result + (remainder > 0);
+	}
+
 	const glm::vec3 SphereCoords::zenith = { 0, 1, 0 };
 	const glm::vec3 SphereCoords::azimuth = { 1, 0, 0 };
 
