@@ -39,7 +39,7 @@ endif()
 
 target_compile_features(aeh
 	PUBLIC
-		cxx_std_17
+		cxx_std_20
 )
 
 target_compile_definitions(aeh
@@ -72,6 +72,8 @@ target_sources(aeh PRIVATE
 	src/circular.hh
 	src/compatibility.hh
 	src/expected.hh
+	src/file_vector.hh
+	src/file_vector.inl
 	src/fixed_capacity_vector.hh
 	src/fixed_capacity_vector.inl
 	src/function_ptr.hh
