@@ -1,5 +1,4 @@
 #include "debug/assert.hh"
-#include <filesystem>
 
 namespace aeh
 {
@@ -10,7 +9,7 @@ namespace aeh
 		FileVector v = FileVector(std::move(base_path_trait_), std::move(load_trait_));
 		for (std::string path : v.base_path_trait.files_in_base_path())
 		{
-			std::optional<T> content = v.load_trait.load(path);
+			std::optional<T> content = v.load_trait.load(path.c_str());
 			debug_assert(content.has_value());
 			v.all_files.push_back({std::move(path), std::move(*content)});
 		}
@@ -23,7 +22,7 @@ namespace aeh
 		std::string full_path = base_path_trait.base_path();
 		full_path += filename;
 
-		bool const saved = load_trait.save(full_path, object);
+		bool const saved = load_trait.save(full_path.c_str(), object);
 		if (saved)
 			all_files.push_back({std::move(full_path), std::move(object)});
 		return saved;
@@ -33,7 +32,7 @@ namespace aeh
 	auto FileVector<T, BasePathTrait, LoadTrait>::remove(int index) -> bool
 	{
 		debug_assert(index >= 0 && index <= all_files.size());
-		bool const removed = load_trait.remove(all_files[index].path);
+		bool const removed = load_trait.remove(all_files[index].path.c_str());
 		if (removed)
 			all_files.erase(all_files.begin() + index);
 		return removed;
@@ -49,7 +48,7 @@ namespace aeh
 			if (new_value == all_files[index].content)
 				return true;
 
-		bool const saved = load_trait.save(all_files[index].path, new_value);
+		bool const saved = load_trait.save(all_files[index].path.c_str(), new_value);
 		if (saved)
 			all_files[index].content = std::move(new_value);
 		return saved;

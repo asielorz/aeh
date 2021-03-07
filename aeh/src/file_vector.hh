@@ -1,5 +1,6 @@
 #pragma once
 
+#include "function_ptr.hh"
 #include <string>
 #include <vector>
 #include <span>
@@ -25,7 +26,7 @@ namespace aeh
 	};
 
 	template <typename Trait, typename T>
-	concept is_load_trait = requires (Trait const trait, T const t, std::string const path) { 
+	concept is_load_trait = requires (Trait const trait, T const t, char const * const path) { 
 		{trait.load(path)} -> std::same_as<std::optional<T>>;
 		{trait.save(path, t)} -> std::same_as<bool>;
 		{trait.remove(path)} -> std::same_as<bool>;
@@ -57,6 +58,26 @@ namespace aeh
 		std::vector<File<T>> all_files;
 		[[no_unique_address]] BasePathTrait base_path_trait;
 		[[no_unique_address]] LoadTrait load_trait;
+	};
+
+	[[nodiscard]] auto all_files_in(char const directory_path[]) -> std::vector<std::string>;
+
+	template <function_ptr<auto() -> std::string> get_base_path>
+	struct ConstantBasePathTrait
+	{
+		auto base_path() const -> std::string { return get_base_path(); }
+		auto files_in_base_path() const -> std::vector<std::string> { return all_files_in(base_path().c_str()); }
+	};
+
+	struct VariableBasePathTrait
+	{
+		VariableBasePathTrait(std::string base_path_) noexcept : path(std::move(base_path_)) {}
+
+		auto base_path() const -> std::string { return path; }
+		auto files_in_base_path() const -> std::vector<std::string> { return all_files_in(base_path().c_str()); }
+
+	private:
+		std::string path;
 	};
 
 } // namespace aeh

@@ -72,6 +72,7 @@ target_sources(aeh PRIVATE
 	src/circular.hh
 	src/compatibility.hh
 	src/expected.hh
+	src/file_vector.cc
 	src/file_vector.hh
 	src/file_vector.inl
 	src/fixed_capacity_vector.hh

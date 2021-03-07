@@ -30,7 +30,7 @@ struct TestLoadTrait
 {
 	TestLoadTrait(FakeFilesystem<T> & m) noexcept : fake_filesystem(&m) {}
 
-	std::optional<T> load(std::string const & path) const 
+	std::optional<T> load(char const path[]) const 
 	{
 		auto const it = fake_filesystem->find(path);
 		if (it != fake_filesystem->end())
@@ -39,13 +39,13 @@ struct TestLoadTrait
 			return std::nullopt;
 	}
 
-	bool save(std::string const & path, T content) const 
+	bool save(char const path[], T content) const
 	{
 		(*fake_filesystem)[path] = content;
 		return true;
 	}
 
-	bool remove(std::string const & path) const
+	bool remove(char const path[]) const
 	{
 		return fake_filesystem->erase(path) == 1;
 	}
@@ -192,4 +192,15 @@ TEST_CASE("Add takes a file name, which is then concatenated with the base path"
 	REQUIRE(fake_filesystem["base/file1.txt"] == 10);
 	REQUIRE(fake_filesystem["base/other_file.txt"] == 20);
 	REQUIRE(fake_filesystem["base/important document.txt"] == 30);
+}
+
+std::string dummy_path()
+{
+	return "";
+}
+
+TEST_CASE("FileVector can be instanced with the provided base path traits")
+{
+	using V1 = aeh::FileVector<int, aeh::ConstantBasePathTrait<dummy_path>, TestLoadTrait<int>>;
+	using V2 = aeh::FileVector<int, aeh::VariableBasePathTrait, TestLoadTrait<int>>;
 }
