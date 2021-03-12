@@ -103,6 +103,8 @@ target_sources(aeh PRIVATE
 	src/unique_handle.hh
 	src/unique_handle.inl
 	src/value_ptr.hh
+	src/viewport.cc
+	src/viewport.hh
 	src/warning_macro.hh
 
 	src/debug/assert.cc

@@ -49,11 +49,11 @@ namespace aeh::main_loop
 
 	template <typename Impl, typename ... Plugins>
 	template <typename Locals>
-	void CRTPBase<Impl, Plugins...>::render(Locals && locals) const
+	void CRTPBase<Impl, Plugins...>::render(aeh::main_loop::RenderInput input, Locals && locals) const
 	{
-		for_each_in_tuple(plugins, [](auto const & plugin) { detail::call_pre_render(plugin); });
-		detail::call_render_impl(implementation(), locals.implementation_locals);
-		for_each_in_tuple_reversed(plugins, [](auto const & plugin) { detail::call_post_render(plugin); });
+		for_each_in_tuple(plugins, [input](auto const & plugin) { detail::call_pre_render(plugin, input); });
+		detail::call_render_impl(implementation(), input, locals.implementation_locals);
+		for_each_in_tuple_reversed(plugins, [input](auto const & plugin) { detail::call_post_render(plugin, input); });
 	}
 
 	template <typename Impl, typename ... Plugins>

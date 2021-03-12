@@ -29,6 +29,7 @@ namespace aeh::main_loop
 		>;
 
 		using UpdateInput = detail::UpdateInputImpl<aeh::main_loop::UpdateInput, plugin_update_input_extension<Plugins>...>;
+		using RenderInput = aeh::main_loop::RenderInput;
 
 		CRTPBase() noexcept((std::is_nothrow_default_constructible_v<Plugins> && ...)) = default;
 		explicit CRTPBase(Plugins ... plugins_) noexcept((std::is_nothrow_move_constructible_v<Plugins> && ...)) : plugins(std::move(plugins_)...) {}
@@ -36,7 +37,7 @@ namespace aeh::main_loop
 		void initialize(SDL_Window * window);
 		auto start_frame();
 		template <typename Locals> void update(aeh::main_loop::UpdateInput input, Locals && local);
-		template <typename Locals> void render(Locals && locals) const;
+		template <typename Locals> void render(aeh::main_loop::RenderInput input, Locals && locals) const;
 		template <typename Locals> void process_event(SDL_Event const & event, Locals && locals);
 		void shutdown();
 

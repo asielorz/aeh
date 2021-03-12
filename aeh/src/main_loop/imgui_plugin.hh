@@ -11,12 +11,13 @@ union SDL_Event;
 namespace aeh::main_loop
 {
 	struct UpdateInput;
+	struct RenderInput;
 
 	struct ImGuiPlugin
 	{
 		void initialize(SDL_Window * window);
 		void update(UpdateInput i);
-		void post_render() const;
+		void post_render(RenderInput) const;
 		void shutdown();
 		void process_event(SDL_Event const & event);
 

@@ -21,7 +21,7 @@ namespace aeh::main_loop
 		ImGui_SDL::NewFrame(renderer, i.window);
 	}
 
-	void ImGuiPlugin::post_render() const
+	void ImGuiPlugin::post_render(RenderInput) const
 	{
 		ImGui::Render();
 		ImGui_SDL::RenderDrawData(renderer, ImGui::GetDrawData());

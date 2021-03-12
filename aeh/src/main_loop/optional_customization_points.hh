@@ -26,7 +26,6 @@ union SDL_Event;
 		z_call_##name(priority_tag_v<1>, std::forward<T>(t), std::forward<Args>(args)...);								\
 	}																													\
 
-
 namespace aeh::main_loop::detail
 {
 
@@ -134,38 +133,38 @@ namespace aeh::main_loop::detail
 		return t.update_impl(input);
 	}
 
-	template <typename Demo, typename Locals>
-	void render_demo(Demo const & demo, Locals & locals)
+	template <typename Demo, typename RenderInput, typename Locals>
+	void render_demo(Demo const & demo, RenderInput && input, Locals & locals)
 	{
 		if constexpr (std::is_same_v<Locals, empty_t>)
 		{
-			demo.render();
+			demo.render(input);
 			static_cast<void>(locals);
 		}
 		else
 		{
-			demo.render(locals);
+			demo.render(input, locals);
 		}
 	}
 
-	template <typename Demo, typename Locals>
-	auto z_call_render_impl(priority_tag<1>, Demo const & demo, Locals & locals) -> decltype(demo.render_impl(locals))
+	template <typename Demo, typename RenderInput, typename Locals>
+	auto z_call_render_impl(priority_tag<1>, Demo const & demo, RenderInput && input, Locals & locals) -> decltype(demo.render_impl(input, locals))
 	{
-		return demo.render_impl(locals);
+		return demo.render_impl(input, locals);
 	}
-	template <typename Demo>
-	auto z_call_render_impl(priority_tag<1>, Demo const & demo, empty_t) -> decltype(demo.render_impl())
+	template <typename Demo, typename RenderInput>
+	auto z_call_render_impl(priority_tag<1>, Demo const & demo, RenderInput && input, empty_t) -> decltype(demo.render_impl(input))
 	{
-		return demo.render_impl();
+		return demo.render_impl(input);
 	}
-	template <typename Demo, typename Locals>
-	void z_call_render_impl(priority_tag<0>, Demo const &, Locals &)
+	template <typename Demo, typename RenderInput, typename Locals>
+	void z_call_render_impl(priority_tag<0>, Demo const &, RenderInput &&, Locals &)
 	{}
 
-	template <typename Demo, typename Locals>
-	void call_render_impl(Demo const & demo, Locals & locals)
+	template <typename Demo, typename RenderInput, typename Locals>
+	void call_render_impl(Demo const & demo, RenderInput && input, Locals & locals)
 	{
-		z_call_render_impl(priority_tag_v<1>, demo, locals);
+		z_call_render_impl(priority_tag_v<1>, demo, input, locals);
 	}
 
 	//****************************************************************

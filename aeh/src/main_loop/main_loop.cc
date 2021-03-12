@@ -94,13 +94,16 @@ namespace aeh::main_loop::detail
 		return done;
 	}
 
-	void pre_render(SDL_Window * window, Options const & options)
+	RenderInput pre_render(SDL_Window * window, Options const & options)
 	{
 		int window_width, window_height;
 		SDL_GetWindowSize(window, &window_width, &window_height);
-		gl::Viewport(0, 0, window_width, window_height);
+		auto const viewport = Viewport{0, 0, window_width, window_height};
+		set_as_current_viewport(viewport);
 		if (options.clear_every_frame)
 			gl::Clear(gl::COLOR_BUFFER_BIT | gl::DEPTH_BUFFER_BIT);
+
+		return RenderInput(window, viewport);
 	}
 
 	void post_render(SDL_Window * window)

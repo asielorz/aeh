@@ -4,6 +4,7 @@
 
 #include "optional_customization_points.hh"
 #include "function_ref.hh"
+#include "viewport.hh"
 #include <type_traits> // std::is_same_v
 #include <tuple>
 #include <optional>
@@ -62,7 +63,7 @@ namespace aeh::main_loop
 	
 	struct UpdateInput
 	{
-		UpdateInput(float dt_, SDL_Window * window_, bool & done_, int & exit_code_) noexcept 
+		explicit UpdateInput(float dt_, SDL_Window * window_, bool & done_, int & exit_code_) noexcept 
 			: dt(dt_)
 			, window(window_)
 			, done(done_)
@@ -72,11 +73,22 @@ namespace aeh::main_loop
 		float const dt;
 		SDL_Window * const window;
 
-		void quit(int exit_code_ = 0) noexcept { done = true; exit_code = exit_code_; }
+		void quit(int exit_code_ = 0) const noexcept { done = true; exit_code = exit_code_; }
 
 	protected:
 		bool & done;
 		int & exit_code;
+	};
+
+	struct RenderInput
+	{
+		explicit RenderInput(SDL_Window * const window_, Viewport const viewport_) noexcept
+			: window(window_)
+			, viewport(viewport_)
+		{}
+
+		SDL_Window * const window;
+		Viewport const viewport;
 	};
 
 	template <typename Demo>
