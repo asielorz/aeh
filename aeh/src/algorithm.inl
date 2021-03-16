@@ -28,4 +28,17 @@ namespace aeh
 		return r;
 	}
 
+	template <typename It> requires std::forward_iterator<It> && requires(It a) { *a + *a; }
+	constexpr auto sum(It begin, It end) noexcept -> std::decay_t<decltype(*begin)>
+	{
+		using value_type = std::decay_t<decltype(*begin)>;
+		return std::accumulate(begin, end, value_type(0));
+	}
+
+	template <typename R>
+	constexpr auto sum(R && range) noexcept -> decltype(sum(std::begin(range), std::end(range)))
+	{
+		return sum(std::begin(range), std::end(range));
+	}
+
 } // namespace aeh
