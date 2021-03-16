@@ -8,23 +8,33 @@
 struct SDL_Window;
 union SDL_Event;
 
-#define AEH_MAIN_LOOP_DECLARE_CALL_IF_EXISTS(name)																		\
-	template <typename T, typename ... Args>																			\
-	auto z_call_##name(priority_tag<1>, T && t, Args && ... args) 														\
-		-> decltype(t.name(std::forward<Args>(args)...))																\
-	{																													\
-		return t.name(std::forward<Args>(args)...);																		\
-	}																													\
-																														\
-	template <typename T, typename ... Args>																			\
-	auto z_call_##name(priority_tag<0>, T &&, Args && ...)																\
-	{}																													\
-																														\
-	template <typename T, typename ... Args>																			\
-	auto call_##name(T && t, Args && ... args) -> void																	\
-	{																													\
-		z_call_##name(priority_tag_v<1>, std::forward<T>(t), std::forward<Args>(args)...);								\
-	}																													\
+#define AEH_MAIN_LOOP_DECLARE_CALL_IF_EXISTS(name)																					\
+	template <typename T, typename ... Args>																						\
+	auto z_call_##name(priority_tag<1>, T && t, Args && ... args) 																	\
+		-> decltype(t.name(std::forward<Args>(args)...))																			\
+	{																																\
+		return t.name(std::forward<Args>(args)...);																					\
+	}																																\
+																																	\
+	template <typename T, typename ... Args>																						\
+	auto z_call_##name(priority_tag<0>, T &&, Args && ...) -> void																	\
+	{}																																\
+																																	\
+	template <typename T, typename ... Args>																						\
+	auto call_##name(T && t, Args && ... args)																						\
+	{																																\
+		using ReturnType = decltype(z_call_##name(priority_tag_v<1>, std::forward<T>(t), std::forward<Args>(args)...));				\
+																																	\
+		if constexpr (std::is_same_v<ReturnType, void>)																				\
+		{																															\
+			z_call_##name(priority_tag_v<1>, std::forward<T>(t), std::forward<Args>(args)...);										\
+			return empty_t();																										\
+		}																															\
+		else																														\
+		{																															\
+			return z_call_##name(priority_tag_v<1>, std::forward<T>(t), std::forward<Args>(args)...);								\
+		}																															\
+	}																																\
 
 namespace aeh::main_loop::detail
 {

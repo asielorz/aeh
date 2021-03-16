@@ -2,10 +2,10 @@ namespace aeh::main_loop
 {
 	namespace detail
 	{
-		template <typename ExtendedInput, typename ... InputExtensions, size_t ... Is>
-		ExtendedInput make_extended_input(UpdateInput base, std::tuple<InputExtensions...> extensions, std::index_sequence<Is...>)
+		template <typename ExtendedInput, typename BaseInput, typename ... InputExtensions, typename ... NonEmptyInputExtensions>
+		ExtendedInput make_extended_input(BaseInput base, std::tuple<InputExtensions...> extensions, type_list<NonEmptyInputExtensions...>)
 		{
-			return ExtendedInput{base, std::move(std::get<Is>(extensions))...};
+			return ExtendedInput{base, std::move(std::get<NonEmptyInputExtensions>(extensions))...};
 		}
 
 		template <typename PluginLocals, typename ImplementationLocals>
@@ -43,7 +43,7 @@ namespace aeh::main_loop
 		auto input_extensions = transform_tuple(plugins, locals.plugin_locals,
 			[input](auto & plugin, auto & locals) { return detail::call_update(plugin, input, locals); });
 
-		UpdateInput extended_input = detail::make_extended_input<UpdateInput>(input, std::move(input_extensions), std::make_index_sequence<sizeof...(Plugins)>());
+		UpdateInput extended_input = detail::make_extended_input<UpdateInput>(input, std::move(input_extensions), detail::keep_non_empty<plugin_update_input_extension<Plugins>...>());
 		detail::call_update_impl(implementation(), extended_input, locals.implementation_locals);
 	}
 
@@ -51,8 +51,11 @@ namespace aeh::main_loop
 	template <typename Locals>
 	void CRTPBase<Impl, Plugins...>::render(aeh::main_loop::RenderInput input, Locals && locals) const
 	{
-		for_each_in_tuple(plugins, [input](auto const & plugin) { detail::call_pre_render(plugin, input); });
-		detail::call_render_impl(implementation(), input, locals.implementation_locals);
+		auto input_extensions = transform_tuple(plugins, 
+			[input](auto const & plugin) { return detail::call_pre_render(plugin, input); });
+
+		RenderInput extended_input = detail::make_extended_input<RenderInput>(input, std::move(input_extensions), detail::keep_non_empty<plugin_render_input_extension<Plugins>...>());
+		detail::call_render_impl(implementation(), extended_input, locals.implementation_locals);
 		for_each_in_tuple_reversed(plugins, [input](auto const & plugin) { detail::call_post_render(plugin, input); });
 	}
 
