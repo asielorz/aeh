@@ -162,7 +162,7 @@ namespace aeh::in
 		return std::nullopt;
 	}
 
-	auto SDL_controller_button_to_enum(int button) -> ControllerButton
+	auto SDL_controller_button_to_enum(int button) -> std::optional<ControllerButton>
 	{
 		switch (button)
 		{
@@ -182,10 +182,10 @@ namespace aeh::in
 			case SDL_CONTROLLER_BUTTON_DPAD_RIGHT: return ControllerButton::right;
 		}
 
-		debug::declare_unreachable();
+		return std::nullopt;
 	}
 
-	auto SDL_controller_axis_to_enum(int button) -> ControllerAxis
+	auto SDL_controller_axis_to_enum(int button) -> std::optional<ControllerAxis>
 	{
 		switch (button)
 		{
@@ -197,7 +197,7 @@ namespace aeh::in
 			case SDL_CONTROLLER_AXIS_TRIGGERRIGHT: return ControllerAxis::right_trigger;
 		}
 
-		debug::declare_unreachable();
+		return std::nullopt;
 	}
 
 	auto prepare_frame_to_process_SDL_events(PreviousFrame const & prev) noexcept -> Frame
@@ -293,32 +293,44 @@ namespace aeh::in
 			{
 				int const index = event.cdevice.which;
 				frame.controllers_on[index] = false;
+				break;
 			}
 			case SDL_CONTROLLERBUTTONDOWN:
 			{
-				int const index = controller_button_index(static_cast<Controller>(event.cbutton.which) | SDL_controller_button_to_enum(event.cbutton.button));
-				frame.controller_buttons[index] = true;
+				std::optional<ControllerButton> const button = SDL_controller_button_to_enum(event.cbutton.button);
+				if (button)
+				{
+					int const index = controller_button_index(static_cast<Controller>(event.cbutton.which) | *button);
+					frame.controller_buttons[index] = true;
+				}
 				break;
 			}
 			case SDL_CONTROLLERBUTTONUP:
 			{
-				int const index = controller_button_index(controller_enum_from_index(event.cbutton.which) | SDL_controller_button_to_enum(event.cbutton.button));
-				frame.controller_buttons[index] = false;
+				std::optional<ControllerButton> const button = SDL_controller_button_to_enum(event.cbutton.button);
+				if (button)
+				{
+					int const index = controller_button_index(controller_enum_from_index(event.cbutton.which) | *button);
+					frame.controller_buttons[index] = false;
+				}
 				break;
 			}
 			
 			case SDL_CONTROLLERAXISMOTION:
 			{
-				ControllerAxis const axis = SDL_controller_axis_to_enum(event.caxis.axis);
-				Controller const controller = controller_enum_from_index(event.caxis.which);
-				auto const [controller_index, axis_index] = controller_axis_index(controller | axis);
-				float const value = event.caxis.value / static_cast<float>(std::numeric_limits<short>::max());
+				std::optional<ControllerAxis> const axis = SDL_controller_axis_to_enum(event.caxis.axis);
+				if (axis)
+				{
+					Controller const controller = controller_enum_from_index(event.caxis.which);
+					auto const [controller_index, axis_index] = controller_axis_index(controller | *axis);
+					float const value = event.caxis.value / static_cast<float>(std::numeric_limits<short>::max());
 
-				// For some reason SDL gives the y axes negated.
-				if (axis == ControllerAxis::left_joystick_y || axis == ControllerAxis::right_joystick_y)
-					frame.controller_axes[controller_index][axis_index] = -value;
-				else
-					frame.controller_axes[controller_index][axis_index] = value;
+					// For some reason SDL gives the y axes negated.
+					if (axis == ControllerAxis::left_joystick_y || axis == ControllerAxis::right_joystick_y)
+						frame.controller_axes[controller_index][axis_index] = -value;
+					else
+						frame.controller_axes[controller_index][axis_index] = value;
+				}
 
 				break;
 			}
