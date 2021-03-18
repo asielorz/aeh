@@ -4,11 +4,12 @@
 #include "input.hh"
 #include "debug/unreachable.hh"
 #include <SDL2/SDL.h>
+#include <optional>
 
 namespace aeh::in
 {
 
-	auto SDL_scancode_to_key(int scancode) noexcept -> Key
+	auto SDL_scancode_to_key(int scancode) noexcept -> std::optional<Key>
  	{
 		switch (scancode)
 		{
@@ -147,11 +148,18 @@ namespace aeh::in
 
 			case SDL_SCANCODE_CLEAR: return Key::clear;
 			case SDL_SCANCODE_SEPARATOR: return Key::separator;
+
+			case SDL_SCANCODE_AUDIONEXT: return Key::media_next_track;
+			case SDL_SCANCODE_AUDIOPREV: return Key::media_prev_track;
+			case SDL_SCANCODE_AUDIOSTOP: return Key::media_stop;
+			case SDL_SCANCODE_AUDIOPLAY: return Key::media_play_pause;
+			case SDL_SCANCODE_AUDIOMUTE: return Key::volume_mute;
+
 			case SDL_SCANCODE_APP1: return Key::launch_app1;
 			case SDL_SCANCODE_APP2: return Key::launch_app2;
 		}
 
-		debug::declare_unreachable();
+		return std::nullopt;
 	}
 
 	auto SDL_controller_button_to_enum(int button) -> ControllerButton
@@ -244,18 +252,26 @@ namespace aeh::in
 			}
 			case SDL_KEYDOWN:
 			{
-				auto const index = index_of(SDL_scancode_to_key(event.key.keysym.scancode));
-				if (frame.buttons_down[index])
-					frame.buttons_repeated[index] = true;
-				else
-					frame.buttons_down[index] = true;
+				auto const key = SDL_scancode_to_key(event.key.keysym.scancode);
+				if (key)
+				{
+					auto const index = index_of(*key);
+					if (frame.buttons_down[index])
+						frame.buttons_repeated[index] = true;
+					else
+						frame.buttons_down[index] = true;
+				}
 
 				break;
 			}
 			case SDL_KEYUP:
 			{
-				auto const index = index_of(SDL_scancode_to_key(event.key.keysym.scancode));
-				frame.buttons_down[index] = false;
+				auto const key = SDL_scancode_to_key(event.key.keysym.scancode);
+				if (key)
+				{
+					auto const index = index_of(*key);
+					frame.buttons_down[index] = false;
+				}
 
 				break;
 			}
