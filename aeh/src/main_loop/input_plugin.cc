@@ -21,13 +21,34 @@ namespace aeh::main_loop
 		return prepare_frame_to_process_SDL_events(input.current);
 	}
 
+	void reset_after_inactivity(in::Input & input)
+	{
+		int16_t const curr_mouse_pos_x = input.current.mouse_pos_x;
+		int16_t const curr_mouse_pos_y = input.current.mouse_pos_y;
+		int16_t const curr_window_width = input.current.window_width;
+		int16_t const curr_window_height = input.current.window_height;
+		int16_t const prev_mouse_pos_x = input.previous.mouse_pos_x;
+		int16_t const prev_mouse_pos_y = input.previous.mouse_pos_y;
+		int16_t const prev_window_width = input.previous.window_width;
+		int16_t const prev_window_height = input.previous.window_height;
+		input = {};
+		input.current.mouse_pos_x = curr_mouse_pos_x;
+		input.current.mouse_pos_y = curr_mouse_pos_y;
+		input.current.window_width = curr_window_width;
+		input.current.window_height = curr_window_height;
+		input.previous.mouse_pos_x = prev_mouse_pos_x;
+		input.previous.mouse_pos_y = prev_mouse_pos_y;
+		input.previous.window_width = prev_window_width;
+		input.previous.window_height = prev_window_height;
+	}
+
 	auto InputPlugin::update(UpdateInput loop, in::Frame const & current_frame) noexcept -> InputExtension
 	{
 		// If a frame takes too long (for an arbitrary definition of too long), reset the input to compensate for possible missed input events.
 		constexpr float frame_duration = 1.0f / 60.0f;
 		if (loop.dt > 10 * frame_duration)
 		{
-			input = {};
+			reset_after_inactivity(input);
 			controller_repeater = {};
 		}
 		else
