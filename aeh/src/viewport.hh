@@ -11,8 +11,10 @@ namespace aeh
 	{
 		int pos_x, pos_y, size_x, size_y;
 
+		auto aspect_ratio() const noexcept { return static_cast<float>(size_x) / size_y; }
+
 		[[nodiscard]] auto offset_by(int x, int y) const noexcept -> Viewport { return { pos_x + x, pos_y + y, size_x, size_y }; }
-		[[nodiscard]] static auto current()->Viewport;
+		[[nodiscard]] static auto current() -> Viewport;
 	};
 
 	struct ViewportFloat
