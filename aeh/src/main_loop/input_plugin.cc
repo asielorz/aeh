@@ -7,13 +7,33 @@
 
 namespace aeh::main_loop
 {
+	namespace
+	{
+		thread_local InputPlugin * current = nullptr;
+	}
 
 	auto InputPlugin::initialize(SDL_Window * window) -> void
 	{
-		int window_width, window_height;
-		SDL_GetWindowSize(window, &window_width, &window_height);
-		input.current.window_width = static_cast<uint16_t>(window_width);
-		input.current.window_height = static_cast<uint16_t>(window_height);
+		if (current)
+		{
+			input = current->input;
+		}
+		else
+		{
+			int window_width, window_height;
+			SDL_GetWindowSize(window, &window_width, &window_height);
+			input.current.window_width = static_cast<uint16_t>(window_width);
+			input.current.window_height = static_cast<uint16_t>(window_height);
+		}
+		previous = current;
+		current = this;
+	}
+
+	auto InputPlugin::shutdown() -> void
+	{
+		if (previous)
+			previous->input = input;
+		current = previous;
 	}
 
 	auto InputPlugin::start_frame() const noexcept -> in::Frame

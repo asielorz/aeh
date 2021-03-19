@@ -21,9 +21,10 @@ namespace aeh::main_loop
 		};
 
 		InputPlugin() noexcept = default;
-		explicit InputPlugin(in::Input const & prev_frame_input) noexcept : input(prev_frame_input) {}
 
 		auto initialize(SDL_Window * window) -> void;
+		auto shutdown() -> void;
+
 		auto start_frame() const noexcept -> in::Frame;
 		auto update(UpdateInput i, in::Frame const & current_frame) noexcept -> InputExtension;
 		auto process_event(SDL_Event const & event, in::Frame & current_frame) noexcept -> void;
@@ -31,6 +32,7 @@ namespace aeh::main_loop
 	private:
 		in::Input input;
 		in::ControllerRepeater controller_repeater;
+		InputPlugin * previous = nullptr;
 	};
 
 } // namespace aeh::main_loop
