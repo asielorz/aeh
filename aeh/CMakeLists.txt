@@ -87,6 +87,7 @@ target_sources(aeh PRIVATE
 	src/map.hh
 	src/math.cc
 	src/math.hh
+	src/monadic_optional.hh
 	src/multicomparison.hh
 	src/out.hh
 	src/overload.hh
