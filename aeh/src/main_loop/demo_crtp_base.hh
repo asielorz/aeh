@@ -68,7 +68,7 @@ namespace aeh::main_loop
 		using RenderInput = detail::InheritFromAllNonEmpty<aeh::main_loop::RenderInput, plugin_render_input_extension<Plugins>...>;
 
 		CRTPBase() noexcept((std::is_nothrow_default_constructible_v<Plugins> && ...)) = default;
-		explicit CRTPBase(Plugins ... plugins_) noexcept((std::is_nothrow_move_constructible_v<Plugins> && ...)) : plugins(std::move(plugins_)...) {}
+		explicit CRTPBase(Plugins ... plugins_) noexcept((std::is_nothrow_move_constructible_v<Plugins> && ...)) requires(sizeof...(Plugins) > 0) : plugins(std::move(plugins_)...) {}
 
 		void initialize(SDL_Window * window);
 		auto start_frame();
