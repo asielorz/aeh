@@ -39,9 +39,9 @@ namespace aeh
 	}
 
 	template <std::invocable<ImGuiDialogUpdateInput> F>
-	void imgui_dialog(main_loop::NewWindowOptions new_window_options, F && f) noexcept
+	auto imgui_dialog(main_loop::NewWindowOptions new_window_options, F && f) -> int
 	{
-		main_loop::run(detail::ImDialogLoop(std::forward<F>(f)), new_window_options);
+		return main_loop::run(detail::ImDialogLoop(std::forward<F>(f)), new_window_options);
 	}
 
 } // namespace aeh
