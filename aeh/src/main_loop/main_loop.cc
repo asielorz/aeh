@@ -81,9 +81,6 @@ namespace aeh::main_loop::detail
 		{
 			demo_process_event(event);
 			if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID(window))
-				done = true;
-
-			if (event.type == SDL_QUIT)
 			{
 				done = true;
 				SDL_PushEvent(&event);
