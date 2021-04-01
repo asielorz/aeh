@@ -81,6 +81,7 @@ target_sources(aeh PRIVATE
 	src/function_ref.hh
 	src/function_ref.inl
 	src/half.hh
+	src/imgui_dialog.hh
 	src/imgui_sdl_binding.cc
 	src/imgui_sdl_binding.hh
 	src/intcmp.hh

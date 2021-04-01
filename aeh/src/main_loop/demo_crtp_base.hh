@@ -43,11 +43,7 @@ namespace aeh::main_loop
 
 		template <typename ... Ts>
 		using InheritFromAllNonEmpty = apply_t<InheritFromAll, keep_non_empty<Ts...>>;
-	} // namespace detail
 
-	template <typename Impl, typename ... Plugins>
-	struct CRTPBase
-	{
 		template <typename Plugin>
 		using plugin_update_input_extension = detail::void_to_empty<
 			decltype(detail::call_update(
@@ -64,8 +60,19 @@ namespace aeh::main_loop
 			))
 		>;
 
-		using UpdateInput = detail::InheritFromAllNonEmpty<aeh::main_loop::UpdateInput, plugin_update_input_extension<Plugins>...>;
-		using RenderInput = detail::InheritFromAllNonEmpty<aeh::main_loop::RenderInput, plugin_render_input_extension<Plugins>...>;
+		template <typename ... Plugins>
+		using UpdateInputForPlugins = InheritFromAllNonEmpty<aeh::main_loop::UpdateInput, plugin_update_input_extension<Plugins>...>;
+
+		template <typename ... Plugins>
+		using RenderInputForPlugins = InheritFromAllNonEmpty<aeh::main_loop::RenderInput, plugin_render_input_extension<Plugins>...>;
+
+	} // namespace detail
+
+	template <typename Impl, typename ... Plugins>
+	struct CRTPBase
+	{
+		using UpdateInput = detail::UpdateInputForPlugins<Plugins...>;
+		using RenderInput = detail::RenderInputForPlugins<Plugins...>;
 
 		CRTPBase() noexcept((std::is_nothrow_default_constructible_v<Plugins> && ...)) = default;
 		explicit CRTPBase(Plugins ... plugins_) noexcept((std::is_nothrow_move_constructible_v<Plugins> && ...)) requires(sizeof...(Plugins) > 0) : plugins(std::move(plugins_)...) {}

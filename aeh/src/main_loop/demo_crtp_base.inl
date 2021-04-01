@@ -43,7 +43,7 @@ namespace aeh::main_loop
 		auto input_extensions = transform_tuple(plugins, locals.plugin_locals,
 			[input](auto & plugin, auto & locals) { return detail::call_update(plugin, input, locals); });
 
-		UpdateInput extended_input = detail::make_extended_input<UpdateInput>(input, std::move(input_extensions), detail::keep_non_empty<plugin_update_input_extension<Plugins>...>());
+		UpdateInput extended_input = detail::make_extended_input<UpdateInput>(input, std::move(input_extensions), detail::keep_non_empty<detail::plugin_update_input_extension<Plugins>...>());
 		detail::call_update_impl(implementation(), extended_input, locals.implementation_locals);
 	}
 
@@ -54,7 +54,7 @@ namespace aeh::main_loop
 		auto input_extensions = transform_tuple(plugins, 
 			[input](auto const & plugin) { return detail::call_pre_render(plugin, input); });
 
-		RenderInput extended_input = detail::make_extended_input<RenderInput>(input, std::move(input_extensions), detail::keep_non_empty<plugin_render_input_extension<Plugins>...>());
+		RenderInput extended_input = detail::make_extended_input<RenderInput>(input, std::move(input_extensions), detail::keep_non_empty<detail::plugin_render_input_extension<Plugins>...>());
 		detail::call_render_impl(implementation(), extended_input, locals.implementation_locals);
 		for_each_in_tuple_reversed(plugins, [input](auto const & plugin) { detail::call_post_render(plugin, input); });
 	}
