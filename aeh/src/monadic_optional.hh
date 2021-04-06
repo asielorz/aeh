@@ -15,13 +15,15 @@ namespace aeh
 {
 
 	template <typename T>
-	auto assign_to(T & t) noexcept
+	struct assign_to
 	{
-		return [&t](T new_t) noexcept
-		{
-			t = std::move(new_t);
-		};
-	}
+		explicit assign_to(T & var) noexcept : variable_to_assign(std::addressof(var)) {}
+
+		auto operator() (T const & t) const noexcept -> void { *variable_to_assign = t; }
+		auto operator() (T && t) const noexcept -> void { *variable_to_assign = std::move(t); }
+
+	private:
+		T * variable_to_assign;
+	};
 
 } // namespace aeh
-

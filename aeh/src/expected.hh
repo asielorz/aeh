@@ -80,16 +80,4 @@ namespace aeh
 		std::optional<ErrorT> maybe_error;
 	};
 
-	template <typename T>
-	struct assign_to
-	{
-		explicit assign_to(T & var) noexcept : variable_to_assign(std::addressof(var)) {}
-
-		auto operator() (T const & t) const noexcept -> void { *variable_to_assign = t; }
-		auto operator() (T && t) const noexcept -> void { *variable_to_assign = std::move(t); }
-
-	private:
-		T * variable_to_assign;
-	};
-
 } // namespace aeh
