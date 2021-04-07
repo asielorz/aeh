@@ -56,6 +56,38 @@ namespace aeh
 		reinterpret_cast<T *&>(p)++;
 	}
 
+	template <typename InputStream, typename T, typename FileIdentifierHeader, typename = std::enable_if_t<std::is_trivially_copyable_v<T>>>
+	auto read_binary_file(InputStream & is, T & t, FileIdentifierHeader const & expected_file_identifier) noexcept -> bool
+	{
+		FileIdentifierHeader file_identifier;
+		aeh::read_binary(is, file_identifier);
+		if (file_identifier != expected_file_identifier)
+			return false;
+
+		uint64_t file_checksum;
+		aeh::read_binary(is, file_checksum);
+
+		if (aeh::bytes_remaining(is) != sizeof(T))
+			return false;
+
+		T loaded_t;
+		aeh::read_binary(is, loaded_t);
+
+		if (file_checksum != aeh::checksum(loaded_t))
+			return false;
+
+		t = loaded_t;
+		return true;
+	}
+
+	template <typename OutputStream, typename T, typename FileIdentifierHeader, typename = std::enable_if_t<std::is_trivially_copyable_v<T>>>
+	auto write_binary_file(OutputStream & os, T const & t, FileIdentifierHeader const & file_identifier) noexcept -> void
+	{
+		aeh::write_binary(os, file_identifier);
+		aeh::write_binary(os, checksum(t));
+		aeh::write_binary(os, t);
+	}
+
 	template <typename InputStream>
 	auto bytes_remaining(InputStream & file) noexcept -> int64_t
 	{

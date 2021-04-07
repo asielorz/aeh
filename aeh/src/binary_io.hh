@@ -22,6 +22,14 @@ namespace aeh
 	//! Writes val (sizeof(T) bytes) to p and advances p by sizeof(T) bytes.
 	template <typename T, typename U> auto write_and_advance(U *& p, T const & val) noexcept -> void;
 
+	//! Reads a file written by write_binary_file from is. The function fails if the stream does not contain
+	//! the correct amount of bytes, or if the header and the checksum do not match.
+	template <typename InputStream, typename T, typename FileIdentifierHeader, typename> 
+	auto read_binary_file(InputStream & is, T & t, FileIdentifierHeader const & expected_file_identifier) noexcept -> bool;
+	//! Writes a trivial object into os, as well as a header to ensure the integrity when reading, containing an identifier and a checksum.
+	template <typename OutputStream, typename T, typename FileIdentifierHeader, typename>
+	auto write_binary_file(OutputStream & os, T const & t, FileIdentifierHeader const & file_identifier) noexcept -> void;
+
 	//! Returns the number of bytes left to read in a stream.
 	template <typename InputStream> auto bytes_remaining(InputStream & file) noexcept -> int64_t;
 
