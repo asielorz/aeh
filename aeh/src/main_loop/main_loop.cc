@@ -43,6 +43,11 @@ namespace
 		if (numFunctionsFailed > 0)
 			printf("Number of gl functions that failed to load: %d\n", numFunctionsFailed);
 
+		return true;
+	}
+
+	void set_initial_opengl_configuration()
+	{
 		// Back face removal
 		gl::Enable(gl::CULL_FACE);
 		// Depth buffer
@@ -52,8 +57,6 @@ namespace
 		gl::BlendFunc(gl::SRC_ALPHA, gl::ONE_MINUS_SRC_ALPHA);
 
 		gl::ClearColor(0, 0, 0, 1);
-
-		return true;
 	}
 
 	aeh::main_loop::Window create_window(aeh::main_loop::NewWindowOptions const & options)
@@ -140,6 +143,8 @@ namespace aeh::main_loop
 		static bool gl_init_ok = load_opengl_functions();
 		if (!gl_init_ok)
 			return {};
+
+		set_initial_opengl_configuration();
 
 		return new_window;
 	}
