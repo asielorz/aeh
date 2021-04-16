@@ -92,13 +92,13 @@ namespace aeh
 		template <typename Callable, typename = std::enable_if_t<std::is_nothrow_invocable_r_v<Ret, Callable const &, Args...>>>
 		constexpr function_ref(Callable const & c) noexcept;
 
-		template <auto F>
-		static constexpr function_ref to_constant = []()
-		{
-			function_ref f;
-			f.caller = [](void *, Args ... args) noexcept -> Ret { return std::invoke(F, args...); };
-			return f;
-		}();
+		//template <auto F>
+		//static constexpr function_ref to_constant = []()
+		//{
+		//	function_ref f;
+		//	f.caller = [](void *, Args ... args) noexcept -> Ret { return std::invoke(F, args...); };
+		//	return f;
+		//}();
 
 		constexpr Ret operator () (Args ... args) const noexcept;
 

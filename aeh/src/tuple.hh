@@ -1,5 +1,6 @@
 #pragma once
 
+#include "function_ptr.hh"
 #include <tuple>
 
 namespace aeh
@@ -19,6 +20,9 @@ namespace aeh
 
 	template <typename Tuple1, typename Tuple2, typename F>
 	auto transform_tuple(Tuple1 && tuple1, Tuple2 && tuple2, F && function);
+
+	template <typename Tuple, typename F>
+	decltype(auto) tuple_at(Tuple && tuple, size_t i, F && function);
 
 } // namespace aeh
 

@@ -8,7 +8,7 @@ using FakeFilesystem = std::map<std::string, T>;
 template <typename T>
 struct TestBasePathTrait
 {
-	TestBasePathTrait(FakeFilesystem<T> & m, std::string p = "") noexcept : fake_filesystem(&m), base_path_(std::move(p)) {}
+	TestBasePathTrait(FakeFilesystem<T> & m, std::string p = "") noexcept : base_path_(std::move(p)), fake_filesystem(&m) {}
 
 	std::string base_path() const { return base_path_; }
 	std::vector<std::string> files_in_base_path() const 

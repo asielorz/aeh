@@ -12,6 +12,7 @@ add_executable(aeh_tests
 	src/pointer_union.tests.cc
 	src/span.tests.cc
 	src/string.tests.cc
+	src/tuple.tests.cc
 )
 add_executable(aeh::aeh_tests ALIAS aeh_tests)
 

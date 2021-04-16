@@ -33,6 +33,16 @@ namespace aeh
 			return std::make_tuple(function(std::get<Is>(tuple1), std::get<Is>(tuple2))...);
 		}
 
+		template <typename Tuple, typename F, size_t ... Is>
+		decltype(auto) tuple_at_impl(Tuple && tuple, size_t i, F && function, std::index_sequence<Is...>)
+		{
+			using return_type = decltype(std::invoke(std::forward<F>(function), std::get<0>(std::forward<Tuple>(tuple))));
+			static constexpr function_ptr<return_type(Tuple &&, F&&)> jump_table[] = { 
+				[](Tuple && tuple, F && function) { return std::invoke(std::forward<F>(function), std::get<Is>(std::forward<Tuple>(tuple))); }... 
+			};
+			return jump_table[i](std::forward<Tuple>(tuple), std::forward<F>(function));
+		}
+
 	} // namespace detail
 
 	template <typename Tuple, typename F>
@@ -69,6 +79,12 @@ namespace aeh
 
 		return detail::transform_tuple_binary_impl(std::forward<Tuple1>(tuple1), std::forward<Tuple2>(tuple2), std::forward<F>(function), 
 			std::make_index_sequence<std::tuple_size_v<std::decay_t<Tuple1>>>());
+	}
+
+	template <typename Tuple, typename F>
+	decltype(auto) tuple_at(Tuple && tuple, size_t i, F && function)
+	{
+		return detail::tuple_at_impl(std::forward<Tuple>(tuple), i, std::forward<F>(function), std::make_index_sequence<std::tuple_size_v<std::decay_t<Tuple>>>());
 	}
 
 } // namespace aeh

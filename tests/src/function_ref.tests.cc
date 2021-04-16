@@ -88,7 +88,7 @@ namespace tests
 		return a + b;
 	}
 }
-
+/*
 TEST_CASE("to_constant allows creating a function_ref to a function_ptr without needing the function_ptr object")
 {
 	auto f = aeh::function_ref<int(int, int)>::to_constant<tests::add>;
@@ -144,3 +144,4 @@ TEST_CASE("noexcept function_ref")
 	constexpr auto f = aeh::function_ref<int(int, int) noexcept>::to_constant<tests::add>;
 	STATIC_REQUIRE(noexcept(f(3, 4)));
 }
+*/
