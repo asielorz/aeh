@@ -65,22 +65,19 @@ namespace aeh::debug
 
 	namespace detail
 	{
-		void handle_debug_assert(bool expression, const char * expression_str, const char * msg, const char * file, const char * function, int line)
+		void debug_assert_failed(const char * expression_str, const char * msg, const char * file, const char * function, int line)
 		{
-			if (!(expression))
-			{
-				/* Remove the folders from the path because they bloat and don't add much information */
-				::std::string file_name_ = file;
-				file_name_ = file_name_.substr(file_name_.find_last_of('\\') + 1, std::string::npos);
+			/* Remove the folders from the path because they bloat and don't add much information */
+			::std::string file_name_ = file;
+			file_name_ = file_name_.substr(file_name_.find_last_of('\\') + 1, std::string::npos);
 
-				message_box_abort_retry_ignore(
-					"Assertion failed",
-					(std::string(msg) +
-						"\nExpression: \"" + expression_str + "\"\n"
-						"Function: \"" + function + "\"\n"
-						"File: \"" + file_name_ + "\"\n"
-						"Line: " + ::std::to_string(line)).c_str());
-			}
+			message_box_abort_retry_ignore(
+				"Assertion failed",
+				(std::string(msg) +
+					"\nExpression: \"" + expression_str + "\"\n"
+					"Function: \"" + function + "\"\n"
+					"File: \"" + file_name_ + "\"\n"
+					"Line: " + ::std::to_string(line)).c_str());
 		}
 	} // namespace detail
 

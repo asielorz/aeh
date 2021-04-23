@@ -62,14 +62,14 @@ namespace aeh::debug
 
 	namespace detail
 	{
-		void handle_debug_assert(bool expression, const char * expression_str, const char * msg, const char * file, const char * function, int line);
+		void debug_assert_failed(const char * expression_str, const char * msg, const char * file, const char * function, int line);
 	}
 
 } // namespace aeh::debug
 
 #if AEH_DEBUG
 	#pragma warning (disable : 4800) // Forcing int/pointer to bool
-	#define debug_assert_msg(expression,msg) ::aeh::debug::detail::handle_debug_assert(static_cast<bool>(expression), #expression, msg, __FILE__, __FUNCTION__, __LINE__)
+	#define debug_assert_msg(expression,msg) if (!static_cast<bool>(expression)) { ::aeh::debug::detail::debug_assert_failed(#expression, msg, __FILE__, __FUNCTION__, __LINE__); }
 #else
 	#define debug_assert_msg(expression,msg) (void)(0);
 #endif

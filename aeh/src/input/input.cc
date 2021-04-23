@@ -275,6 +275,14 @@ namespace aeh::in
 		}
 	}
 
+	auto any_key_pressed(Input const & input) noexcept -> std::optional<Key>
+	{
+		for (int i = 0; i < key_count; ++i)
+			if (is_pressed(input, Key(i)))
+				return Key(i);
+		return std::nullopt;
+	}
+
 	auto is_pressed_or_repeated(Input const & input, Key key) noexcept -> bool
 	{
 		return is_pressed(input, key) || input.current.buttons_repeated[static_cast<uint16_t>(key)];

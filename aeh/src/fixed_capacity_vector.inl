@@ -1,10 +1,10 @@
 namespace aeh
 {
 
-	template <typename Self>
-	fixed_capacity_vector_crtp_base<Self>::~fixed_capacity_vector_crtp_base()
+	template <typename T, size_t Capacity>
+	constexpr fixed_capacity_vector<T, Capacity>::~fixed_capacity_vector() requires(!std::is_trivially_destructible_v<T>)
 	{
-		static_cast<Self *>(this)->clear();
+		clear();
 	}
 
 	template <typename T, size_t Capacity>
@@ -16,21 +16,21 @@ namespace aeh
 	}
 
 	template <typename T, size_t Capacity>
-	constexpr fixed_capacity_vector<T, Capacity>::fixed_capacity_vector(fixed_capacity_vector const & other) noexcept(std::is_nothrow_copy_constructible_v<T>)
+	constexpr fixed_capacity_vector<T, Capacity>::fixed_capacity_vector(fixed_capacity_vector const & other) noexcept(std::is_nothrow_copy_constructible_v<T>) requires(!std::is_trivially_copy_constructible_v<T>)
 		: size_(other.size())
 	{
 		std::uninitialized_copy_n(other.data(), other.size(), data());
 	}
 
 	template <typename T, size_t Capacity>
-	constexpr fixed_capacity_vector<T, Capacity>::fixed_capacity_vector(fixed_capacity_vector && other) noexcept(std::is_nothrow_move_constructible_v<T>)
+	constexpr fixed_capacity_vector<T, Capacity>::fixed_capacity_vector(fixed_capacity_vector && other) noexcept(std::is_nothrow_move_constructible_v<T>) requires(!std::is_trivially_move_constructible_v<T>)
 		: size_(other.size())
 	{
 		std::uninitialized_move_n(other.data(), other.size(), data());
 	}
 
 	template <typename T, size_t Capacity>
-	constexpr auto fixed_capacity_vector<T, Capacity>::operator = (fixed_capacity_vector const & other) noexcept(std::is_nothrow_copy_constructible_v<T>) -> fixed_capacity_vector &
+	constexpr auto fixed_capacity_vector<T, Capacity>::operator = (fixed_capacity_vector const & other) noexcept(std::is_nothrow_copy_constructible_v<T>) -> fixed_capacity_vector & requires(!std::is_trivially_copy_constructible_v<T>)
 	{
 		clear();
 		size_ = other.size();
@@ -39,11 +39,11 @@ namespace aeh
 	}
 
 	template <typename T, size_t Capacity>
-	constexpr auto fixed_capacity_vector<T, Capacity>::operator = (fixed_capacity_vector && other) noexcept(std::is_nothrow_move_constructible_v<T>) -> fixed_capacity_vector &
+	constexpr auto fixed_capacity_vector<T, Capacity>::operator = (fixed_capacity_vector && other) noexcept(std::is_nothrow_move_constructible_v<T>) -> fixed_capacity_vector & requires(!std::is_trivially_move_constructible_v<T>)
 	{
 		clear();
 		size_ = other.size();
-		std::uninitialized_copy_n(other.data(), other.size(), data());
+		std::uninitialized_move_n(other.data(), other.size(), data());
 		return *this;
 	}
 
@@ -51,6 +51,18 @@ namespace aeh
 	constexpr auto fixed_capacity_vector<T, Capacity>::size() const noexcept -> size_t
 	{
 		return size_;
+	}
+
+	template <typename T, size_t Capacity>
+	constexpr auto fixed_capacity_vector<T, Capacity>::ssize() const noexcept -> ptrdiff_t
+	{
+		return ptrdiff_t(size());
+	}
+
+	template <typename T, size_t Capacity>
+	constexpr auto fixed_capacity_vector<T, Capacity>::int_size() const noexcept -> int requires(Capacity <= std::numeric_limits<int>::max())
+	{
+		return int(size());
 	}
 
 	template <typename T, size_t Capacity>
@@ -208,15 +220,15 @@ namespace aeh
 	}
 
 	template <typename T, size_t Capacity>
-	constexpr fixed_capacity_vector<T, Capacity>::operator span<T>() noexcept
+	constexpr fixed_capacity_vector<T, Capacity>::operator std::span<T>() noexcept
 	{
-		return span<T>(data(), size());
+		return std::span<T>(data(), size());
 	}
 
 	template <typename T, size_t Capacity>
-	constexpr fixed_capacity_vector<T, Capacity>::operator span<T const>() const noexcept
+	constexpr fixed_capacity_vector<T, Capacity>::operator std::span<T const>() const noexcept
 	{
-		return span<T const>(data(), size());
+		return std::span<T const>(data(), size());
 	}
 
 	template <typename T, size_t Capacity>
@@ -314,33 +326,9 @@ namespace aeh
 	}
 
 	template <typename T, size_t Capacity>
-	constexpr auto operator != (fixed_capacity_vector<T, Capacity> const & a, fixed_capacity_vector<T, Capacity> const & b) noexcept -> bool
+	constexpr auto operator <=> (fixed_capacity_vector<T, Capacity> const & a, fixed_capacity_vector<T, Capacity> const & b) noexcept
 	{
-		return !(a == b);
-	}
-
-	template <typename T, size_t Capacity>
-	constexpr auto operator < (fixed_capacity_vector<T, Capacity> const & a, fixed_capacity_vector<T, Capacity> const & b) noexcept -> bool
-	{
-		return std::lexicographical_compare(a.begin(), a.end(), b.begin(), b.end(), std::less());
-	}
-
-	template <typename T, size_t Capacity>
-	constexpr auto operator <= (fixed_capacity_vector<T, Capacity> const & a, fixed_capacity_vector<T, Capacity> const & b) noexcept -> bool
-	{
-		return std::lexicographical_compare(a.begin(), a.end(), b.begin(), b.end(), std::less_equal());
-	}
-
-	template <typename T, size_t Capacity>
-	constexpr auto operator > (fixed_capacity_vector<T, Capacity> const & a, fixed_capacity_vector<T, Capacity> const & b) noexcept -> bool
-	{
-		return std::lexicographical_compare(a.begin(), a.end(), b.begin(), b.end(), std::greater());
-	}
-
-	template <typename T, size_t Capacity>
-	constexpr auto operator >= (fixed_capacity_vector<T, Capacity> const & a, fixed_capacity_vector<T, Capacity> const & b) noexcept -> bool
-	{
-		return std::lexicographical_compare(a.begin(), a.end(), b.begin(), b.end(), std::greater_equal());
+		return std::lexicographical_compare_three_way(a.begin(), a.end(), b.begin(), b.end());
 	}
 
 } // namespace aeh

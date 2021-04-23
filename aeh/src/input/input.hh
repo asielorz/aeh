@@ -3,6 +3,7 @@
 #include <bitset>
 #include <array>
 #include <string_view>
+#include <optional>
 
 #define binary_literal(x) 0b##x
 
@@ -168,6 +169,8 @@ namespace aeh::in
 	[[nodiscard]] auto current_state(Input const & input, BoundControllerInput control, float threshold) noexcept -> ControlState;
 	[[nodiscard]] auto current_state(Input const & input, Control control, float threshold) noexcept -> ControlState;
 
+	[[nodiscard]] auto any_key_pressed(Input const & input) noexcept -> std::optional<Key>;
+
 	[[nodiscard]] auto is_pressed_or_repeated(Input const & input, Key key) noexcept -> bool;
 	[[nodiscard]] auto axis_state(Input const & input, BoundControllerAxis axis) noexcept -> float;
 	[[nodiscard]] auto axis_state(Input const & input, BoundControllerAxis axis, float dead_zone) noexcept -> float;
@@ -212,3 +215,8 @@ namespace aeh::in
 	auto operator != (PreviousFrame const & a, Frame const & b) noexcept -> bool = delete;
 
 } // namespace aeh::in
+
+#undef XMACRO_INPUT_KEY
+#undef XMACRO_INPUT_MOUSE_BUTTON
+#undef XMACRO_INPUT_CONTROLLER_BUTTON
+#undef XMACRO_INPUT_CONTROLLER_AXIS

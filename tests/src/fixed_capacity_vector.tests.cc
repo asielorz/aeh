@@ -67,3 +67,15 @@ TEST_CASE("erasing a range")
 	v.erase(v.begin(), v.end());
 	REQUIRE(v.empty());
 }
+
+static_assert(std::is_trivially_destructible_v<aeh::fixed_capacity_vector<int, 8>>, "fixed_capacity_vector of trivial type is trivially destructuble.");
+static_assert(std::is_trivially_copy_constructible_v<aeh::fixed_capacity_vector<int, 8>>, "fixed_capacity_vector of trivial type is trivially copy constructible.");
+static_assert(std::is_trivially_move_constructible_v<aeh::fixed_capacity_vector<int, 8>>, "fixed_capacity_vector of trivial type is trivially move constructible.");
+static_assert(std::is_trivially_copy_assignable_v<aeh::fixed_capacity_vector<int, 8>>, "fixed_capacity_vector of trivial type is trivially copy assignable.");
+static_assert(std::is_trivially_move_assignable_v<aeh::fixed_capacity_vector<int, 8>>, "fixed_capacity_vector of trivial type is trivially move assignable.");
+
+static_assert(!std::is_trivially_destructible_v<aeh::fixed_capacity_vector<std::string, 8>>, "fixed_capacity_vector of non-trivial type is not trivially destructuble.");
+static_assert(!std::is_trivially_copy_constructible_v<aeh::fixed_capacity_vector<std::string, 8>>, "fixed_capacity_vector of non-trivial type is not trivially copy constructible.");
+static_assert(!std::is_trivially_move_constructible_v<aeh::fixed_capacity_vector<std::string, 8>>, "fixed_capacity_vector of non-trivial type is not trivially move constructible.");
+static_assert(!std::is_trivially_copy_assignable_v<aeh::fixed_capacity_vector<std::string, 8>>, "fixed_capacity_vector of non-trivial type is not trivially copy assignable.");
+static_assert(!std::is_trivially_move_assignable_v<aeh::fixed_capacity_vector<std::string, 8>>, "fixed_capacity_vector of non-trivial type is not trivially move assignable.");

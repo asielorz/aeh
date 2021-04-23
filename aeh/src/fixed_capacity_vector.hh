@@ -1,7 +1,7 @@
 #pragma once
 
-#include "span.hh"
 #include "debug/assert.hh"
+#include <span>
 #include <type_traits> // aligned_storage
 #include <new> // launder
 #include <iterator> // reverse_iterator
@@ -11,20 +11,8 @@
 namespace aeh
 {
 
-	template <typename Self>
-	struct fixed_capacity_vector_crtp_base
-	{
-		~fixed_capacity_vector_crtp_base();
-	};
-
-	struct fixed_capacity_vector_trivially_destructible_base {};
-
 	template <typename T, size_t Capacity>
 	struct fixed_capacity_vector
-		: std::conditional_t<std::is_trivially_constructible_v<T>,
-			fixed_capacity_vector_trivially_destructible_base, 
-			fixed_capacity_vector_crtp_base<fixed_capacity_vector<T, Capacity>>
-		>
 	{
 		using value_type = T;
 		using iterator = T *;
@@ -35,12 +23,25 @@ namespace aeh
 
 		constexpr fixed_capacity_vector() noexcept = default;
 		constexpr fixed_capacity_vector(std::initializer_list<T> ilist) noexcept;
-		constexpr fixed_capacity_vector(fixed_capacity_vector const & other) noexcept(std::is_nothrow_copy_constructible_v<T>);
-		constexpr fixed_capacity_vector(fixed_capacity_vector && other) noexcept(std::is_nothrow_move_constructible_v<T>);
-		constexpr auto operator = (fixed_capacity_vector const & other) noexcept(std::is_nothrow_copy_constructible_v<T>)->fixed_capacity_vector &;
-		constexpr auto operator = (fixed_capacity_vector && other) noexcept(std::is_nothrow_move_constructible_v<T>)->fixed_capacity_vector &;
+		
+		constexpr ~fixed_capacity_vector() requires(std::is_trivially_destructible_v<T>) = default;
+		constexpr ~fixed_capacity_vector() requires(!std::is_trivially_destructible_v<T>);
+		
+		constexpr fixed_capacity_vector(fixed_capacity_vector const & other) noexcept requires(std::is_trivially_copy_constructible_v<T>) = default;
+		constexpr fixed_capacity_vector(fixed_capacity_vector const & other) noexcept(std::is_nothrow_copy_constructible_v<T>) requires(!std::is_trivially_copy_constructible_v<T>);
+
+		constexpr fixed_capacity_vector(fixed_capacity_vector && other) noexcept requires(std::is_trivially_move_constructible_v<T>) = default;
+		constexpr fixed_capacity_vector(fixed_capacity_vector && other) noexcept(std::is_nothrow_move_constructible_v<T>) requires(!std::is_trivially_move_constructible_v<T>);
+
+		constexpr auto operator = (fixed_capacity_vector const & other) noexcept -> fixed_capacity_vector & requires(std::is_trivially_copy_constructible_v<T>) = default;
+		constexpr auto operator = (fixed_capacity_vector const & other) noexcept(std::is_nothrow_copy_constructible_v<T>) -> fixed_capacity_vector & requires(!std::is_trivially_copy_constructible_v<T>);
+
+		constexpr auto operator = (fixed_capacity_vector && other) noexcept -> fixed_capacity_vector & requires(std::is_trivially_move_constructible_v<T>) = default;
+		constexpr auto operator = (fixed_capacity_vector && other) noexcept(std::is_nothrow_move_constructible_v<T>) -> fixed_capacity_vector & requires(!std::is_trivially_move_constructible_v<T>);
 
 		[[nodiscard]] constexpr auto size() const noexcept -> size_t;
+		[[nodiscard]] constexpr auto ssize() const noexcept -> ptrdiff_t;
+		[[nodiscard]] constexpr auto int_size() const noexcept -> int requires(Capacity <= std::numeric_limits<int>::max());
 		[[nodiscard]] constexpr auto empty() const noexcept -> bool;
 		[[nodiscard]] static constexpr auto capacity() noexcept -> size_t;
 		[[nodiscard]] static constexpr auto max_size() noexcept -> size_t;
@@ -70,8 +71,8 @@ namespace aeh
 		[[nodiscard]] constexpr auto nth(size_t i) noexcept -> iterator;
 		[[nodiscard]] constexpr auto nth(size_t i) const noexcept -> const_iterator;
 
-		constexpr operator span<T>() noexcept;
-		constexpr operator span<T const>() const noexcept;
+		constexpr operator std::span<T>() noexcept;
+		constexpr operator std::span<T const>() const noexcept;
 
 		constexpr auto clear() noexcept -> void;
 		constexpr auto push_back(T const & t) noexcept(std::is_nothrow_copy_constructible_v<T>)->T &;
@@ -84,7 +85,7 @@ namespace aeh
 		constexpr auto erase(const_iterator first, const_iterator last) noexcept -> const_iterator;
 
 	private:
-		std::aligned_storage_t<sizeof(T) * Capacity, alignof(T)> buffer;
+		std::aligned_storage_t<sizeof(T) * Capacity, alignof(T)> buffer = {0};
 		size_t size_ = 0;
 	};
 
@@ -92,19 +93,7 @@ namespace aeh
 	[[nodiscard]] constexpr auto operator == (fixed_capacity_vector<T, Capacity> const & a, fixed_capacity_vector<T, Capacity> const & b) noexcept -> bool;
 
 	template <typename T, size_t Capacity>
-	[[nodiscard]] constexpr auto operator != (fixed_capacity_vector<T, Capacity> const & a, fixed_capacity_vector<T, Capacity> const & b) noexcept -> bool;
-
-	template <typename T, size_t Capacity>
-	[[nodiscard]] constexpr auto operator < (fixed_capacity_vector<T, Capacity> const & a, fixed_capacity_vector<T, Capacity> const & b) noexcept -> bool;
-
-	template <typename T, size_t Capacity>
-	[[nodiscard]] constexpr auto operator <= (fixed_capacity_vector<T, Capacity> const & a, fixed_capacity_vector<T, Capacity> const & b) noexcept -> bool;
-
-	template <typename T, size_t Capacity>
-	[[nodiscard]] constexpr auto operator > (fixed_capacity_vector<T, Capacity> const & a, fixed_capacity_vector<T, Capacity> const & b) noexcept -> bool;
-
-	template <typename T, size_t Capacity>
-	[[nodiscard]] constexpr auto operator >= (fixed_capacity_vector<T, Capacity> const & a, fixed_capacity_vector<T, Capacity> const & b) noexcept -> bool;
+	[[nodiscard]] constexpr auto operator <=> (fixed_capacity_vector<T, Capacity> const & a, fixed_capacity_vector<T, Capacity> const & b) noexcept;
 
 } // namespace aeh
 
