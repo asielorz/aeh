@@ -109,12 +109,14 @@ namespace aeh::in
 			case SDL_SCANCODE_UP: return Key::arrow_up;
 			case SDL_SCANCODE_DOWN: return Key::arrow_down;
 
+			case SDL_SCANCODE_NUMLOCKCLEAR: return Key::num_lock;
+
 			case SDL_SCANCODE_KP_DIVIDE: return Key::divide;
 			case SDL_SCANCODE_KP_MULTIPLY: return Key::multiply;
 			case SDL_SCANCODE_KP_MINUS: return Key::subtract;
 			case SDL_SCANCODE_KP_PLUS: return Key::add;
 			//case SDL_SCANCODE_KP_ENTER: return Key::;
-			//case SDL_SCANCODE_KP_PERIOD: return Key::;
+			case SDL_SCANCODE_KP_PERIOD: return Key::decimal;
 			case SDL_SCANCODE_KP_1: return Key::numpad1;
 			case SDL_SCANCODE_KP_2: return Key::numpad2;
 			case SDL_SCANCODE_KP_3: return Key::numpad3;
@@ -125,6 +127,8 @@ namespace aeh::in
 			case SDL_SCANCODE_KP_8: return Key::numpad8;
 			case SDL_SCANCODE_KP_9: return Key::numpad9;
 			case SDL_SCANCODE_KP_0: return Key::numpad0;
+
+			case SDL_SCANCODE_NONUSBACKSLASH: return Key::oem_102;
 
 			case SDL_SCANCODE_EXECUTE: return Key::execute;
 			case SDL_SCANCODE_HELP: return Key::help;
