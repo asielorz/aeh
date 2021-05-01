@@ -15,6 +15,24 @@ namespace aeh
 {
 
 	template <typename T>
+	auto pointer_or_null(std::optional<T> & opt) noexcept -> T *
+	{
+		if (opt.has_value())
+			return std::addressof(*opt);
+		else
+			return nullptr;
+	}
+
+	template <typename T>
+	auto pointer_or_null(std::optional<T const> & opt) noexcept -> T const *
+	{
+		if (opt.has_value())
+			return std::addressof(*opt);
+		else
+			return nullptr;
+	}
+
+	template <typename T>
 	struct assign_to
 	{
 		explicit assign_to(T & var) noexcept : variable_to_assign(std::addressof(var)) {}
