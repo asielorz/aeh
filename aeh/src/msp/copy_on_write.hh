@@ -16,6 +16,9 @@ namespace aeh::msp
         explicit cow(T const & t);
         explicit cow(T && t);
 
+        [[nodiscard]] auto lock() -> T &;
+        [[nodiscard]] auto read() const noexcept -> T const &;
+
         [[nodiscard]] auto operator * () -> T &;
         [[nodiscard]] auto operator * () const noexcept -> T const &;
         auto operator -> () -> T *;
@@ -29,7 +32,6 @@ namespace aeh::msp
     };
 
     template <typename T> auto operator == (cow<T> const & a, cow<T> const & b) noexcept -> bool;
-    template <typename T> auto operator != (cow<T> const & a, cow<T> const & b) noexcept -> bool;
 
 } // namespace aeh::msp
 

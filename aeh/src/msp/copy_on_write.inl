@@ -29,7 +29,7 @@ namespace aeh::msp
     {}
 
     template <typename T>
-    auto cow<T>::operator * () -> T &
+    auto cow<T>::lock() -> T &
     {
         if (!pointer.is_unique())
             pointer = shared_ptr<T>::make_new(*pointer);
@@ -38,9 +38,21 @@ namespace aeh::msp
     }
 
     template <typename T>
-    auto cow<T>::operator * () const noexcept -> T const &
+    auto cow<T>::read() const noexcept -> T const &
     {
         return *pointer;
+    }
+
+    template <typename T>
+    auto cow<T>::operator * () -> T &
+    {
+        return lock();
+    }
+
+    template <typename T>
+    auto cow<T>::operator * () const noexcept -> T const &
+    {
+        return read();
     }
 
     template <typename T>
@@ -68,12 +80,6 @@ namespace aeh::msp
     auto operator == (cow<T> const & a, cow<T> const & b) noexcept -> bool
     {
         return &(*a) == &(*b) || *a == *b;
-    }
-
-    template <typename T>
-    auto operator != (cow<T> const & a, cow<T> const & b) noexcept -> bool
-    {
-        return !(a == b);
     }
 
 } // namespace aeh::msp
