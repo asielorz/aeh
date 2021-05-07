@@ -12,7 +12,7 @@ namespace aeh
 	{
 		int values[4];
 		gl::GetIntegerv(gl::VIEWPORT, values);
-		return { values[0], values[1], values[2], values[3] };
+		return {values[0], values[1], values[2], values[3]};
 	}
 
 	void set_as_current_viewport(Viewport viewport)
