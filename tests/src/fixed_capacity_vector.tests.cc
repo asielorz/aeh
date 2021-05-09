@@ -1,4 +1,5 @@
 #include "fixed_capacity_vector.hh"
+#include "span.hh"
 #include <catch2/catch.hpp>
 
 using test_vector = aeh::fixed_capacity_vector<int, 8>;
@@ -23,13 +24,26 @@ TEST_CASE("Constructor from initializer list")
 TEST_CASE("Conversion to span")
 {
 	test_vector v = {1, 2, 3, 4};
-	aeh::span<int> s = v;
+	
+	{
+		aeh::span<int> s = v;
 
-	REQUIRE(s.size() == 4);
-	REQUIRE(s[0] == 1);
-	REQUIRE(s[1] == 2);
-	REQUIRE(s[2] == 3);
-	REQUIRE(s[3] == 4);
+		REQUIRE(s.size() == 4);
+		REQUIRE(s[0] == 1);
+		REQUIRE(s[1] == 2);
+		REQUIRE(s[2] == 3);
+		REQUIRE(s[3] == 4);
+	}
+
+	{
+		std::span<int> s = v;
+
+		REQUIRE(s.size() == 4);
+		REQUIRE(s[0] == 1);
+		REQUIRE(s[1] == 2);
+		REQUIRE(s[2] == 3);
+		REQUIRE(s[3] == 4);
+	}
 }
 
 TEST_CASE("erase single element")
@@ -66,6 +80,20 @@ TEST_CASE("erasing a range")
 
 	v.erase(v.begin(), v.end());
 	REQUIRE(v.empty());
+}
+
+TEST_CASE("Comparison")
+{
+	test_vector const v1 = { 1, 2, 3, 4 };
+
+	REQUIRE(v1 == v1);
+	REQUIRE_FALSE(v1 != v1);
+	REQUIRE(v1 <=> v1 == std::strong_ordering::equal);
+
+	test_vector const v2 = { 1, 3, 3, 4 };
+	REQUIRE_FALSE(v1 == v2);
+	REQUIRE(v1 != v2);
+	REQUIRE(v1 <=> v2 == std::strong_ordering::less);;
 }
 
 static_assert(std::is_trivially_destructible_v<aeh::fixed_capacity_vector<int, 8>>, "fixed_capacity_vector of trivial type is trivially destructuble.");

@@ -255,7 +255,7 @@ namespace aeh
 	constexpr auto fixed_capacity_vector<T, Capacity>::emplace_back(Args && ... args) noexcept(std::is_nothrow_constructible_v<T, Args...>) -> T &
 	{
 		debug_assert(size() < capacity());
-		T * const new_element = ::new(data() + size()) T(std::forward<Args>(args)...);
+		T * const new_element = std::construct_at(data() + size(), std::forward<Args>(args)...);
 		size_++;
 		return *new_element;
 	}
@@ -322,7 +322,7 @@ namespace aeh
 	template <typename T, size_t Capacity>
 	constexpr auto operator == (fixed_capacity_vector<T, Capacity> const & a, fixed_capacity_vector<T, Capacity> const & b) noexcept -> bool
 	{
-		return a.size() == b.size() && std::equal(a.begin(), a.end(), b.begin(), b.end());
+		return std::equal(a.begin(), a.end(), b.begin(), b.end());
 	}
 
 	template <typename T, size_t Capacity>
