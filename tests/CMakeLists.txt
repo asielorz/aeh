@@ -7,6 +7,7 @@ add_executable(aeh_tests
 	src/file_vector.tests.cc
 	src/fixed_capacity_vector.tests.cc
 	src/function_ref.tests.cc
+	src/generator.tests.cc
 	src/half.tests.cc
 	src/input.tests.cc
 	src/pointer_union.tests.cc

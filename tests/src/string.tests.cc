@@ -26,20 +26,14 @@ TEST_CASE("replace doesn't find anything")
 	REQUIRE(s == "some test string");
 }
 
-template <typename StringView, typename Delimiter, std::output_iterator<StringView> Output>
-void split_to(Output output, StringView text, Delimiter delimiter)
+template <typename F>
+auto to_vector(aeh::generator<F> g) -> std::vector<typename aeh::generator<F>::value_type>
 {
-	for (auto part : aeh::split(text, delimiter))
-		*output++ = part;
-}
+	std::vector<typename aeh::generator<F>::value_type> result;
+	result.reserve(16);
 
-template <typename StringView, typename Delimiter>
-std::vector<StringView> split_to_vector(StringView text, Delimiter delimiter, std::size_t reserve = 0)
-{
-	std::vector<StringView> result;
-	result.reserve(reserve);
-
-	split_to(std::back_inserter(result), text, delimiter);
+	for (auto && part : g)
+		result.push_back(part);
 
 	return result;
 }
@@ -52,29 +46,8 @@ TEST_CASE("Split single char")
 
 	constexpr std::string_view text = "128.0.0.1"sv;
 
-	REQUIRE(split_to_vector(text, '.') == expected);
-	REQUIRE(split_to_vector(text, "."sv) == expected);
-
-	{
-		std::vector<std::string_view> vec;
-		vec.reserve(4);
-		split_to(std::back_inserter(vec), text, '.');
-		REQUIRE(vec == expected);
-	}
-
-	{
-		std::array<std::string_view, 4> array;
-		REQUIRE(expected.size() == 4);
-
-		split_to(array.begin(), text, '.');
-		REQUIRE(array == (std::array{expected[0], expected[1], expected[2], expected[3]}));
-	}
-
-	{
-		std::list<std::string_view> list;
-		split_to(std::back_inserter(list), text, "."sv);
-		REQUIRE(list == std::list(expected.cbegin(), expected.cend()));
-	}
+	REQUIRE(to_vector(aeh::split(text, '.')) == expected);
+	REQUIRE(to_vector(aeh::split(text, "."sv)) == expected);
 }
 
 TEST_CASE("Split that ends with a delimiter")
@@ -84,7 +57,7 @@ TEST_CASE("Split that ends with a delimiter")
 	auto const expected = std::vector<std::string_view>{"std", "chrono", "literals", ""};
 	constexpr std::string_view text = "std::chrono::literals::";
 
-	auto const splitted = split_to_vector(text, "::"sv);
+	auto const splitted = to_vector(aeh::split(text, "::"sv));
 
 	REQUIRE(splitted == expected);
 }
@@ -96,7 +69,7 @@ TEST_CASE("Split that begins with a delimiter")
 	auto const expected = std::vector<std::string_view>{"", "std", "chrono", "literals"};
 	constexpr std::string_view text = "::std::chrono::literals";
 
-	auto const splitted = split_to_vector(text, "::"sv);
+	auto const splitted = to_vector(aeh::split(text, "::"sv));
 
 	REQUIRE(splitted == expected);
 }
@@ -106,8 +79,48 @@ TEST_CASE("Split with multiple consecutive delimiters")
 	auto const expected = std::vector<std::string_view>{ "", "", "", "2", "", "3", "0", "", "" };
 	constexpr std::string_view text = "...2..3.0..";
 
-	auto const splitted = split_to_vector(text, '.');
+	auto const splitted = to_vector(aeh::split(text, '.'));
 
 	REQUIRE(splitted == expected);
 }
 
+constexpr auto compile_time_split(std::string_view str, char delim) noexcept -> std::array<std::string_view, 4>
+{
+	auto split_generator = aeh::split(str, delim);
+	std::array<std::string_view, 4> result;
+	result[0] = *split_generator();
+	result[1] = *split_generator();
+	result[2] = *split_generator();
+	result[3] = *split_generator();
+	return result;
+}
+
+TEST_CASE("Splitting at compile time")
+{
+	constexpr std::string_view text = "128.0.0.1";
+	constexpr std::array<std::string_view, 4> splitted = compile_time_split(text, '.');
+	STATIC_REQUIRE(splitted[0] == "128");
+	STATIC_REQUIRE(splitted[1] == "0");
+	STATIC_REQUIRE(splitted[2] == "0");
+	STATIC_REQUIRE(splitted[3] == "1");
+}
+
+TEST_CASE("Ascii text is utf8")
+{
+	constexpr std::u8string_view text = u8"A good ol' ascii string!";
+	std::vector<unsigned> const code_points = to_vector(aeh::view_as_utf8(text));
+
+	REQUIRE(std::equal(text.begin(), text.end(), code_points.begin(), code_points.end()));
+}
+
+TEST_CASE("Non ascii chars take more than one byte")
+{
+	constexpr std::u8string_view text = u8"eñe";
+	std::vector<unsigned> const code_points = to_vector(aeh::view_as_utf8(text));
+
+	REQUIRE(code_points.size() < text.size());
+	REQUIRE(code_points.size() == 3);
+	REQUIRE(code_points[0] == u'e');
+	REQUIRE(code_points[1] == u'ñ');
+	REQUIRE(code_points[2] == u'e');
+}

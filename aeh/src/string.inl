@@ -38,4 +38,68 @@ namespace aeh
 		return (to_string(ts) + ...);
 	}
 
+	namespace detail
+	{
+		template <typename T>
+		concept has_size = requires(T const t) { {t.size()} -> std::convertible_to<size_t>; };
+
+		template <typename StringView, typename Delimiter>
+		constexpr auto split_impl(StringView text, Delimiter delimiter)
+		{
+			return generator([text, delimiter, index = size_t(0)]() mutable noexcept -> std::optional<StringView>
+			{
+				if (index > text.size())
+					return std::nullopt;
+
+				size_t next = text.find(delimiter, index);
+				if (next == std::string_view::npos)
+					next = text.size();
+				StringView const substring = text.substr(index, next - index);
+
+				if constexpr (detail::has_size<Delimiter>)
+					index = next + delimiter.size();
+				else
+					index = next + 1;
+
+				return substring;
+			});
+		}
+	} // namespace detail
+
+	constexpr auto split(std::string_view text, char delimiter) noexcept
+	{
+		return detail::split_impl(text, delimiter);
+	}
+
+	constexpr auto split(std::string_view text, std::string_view delimiter) noexcept
+	{
+		return detail::split_impl(text, delimiter);
+	}
+
+	constexpr auto split(std::u8string_view text, char8_t delimiter) noexcept
+	{
+		return detail::split_impl(text, delimiter);
+	}
+
+	constexpr auto split(std::u8string_view text, std::u8string_view delimiter) noexcept
+	{
+		return detail::split_impl(text, delimiter);
+	}
+
+	namespace detail
+	{
+		auto view_as_utf8_advance(std::u8string_view text, size_t & index) noexcept -> unsigned;
+	}
+
+	inline auto view_as_utf8(std::u8string_view text) noexcept
+	{
+		return generator([text, index = size_t(0)]() mutable noexcept -> std::optional<unsigned>
+		{
+			if (index >= text.size())
+				return std::nullopt;
+
+			return detail::view_as_utf8_advance(text, index);
+		});
+	}
+
 } // namespace aeh

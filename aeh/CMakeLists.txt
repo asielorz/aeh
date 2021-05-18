@@ -81,6 +81,8 @@ target_sources(aeh PRIVATE
 	src/function_ptr.hh
 	src/function_ref.hh
 	src/function_ref.inl
+	src/generator.hh
+	src/generator.inl
 	src/half.hh
 	src/imgui_dialog.hh
 	src/imgui_sdl_binding.cc
@@ -94,6 +96,8 @@ target_sources(aeh PRIVATE
 	src/out.hh
 	src/overload.hh
 	src/pointer_union.hh
+	src/polymorphic_generator.hh
+	src/polymorphic_generator.inl
 	src/priority.hh
 	src/randomly_seeded.hh
 	src/range_function.hh
