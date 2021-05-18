@@ -81,8 +81,20 @@ TEST_CASE("Split that ends with a delimiter")
 {
 	using namespace std::string_view_literals;
 
-	auto const expected = std::vector<std::string_view>{"std", "chrono", "literals"sv, ""sv};
+	auto const expected = std::vector<std::string_view>{"std", "chrono", "literals", ""};
 	constexpr std::string_view text = "std::chrono::literals::";
+
+	auto const splitted = split_to_vector(text, "::"sv);
+
+	REQUIRE(splitted == expected);
+}
+
+TEST_CASE("Split that begins with a delimiter")
+{
+	using namespace std::string_view_literals;
+
+	auto const expected = std::vector<std::string_view>{"", "std", "chrono", "literals"};
+	constexpr std::string_view text = "::std::chrono::literals";
 
 	auto const splitted = split_to_vector(text, "::"sv);
 

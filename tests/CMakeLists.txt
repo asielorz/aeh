@@ -10,7 +10,6 @@ add_executable(aeh_tests
 	src/half.tests.cc
 	src/input.tests.cc
 	src/pointer_union.tests.cc
-	src/span.tests.cc
 	src/string.tests.cc
 	src/tuple.tests.cc
 )
