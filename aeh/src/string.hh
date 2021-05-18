@@ -65,6 +65,118 @@ namespace aeh
 	bool browse(char buffer[], size_t size) noexcept;
 #endif
 
+	namespace detail
+	{
+		template <typename T>
+		concept has_size = requires(T const t) { {t.size()} -> std::convertible_to<size_t>; };
+	}
+
+	template <typename StringView, typename Delimiter>
+	struct SplitIterator
+	{
+		struct Sentinel {};
+
+		explicit SplitIterator(StringView text_, Delimiter delimiter_) noexcept : text(text_), delimiter(delimiter_)
+		{
+			next = text.find(delimiter);
+			if (next == StringView::npos)
+				next = text.size();
+		}
+
+		StringView operator * () const noexcept { return text.substr(index, next - index); }
+
+		SplitIterator & advance() noexcept
+		{
+			if constexpr (detail::has_size<Delimiter>)
+				index = next + delimiter.size();
+			else
+				index = next + 1;
+
+			next = text.find(delimiter, index);
+			if (next == StringView::npos)
+				next = text.size();
+			return *this;
+		}
+
+		SplitIterator & operator ++ () noexcept
+		{
+			return advance();
+		}
+
+		SplitIterator operator ++ (int)
+		{
+			auto copy = *this;
+			advance();
+			return copy;
+		}
+
+		friend bool operator == (SplitIterator const & split, Sentinel) noexcept { return split.index > split.text.size(); }
+
+		SplitIterator begin() const noexcept { return *this; }
+		Sentinel end() const noexcept { return Sentinel(); }
+
+		StringView text;
+		Delimiter delimiter;
+		size_t index = 0;
+		size_t next;
+	};
+
+	inline SplitIterator<std::string_view, char> split(std::string_view text, char delimiter) noexcept
+	{
+		return SplitIterator<std::string_view, char>(text, delimiter);
+	}
+
+	inline SplitIterator<std::string_view, std::string_view> split(std::string_view text, std::string_view delimiter) noexcept
+	{
+		return SplitIterator<std::string_view, std::string_view>(text, delimiter);
+	}
+
+	inline SplitIterator<std::u8string_view, std::u8string_view> split(std::u8string_view text, std::u8string_view delimiter) noexcept
+	{
+		return SplitIterator<std::u8string_view, std::u8string_view>(text, delimiter);
+	}
+
+	struct UTF8CodePointIterator
+	{
+		struct Sentinel {};
+
+		explicit UTF8CodePointIterator(std::u8string_view text_) noexcept : text(text_)
+		{
+			advance();
+		}
+
+		unsigned const & operator * () const noexcept { return code_point; }
+
+		UTF8CodePointIterator & advance() noexcept;
+
+		UTF8CodePointIterator & operator ++ () noexcept
+		{
+			return advance();
+		}
+
+		UTF8CodePointIterator operator ++ (int)
+		{
+			auto copy = *this;
+			advance();
+			return copy;
+		}
+
+		friend bool operator == (UTF8CodePointIterator const & utf8_string, Sentinel) noexcept { return utf8_string.ended; }
+
+		UTF8CodePointIterator begin() const noexcept { return *this; }
+		Sentinel end() const noexcept { return Sentinel(); }
+
+		std::u8string_view text;
+		size_t index = 0;
+		unsigned code_point;
+		bool ended = false;
+	};
+
+	inline UTF8CodePointIterator view_as_utf8(std::u8string_view text) noexcept
+	{
+		return UTF8CodePointIterator(text);
+	}
+
 } // namespace aeh
 
 #include "string.inl"

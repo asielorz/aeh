@@ -1,5 +1,7 @@
 #include "string.hh"
 #include "debug/assert.hh"
+#include <imgui.h> // Needed to include <imgui_internal.h>
+#include <imgui_internal.h> // ImTextCharFromUtf8
 #include <fstream>
 #include <algorithm>
 
@@ -306,7 +308,17 @@ namespace aeh
 		return {};
 	}
 
+	UTF8CodePointIterator & UTF8CodePointIterator::advance() noexcept
+	{
+		if (index >= text.size())
+			ended = true;
 
+		int const chars_in_codepoint = ImTextCharFromUtf8(&code_point, reinterpret_cast<char const *>(text.data()) + index, reinterpret_cast<char const *>(text.data()) + text.size());
+		debug_assert_msg(chars_in_codepoint > 0, "String passed to render_text_justified is not well formed UTF-8.");
+		index += chars_in_codepoint;
+
+		return *this;
+	}
 
 } // namespace aeh
 #endif

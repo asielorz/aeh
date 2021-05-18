@@ -16,7 +16,7 @@ namespace aeh
 	}
 	
 	template <typename InputStream, typename T, typename = std::enable_if_t<std::is_trivially_copyable_v<T>>>
-	InputStream & read_binary(InputStream & is, span<T> t) noexcept
+	InputStream & read_binary(InputStream & is, std::span<T> t) noexcept
 	{
 		return read_binary(is, t.data(), t.size());
 	}
@@ -36,7 +36,7 @@ namespace aeh
 	}
 
 	template <typename OutputStream, typename T, typename = std::enable_if_t<std::is_trivially_copyable_v<T>>>
-	OutputStream & write_binary(OutputStream & os, span<T const> t) noexcept
+	OutputStream & write_binary(OutputStream & os, std::span<T const> t) noexcept
 	{
 		return write_binary(os, t.data(), t.size());
 	}
