@@ -44,7 +44,7 @@ std::vector<StringView> split_to_vector(StringView text, Delimiter delimiter, st
 	return result;
 }
 
-TEST_CASE("split single char")
+TEST_CASE("Split single char")
 {
 	using namespace std::string_view_literals;
 
@@ -100,3 +100,14 @@ TEST_CASE("Split that begins with a delimiter")
 
 	REQUIRE(splitted == expected);
 }
+
+TEST_CASE("Split with multiple consecutive delimiters")
+{
+	auto const expected = std::vector<std::string_view>{ "", "", "", "2", "", "3", "0", "", "" };
+	constexpr std::string_view text = "...2..3.0..";
+
+	auto const splitted = split_to_vector(text, '.');
+
+	REQUIRE(splitted == expected);
+}
+
