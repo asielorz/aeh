@@ -131,6 +131,11 @@ namespace aeh
 		return SplitIterator<std::string_view, std::string_view>(text, delimiter);
 	}
 
+	inline SplitIterator<std::u8string_view, char8_t> split(std::u8string_view text, char8_t delimiter) noexcept
+	{
+		return SplitIterator<std::u8string_view, char8_t>(text, delimiter);
+	}
+
 	inline SplitIterator<std::u8string_view, std::u8string_view> split(std::u8string_view text, std::u8string_view delimiter) noexcept
 	{
 		return SplitIterator<std::u8string_view, std::u8string_view>(text, delimiter);
