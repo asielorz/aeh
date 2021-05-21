@@ -10,6 +10,7 @@ add_executable(aeh_tests
 	src/generator.tests.cc
 	src/half.tests.cc
 	src/input.tests.cc
+	src/json_string_builder.tests.cc
 	src/pointer_union.tests.cc
 	src/string.tests.cc
 	src/tuple.tests.cc

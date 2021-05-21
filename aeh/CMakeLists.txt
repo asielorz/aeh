@@ -88,6 +88,8 @@ target_sources(aeh PRIVATE
 	src/imgui_sdl_binding.cc
 	src/imgui_sdl_binding.hh
 	src/intcmp.hh
+	src/json_string_builder.cc
+	src/json_string_builder.hh
 	src/map.hh
 	src/math.cc
 	src/math.hh
