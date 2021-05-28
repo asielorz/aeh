@@ -92,7 +92,7 @@ namespace aeh::msp
     auto flexible_immutable_array<T>::permute(F && f) const -> shared_ptr<flexible_immutable_array>
     {
         auto builder = flexible_immutable_array_builder<T>::copy_of_range(begin(), end());
-        std::forward<F>(f)(span<T>(builder.data(), builder.size()));
+        std::forward<F>(f)(std::span<T>(builder.data(), builder.size()));
         return builder.finish();
     }
 

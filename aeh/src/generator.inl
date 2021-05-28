@@ -28,7 +28,7 @@ namespace aeh
 	template <std::invocable<> F>
 	constexpr auto generator_iterator<F>::operator == (generator_sentinel_t) const noexcept -> bool
 	{
-		return !last_generated.has_value(); 
+		return !last_generated; 
 	}
 
 	template <std::invocable<> F>

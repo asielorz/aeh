@@ -95,8 +95,8 @@ namespace aeh::math
 	//! From the azimuth, an increase in the longitude represents a rotation towards the positive z.
 	struct SphereCoords
 	{
-		static const glm::vec3 zenith; // = { 0, 1, 0 };
-		static const glm::vec3 azimuth; // = { 1, 0, 0 };
+		static constexpr glm::vec3 zenith = {0, 1, 0};
+		static constexpr glm::vec3 azimuth = {1, 0, 0};
 
 		float latitude;
 		float longitude;

@@ -2,17 +2,10 @@
 
 #include <cstdint>
 #include <cstring>
+#include <bit>
 
 namespace aeh
 {
-
-	template <typename To, typename From>
-	constexpr To bit_cast(From input)
-	{
-		To result;
-		memcpy(&result, &input, sizeof(From));
-		return result;
-	}
 
 	// Storage type for 16 bit IEEE754 floating point numbers. Since this is emulating 16 bit floats and
 	// not implementing their operations, consider using them as a storage type for passing 16 bit float
@@ -23,7 +16,7 @@ namespace aeh
 
 		constexpr static auto from_float(float value) noexcept -> half
 		{
-			uint32_t const float_state = bit_cast<uint32_t>(value);
+			uint32_t const float_state = std::bit_cast<uint32_t>(value);
 			uint16_t const half_state =
 				((float_state >> 16) & 0b1000'0000'0000'0000) |																								// Sign
 				((((float_state & 0b0111'1111'1000'0000'0000'0000'0000'0000) - 0b0011'1000'0000'0000'0000'0000'0000'0000) >> 13) & 0b0111'1100'0000'0000) |	// Exponent
@@ -45,7 +38,7 @@ namespace aeh
 				(((state & 0b0111'1100'0000'0000) + 0b0001'1100'0000'0000'0000) << 13) |	// Exponent
 				((state & 0b0011'1111'1111) << 13);											// Mantissa
 
-			return bit_cast<float>(float_state);
+			return std::bit_cast<float>(float_state);
 		}
 
 		uint16_t state = 0;

@@ -1,11 +1,11 @@
 #pragma once
 
-#include "span.hh"
 #include "minimalistic_shared_ptr.hh"
 #include <memory>
 #include <iterator>
 #include <cassert>
 #include <vector>
+#include <span>
 
 namespace aeh::msp
 {
@@ -69,7 +69,7 @@ namespace aeh::msp
         [[nodiscard]] auto operator [] (size_t i) const noexcept -> T const & { assert(i < size()); return data()[i]; }
         [[nodiscard]] auto front() const noexcept -> T const & { return data()[0]; }
         [[nodiscard]] auto back() const noexcept -> T const & { return data()[size() - 1]; }
-        operator span<T const>() const noexcept { return { data(), size() }; }
+        operator std::span<T const>() const noexcept { return { data(), size() }; }
 
         friend struct flexible_immutable_array_builder<T>;
         friend detail::the_empty_array_buffer_t detail::make_empty_flexible_immutable_array() noexcept;
@@ -122,8 +122,8 @@ namespace aeh::msp
         [[nodiscard]] auto back() noexcept -> T & { return data()[size() - 1]; }
         [[nodiscard]] auto back() const noexcept -> T const & { return data()[size() - 1]; }
 
-        operator span<T>() noexcept { return { data(), size() }; }
-        operator span<T const>() const noexcept { return { data(), size() }; }
+        operator std::span<T>() noexcept { return { data(), size() }; }
+        operator std::span<T const>() const noexcept { return { data(), size() }; }
 
         [[nodiscard]] auto finish() noexcept -> shared_ptr<flexible_immutable_array<T>> { return std::move(array_being_built); }
         [[nodiscard]] bool has_finished() const noexcept { return array_being_built == nullptr; }

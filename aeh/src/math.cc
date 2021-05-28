@@ -203,9 +203,6 @@ namespace aeh::math
 		return result + (remainder > 0);
 	}
 
-	const glm::vec3 SphereCoords::zenith = { 0, 1, 0 };
-	const glm::vec3 SphereCoords::azimuth = { 1, 0, 0 };
-
 	glm::vec3 forward(SphereCoords c) noexcept
 	{
 		return {

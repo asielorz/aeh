@@ -1,6 +1,7 @@
 #pragma once
 
 #include <optional>
+#include <concepts>
 
 namespace aeh
 {
@@ -10,7 +11,7 @@ namespace aeh
 	{
 		using type = T;
 	};
-	template <typename T> using remove_optional_t = typename remove_optional<T>::type;
+	template <typename T> using dereference_t = std::remove_cvref_t<decltype(*std::declval<T>())>;
 
 	struct generator_sentinel_t {};
 	constexpr generator_sentinel_t generator_sentinel;
@@ -18,7 +19,9 @@ namespace aeh
 	template <std::invocable<> F>
 	struct generator_iterator
 	{
-		using value_type = remove_optional_t<std::invoke_result_t<F>>;
+		using optional_type = std::invoke_result_t<F>;
+		using value_type = dereference_t <optional_type>;
+		using iterator_category = std::forward_iterator_tag;
 		static constexpr bool is_noexcept = std::is_nothrow_invocable_v<F>;
 
 		constexpr explicit generator_iterator(F const & function) noexcept(is_noexcept && std::is_nothrow_copy_constructible_v<F>);
@@ -34,13 +37,14 @@ namespace aeh
 
 	private:
 		F generator_function;
-		std::optional<value_type> last_generated;
+		optional_type last_generated;
 	};
 
 	template <std::invocable<> F>
 	struct generator
 	{
-		using value_type = remove_optional_t<std::invoke_result_t<F>>;
+		using optional_type = std::invoke_result_t<F>;
+		using value_type = dereference_t<optional_type>;
 		static constexpr bool is_noexcept = std::is_nothrow_invocable_v<F>;
 
 		constexpr explicit generator(F const & function) noexcept(std::is_nothrow_copy_constructible_v<F>);
