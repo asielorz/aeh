@@ -69,7 +69,7 @@ namespace aeh::msp
         [[nodiscard]] auto operator [] (size_t i) const noexcept -> T const & { assert(i < size()); return data()[i]; }
         [[nodiscard]] auto front() const noexcept -> T const & { return data()[0]; }
         [[nodiscard]] auto back() const noexcept -> T const & { return data()[size() - 1]; }
-        operator std::span<T const>() const noexcept { return { data(), size() }; }
+        operator std::span<T const>() const noexcept { return {data(), size()}; }
 
         friend struct flexible_immutable_array_builder<T>;
         friend detail::the_empty_array_buffer_t detail::make_empty_flexible_immutable_array() noexcept;
@@ -92,13 +92,13 @@ namespace aeh::msp
         using reverse_iterator = std::reverse_iterator<iterator>;
         using const_reverse_iterator = std::reverse_iterator<const_iterator>;
 
-        [[nodiscard]] static auto with_size(size_t size)->flexible_immutable_array_builder;
+        [[nodiscard]] static auto with_size(size_t size) -> flexible_immutable_array_builder;
 
         template <typename ForwardIterator>
-        [[nodiscard]] static auto copy_of_range(ForwardIterator first, ForwardIterator last)->flexible_immutable_array_builder;
+        [[nodiscard]] static auto copy_of_range(ForwardIterator first, ForwardIterator last) -> flexible_immutable_array_builder;
 
         template <typename ForwardIterator>
-        [[nodiscard]] static auto move_from_range(ForwardIterator first, ForwardIterator last)->flexible_immutable_array_builder;
+        [[nodiscard]] static auto move_from_range(ForwardIterator first, ForwardIterator last) -> flexible_immutable_array_builder;
 
         [[nodiscard]] auto size() const noexcept -> size_t { return array_being_built->size_; }
         [[nodiscard]] auto data() noexcept -> T * { return array_being_built->data_; }
@@ -122,14 +122,14 @@ namespace aeh::msp
         [[nodiscard]] auto back() noexcept -> T & { return data()[size() - 1]; }
         [[nodiscard]] auto back() const noexcept -> T const & { return data()[size() - 1]; }
 
-        operator std::span<T>() noexcept { return { data(), size() }; }
-        operator std::span<T const>() const noexcept { return { data(), size() }; }
+        operator std::span<T>() noexcept { return {data(), size()}; }
+        operator std::span<T const>() const noexcept { return {data(), size()}; }
 
         [[nodiscard]] auto finish() noexcept -> shared_ptr<flexible_immutable_array<T>> { return std::move(array_being_built); }
-        [[nodiscard]] bool has_finished() const noexcept { return array_being_built == nullptr; }
+        [[nodiscard]] auto has_finished() const noexcept -> bool { return array_being_built == nullptr; }
 
     private:
-        explicit flexible_immutable_array_builder(shared_ptr<flexible_immutable_array<T>> array) : array_being_built(std::move(array)) {}
+        explicit flexible_immutable_array_builder(shared_ptr<flexible_immutable_array<T>> array) noexcept : array_being_built(std::move(array)) {}
         shared_ptr<flexible_immutable_array<T>> array_being_built;
     };
 
