@@ -1,6 +1,6 @@
-#pragma once
-
 #ifdef AEH_WITH_GLM
+
+#include "mouse_ndc.hh"
 
 #include "input.hh"
 #include <glm/vec2.hpp>

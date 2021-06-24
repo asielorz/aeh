@@ -1,6 +1,7 @@
 #include "binary_io.hh"
 #include <numeric>
 #include <fstream>
+#include <cstring>
 
 namespace aeh
 {

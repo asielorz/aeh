@@ -116,7 +116,7 @@
 #endif
 
 // We use a macro so that MSVC's sprintf_s can deduce the size of 'buffer'
-#ifdef _MSC_VER
+#if AEH_MSVC
 #	define AEH_SPRINTF(buffer, format, ...) sprintf_s(buffer, format, __VA_ARGS__)
 #else
 #	define AEH_SPRINTF(buffer, format, ...) std::sprintf(buffer, format, __VA_ARGS__)

@@ -1,32 +1,15 @@
 #define CATCH_CONFIG_RUNNER
 #include <catch2/catch.hpp>
 
-#include "compatibility.hh"
-
-#if AEH_WINDOWS
-#	include <Windows.h>
-#endif
-
-static void message_box(char const * title, char const * message) noexcept
-{
-#if AEH_WINDOWS
-	::MessageBoxA(nullptr, message, title, MB_OK | MB_ICONINFORMATION);
-
-#else
-	constexpr char title_color[] = "\u001b[41;27m";
-	constexpr char message_color[] = "\u001b[31m";
-	constexpr char reset_color[] = "\u001b[0m";
-
-	std::fprintf(stderr, "%s%s:%s\n%s%s%s\n", title_color, title, reset_color, message_color, message, reset_color);
-#endif
-}
+#include "debug/assert.hh"
 
 auto run_tests(int argc, char const * const argv[]) noexcept -> int
 {
+	// TODO: option for non-interactive
 	int const result = Catch::Session().run(argc, argv);
 	if (result != 0)
 	{
-		message_box("A test failed", "One of the tests failed. Look at the console for more information.");
+		aeh::debug::message_box("A test failed", "One of the tests failed. Look at the console for more information.", aeh::debug::MBType::Ok | aeh::debug::MBIcon::Information);
 		system_pause();
 	}
 	return result;

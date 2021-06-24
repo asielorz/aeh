@@ -1,3 +1,4 @@
+﻿#include "string.hh"
 namespace aeh
 {
 
@@ -88,12 +89,12 @@ namespace aeh
 
 	namespace detail
 	{
-		auto view_as_utf8_advance(std::u8string_view text, size_t & index) noexcept -> unsigned;
+		auto view_as_utf8_advance(std::u8string_view text, size_t & index) noexcept -> char32_t;
 	}
 
 	inline auto view_as_utf8(std::u8string_view text) noexcept
 	{
-		return generator([text, index = size_t(0)]() mutable noexcept -> std::optional<unsigned>
+		return generator([text, index = size_t(0)]() mutable noexcept -> std::optional<char32_t>
 		{
 			if (index >= text.size())
 				return std::nullopt;

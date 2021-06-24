@@ -164,7 +164,7 @@ namespace aeh::math
 
 	glm::vec3 any_perpendicular(const glm::vec3 & v) noexcept
 	{
-		const float abs_vals[] = { abs(v.x), abs(v.y), abs(v.z) };
+		const float abs_vals[] = { std::abs(v.x), std::abs(v.y), std::abs(v.z) };
 		const auto min = std::min_element(abs_vals, abs_vals + 3) - abs_vals;
 
 		if (min == 0)

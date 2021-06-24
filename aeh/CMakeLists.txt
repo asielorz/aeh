@@ -14,7 +14,7 @@ target_include_directories(aeh
 
 if (AEH_WITH_SDL2)
 	find_package(SDL2 REQUIRED)
-	target_link_libraries(aeh PUBLIC sdl2::sdl2)
+	target_link_libraries(aeh PUBLIC SDL2::SDL2-static)
 	target_compile_definitions(aeh PUBLIC AEH_WITH_SDL2)
 	
 	find_package(OpenGL REQUIRED)
@@ -36,6 +36,9 @@ if (AEH_WITH_GLM)
 		GLM_FORCE_EXPLICIT_CTOR # Make make conversion constructors explicit; vec4 foo = ...; vec3 bar = foo; // Now it fails to compile
 	)
 endif()
+
+find_package(portable-file-dialogs REQUIRED)
+target_link_libraries(aeh PRIVATE portable-file-dialogs::portable-file-dialogs)
 
 target_compile_features(aeh
 	PUBLIC
@@ -68,6 +71,7 @@ target_sources(aeh PRIVATE
 	src/binary_io.cc
 	src/binary_io.hh
 	src/binary_io.inl
+	src/bit.hh
 	src/change_stack.hh
 	src/change_stack.inl
 	src/circular.hh

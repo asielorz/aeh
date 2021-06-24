@@ -2,15 +2,13 @@
 
 #include "compatibility.hh"
 
-#if AEH_WINDOWS
-
 namespace aeh::debug
 {
 	enum struct MBType
 	{
 		AbortRetryIgnore = 0x00000002L,
-		CancelTryContinue = 0x00000006L,
-		Help = 0x00004000L,
+		//CancelTryContinue = 0x00000006L,
+		//Help = 0x00004000L,
 		Ok = 0x00000000L,
 		OkCancel = 0x00000001L,
 		RetryCancel = 0x00000005L,
@@ -20,16 +18,20 @@ namespace aeh::debug
 
 	enum struct MBIcon
 	{
-		Exclamation = 0x00000030L,
+		//Exclamation = 0x00000030L,
 		Warning = 0x00000030L,
 		Information = 0x00000040L,
-		Asterist = 0x00000040L,
+		//Asterist = 0x00000040L,
 		Question = 0x00000020L,
-		Stop = 0x00000010L,
+		//Stop = 0x00000010L,
 		Error = 0x00000010L
 	};
-	enum struct MBFlags {};
-	constexpr MBFlags operator | (MBType type, MBIcon icon) noexcept { return MBFlags(static_cast<int>(type) | static_cast<int>(icon)); }
+	struct MBFlags
+	{
+		MBType type;
+		MBIcon icon;
+	};
+	constexpr MBFlags operator | (MBType type, MBIcon icon) noexcept { return MBFlags{ type, icon }; }
 
 	enum struct MBRet
 	{
@@ -40,8 +42,8 @@ namespace aeh::debug
 		Ignore = 5,
 		Yes = 6,
 		No = 7,
-		TryAgain = 10,
-		Continue = 11
+		//TryAgain = 10,
+		//Continue = 11
 	};
 
 	MBRet message_box(const char * title, const char * message, MBFlags flags = MBType::Ok | MBIcon::Error) noexcept;
@@ -60,6 +62,9 @@ namespace aeh::debug
 	MBRet not_implemented(char const location[] = nullptr);
 	void not_implemented_ok(char const location[] = nullptr);
 
+	//! Breaks into the debugger
+	void debugbreak() noexcept;
+
 	namespace detail
 	{
 		void debug_assert_failed(const char * expression_str, const char * msg, const char * file, const char * function, int line);
@@ -68,15 +73,12 @@ namespace aeh::debug
 } // namespace aeh::debug
 
 #if AEH_DEBUG
-	#pragma warning (disable : 4800) // Forcing int/pointer to bool
+	AEH_WARNING_PUSH()
+	AEH_MSVC_PRAGMA(warning(disable : 4800)) // Forcing int/pointer to bool
 	#define debug_assert_msg(expression,msg) if (!static_cast<bool>(expression)) { ::aeh::debug::detail::debug_assert_failed(#expression, msg, __FILE__, __FUNCTION__, __LINE__); }
+	AEH_WARNING_POP()
 #else
-	#define debug_assert_msg(expression,msg) (void)(0);
+	#define debug_assert_msg(expression,msg) static_cast<void>(0);
 #endif
 
 #define debug_assert(expression) debug_assert_msg(expression, "debug_assert expression evaluated to false.")
-
-#else
-#include <cassert>
-#define debug_assert(expression) assert(expression)
-#endif

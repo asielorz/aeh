@@ -3,10 +3,6 @@
 #include <cstdlib>
 #include <cstdio>
 
-#if AEH_WINDOWS
-#	include <Windows.h>
-#endif
-
 namespace aeh::debug
 {
 
@@ -16,7 +12,7 @@ namespace aeh::debug
 		{
 			MBRet const ret = message_box(title, message, MBType::RetryCancel | MBIcon::Error);
 			if (ret == MBRet::Retry)
-				__debugbreak();
+				debugbreak();
 
 			std::quick_exit(1);
 		}
@@ -35,7 +31,7 @@ namespace aeh::debug
 	[[noreturn]] auto mark_as_to_do(char const what[]) noexcept -> void
 	{
 		char buffer[1024];
-		sprintf_s(buffer, "This part of the code (%s) has not been implemented yet.", what);
+		AEH_SPRINTF(buffer, "This part of the code (%s) has not been implemented yet.", what);
 
 		unreachable_locals::handle_unreachable("TODO", buffer);
 	}

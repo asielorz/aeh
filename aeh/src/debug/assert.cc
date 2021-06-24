@@ -1,13 +1,99 @@
 #include "assert.hh"
 #include <string>
-#include <Windows.h>
+
+AEH_WARNING_PUSH()
+AEH_MSVC_PRAGMA(warning(disable: 4355)) // 'this' used as a base class initializer
+AEH_MSVC_PRAGMA(warning(disable: 4191)) // conversion from different function pointer types
+#	include <portable-file-dialogs.h>
+AEH_WARNING_POP()
+
+#include "unreachable.hh"
 
 namespace aeh::debug
 {
+	namespace assert_locals
+	{
+		[[nodiscard]] static constexpr pfd::choice type_to_pfd(MBType type) noexcept
+		{
+			switch (type)
+			{
+			case aeh::debug::MBType::AbortRetryIgnore:
+				return pfd::choice::abort_retry_ignore;
+			case aeh::debug::MBType::Ok:
+				return pfd::choice::ok;
+			case aeh::debug::MBType::OkCancel:
+				return pfd::choice::ok_cancel;
+			case aeh::debug::MBType::RetryCancel:
+				return pfd::choice::retry_cancel;
+			case aeh::debug::MBType::YesNo:
+				return pfd::choice::yes_no;
+			case aeh::debug::MBType::YesNoCancel:
+				return pfd::choice::yes_no_cancel;
+			}
+
+			declare_unreachable();
+		}
+
+		[[nodiscard]] static constexpr pfd::icon icon_to_pfd(MBIcon icon) noexcept
+		{
+			switch (icon)
+			{
+			case aeh::debug::MBIcon::Warning:
+				return pfd::icon::warning;
+			case aeh::debug::MBIcon::Information:
+				return pfd::icon::info;
+			case aeh::debug::MBIcon::Question:
+				return pfd::icon::question;
+			case aeh::debug::MBIcon::Error:
+				return pfd::icon::error;
+			}
+
+			declare_unreachable();
+		}
+
+		[[nodiscard]] static constexpr MBRet pfd_button_to_mbret(pfd::button button) noexcept
+		{
+			switch (button)
+			{
+			case pfd::button::cancel:
+				return MBRet::Cancel;
+			case pfd::button::ok:
+				return MBRet::Ok;
+			case pfd::button::yes:
+				return MBRet::Yes;
+			case pfd::button::no:
+				return MBRet::No;
+			case pfd::button::abort:
+				return MBRet::Abort;
+			case pfd::button::retry:
+				return MBRet::Retry;
+			case pfd::button::ignore:
+				return MBRet::Ignore;
+			}
+
+			declare_unreachable();
+		}
+	} // namespace assert_locals
+
+	// TODO: maybe use the implementation from catch? (catch_debugger.h)
+	void debugbreak() noexcept
+	{
+#if AEH_MSVC
+		__debugbreak();
+#else
+		AEH_MESSAGE_INFO("debugbreak not implemented")
+#endif
+		// TODO: other compilers/platforms
+	}
 
 	MBRet message_box(const char * title, const char * message, MBFlags flags) noexcept
 	{
-		return MBRet(::MessageBoxA(nullptr, message, title, static_cast<int>(flags)));
+		const pfd::choice type = assert_locals::type_to_pfd(flags.type);
+		const pfd::icon icon = assert_locals::icon_to_pfd(flags.icon);
+
+		const pfd::button result_button = pfd::message(title, message, type, icon).result();
+
+		return assert_locals::pfd_button_to_mbret(result_button);
 	}
 
 	MBRet message_box_abort_retry_ignore(const char * title, const char * message) noexcept
@@ -20,7 +106,7 @@ namespace aeh::debug
 			std::abort();
 			break;
 		case MBRet::Retry:
-			__debugbreak();
+			debugbreak();
 			break;
 		default:
 			break;
@@ -40,7 +126,7 @@ namespace aeh::debug
 		if (location)
 		{
 			char buffer[2048];
-			sprintf_s(buffer, "The functionality at %s has not been implemented.", location);
+			AEH_SPRINTF(buffer, "The functionality at %s has not been implemented.", location);
 			return message_box_abort_retry_ignore("Not implemented", buffer);
 		}
 		else
@@ -54,7 +140,7 @@ namespace aeh::debug
 		if (location)
 		{
 			char buffer[2048];
-			sprintf_s(buffer, "The functionality at %s has not been implemented.", location);
+			AEH_SPRINTF(buffer, "The functionality at %s has not been implemented.", location);
 			message_box("Not implemented", buffer);
 		}
 		else

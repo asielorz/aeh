@@ -47,7 +47,7 @@ namespace aeh::main_loop
 		return exit_code;
 	}
 
-	template <typename Demo, typename = std::enable_if_t<std::is_rvalue_reference_v<Demo &&>>>
+	template <typename Demo> requires std::is_rvalue_reference_v<Demo&&>
 	int run(Demo && demo, SDL_Window * window, Options const & options)
 	{
 		Demo & demo_as_non_rvalue_ref = demo;
@@ -66,7 +66,7 @@ namespace aeh::main_loop
 		return result;
 	}
 
-	template <typename Demo, typename = std::enable_if_t<std::is_rvalue_reference_v<Demo &&>>>
+	template <typename Demo> requires std::is_rvalue_reference_v<Demo&&>
 	int run(Demo && demo, NewWindowOptions const & options)
 	{
 		Demo & demo_as_non_rvalue_ref = demo;

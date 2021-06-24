@@ -3,6 +3,7 @@
 #include "input_SDL.hh"
 #include "input.hh"
 #include "debug/unreachable.hh"
+#include "string.hh"
 #include <SDL2/SDL.h>
 #include <optional>
 
@@ -251,7 +252,7 @@ namespace aeh::in
 			}
 			case SDL_TEXTINPUT:
 			{
-				strcpy_s(frame.text_input.data(), frame.text_input.size(), event.text.text);
+				c_string_copy(frame.text_input, event.text.text);
 				break;
 			}
 			case SDL_KEYDOWN:

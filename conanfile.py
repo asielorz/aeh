@@ -38,7 +38,7 @@ class AehConan(conans.ConanFile):
 
     def requirements(self):
         if self.options.with_unit_tests:
-            self.requires("catch2/2.13.0")
+            self.requires("catch2/2.13.6")
         
         if self.options.with_glm:
             self.requires("glm/0.9.9.8")
@@ -50,7 +50,7 @@ class AehConan(conans.ConanFile):
             self.requires("imgui/1.79")
 
         if self.options.with_sdl2:
-            self.requires("sdl2/2.0.10@bincrafters/stable")
+            self.requires("sdl2/2.0.14@bincrafters/stable")
             self.requires("opengl/system")
 
             if self.settings.os == "Linux":
@@ -60,6 +60,8 @@ class AehConan(conans.ConanFile):
                 self.options["sdl2"].jack = False
                 self.options["sdl2"].nas = False
                 self.options["sdl2"].pulse = False
+
+        self.requires("portable-file-dialogs/0.1.0")
 
     def configure(self):
         required_cpp_std = "17"

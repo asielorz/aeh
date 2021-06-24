@@ -1,9 +1,11 @@
-#pragma once
+﻿#pragma once
 
 #include "compatibility.hh"
 #include "generator.hh"
+#include "debug/assert.hh"
 #include <string>
 #include <filesystem>
+#include <span>
 
 namespace aeh
 {
@@ -73,6 +75,10 @@ namespace aeh
 
 	//! Returns an aeh::generator object that generates the UTF8 code points.
 	inline auto view_as_utf8(std::u8string_view text) noexcept;
+
+	//! Like strncpy but guarantees that the destination is null terminated,
+	//! even when a truncation occurs. The extra space (if any) is not written to
+	void c_string_copy(std::span<char> dest, char const src[]);
 
 } // namespace aeh
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "function_ptr.hh"
+#include <functional>
 
 /*
 *	Non owning polymorphic callable object wrapper.

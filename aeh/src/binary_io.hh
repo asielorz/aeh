@@ -1,7 +1,8 @@
 #pragma once
 
+#include <cstdint>
 #include <span>
-#include <iosfwd>
+#include <ios>
 
 namespace aeh
 {

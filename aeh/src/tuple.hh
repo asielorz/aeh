@@ -2,6 +2,7 @@
 
 #include "function_ptr.hh"
 #include <tuple>
+#include <functional>
 
 namespace aeh
 {

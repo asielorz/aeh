@@ -94,13 +94,13 @@ namespace aeh::main_loop
 	template <typename Demo>
 	int run(Demo & demo, SDL_Window * window, Options const & options = Options());
 
-	template <typename Demo, typename>
+	template <typename Demo> requires std::is_rvalue_reference_v<Demo&&>
 	int run(Demo && demo, SDL_Window * window, Options const & options = Options());
 
 	template <typename Demo>
 	int run(Demo & demo, NewWindowOptions const & options = NewWindowOptions());
 
-	template <typename Demo, typename>
+	template <typename Demo> requires std::is_rvalue_reference_v<Demo&&>
 	int run(Demo && demo, NewWindowOptions const & options = NewWindowOptions());
 
 } // namespace demo_main_loop

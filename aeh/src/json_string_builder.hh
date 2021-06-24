@@ -54,7 +54,7 @@ namespace aeh::json
 		ObjectMemberBuilder(ObjectMemberBuilder &&) = delete;
 
 #ifndef NDEBUG
-		~ObjectMemberBuilder();
+		virtual ~ObjectMemberBuilder();
 #endif
 
 	private:
@@ -100,7 +100,11 @@ namespace aeh::json
 	{
 		ArrayBuilder & operator << (JsonSerializable auto const & value) { static_cast<ValueBuilder &>(*this) << value; return *this; }
 
+#ifdef NDEBUG
 		~ArrayBuilder();
+#else
+		virtual ~ArrayBuilder(); // Avoid -Wnon-virtual-dtor
+#endif
 		ArrayBuilder(ObjectBuilder const &) = delete;
 		ArrayBuilder(ObjectBuilder &&) = delete;
 

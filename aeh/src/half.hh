@@ -1,8 +1,9 @@
 #pragma once
 
+#include "bit.hh"
 #include <cstdint>
 #include <cstring>
-#include <bit>
+
 
 namespace aeh
 {
@@ -16,7 +17,7 @@ namespace aeh
 
 		constexpr static auto from_float(float value) noexcept -> half
 		{
-			uint32_t const float_state = std::bit_cast<uint32_t>(value);
+			uint32_t const float_state = bit_cast<uint32_t>(value);
 			uint16_t const half_state =
 				((float_state >> 16) & 0b1000'0000'0000'0000) |																								// Sign
 				((((float_state & 0b0111'1111'1000'0000'0000'0000'0000'0000) - 0b0011'1000'0000'0000'0000'0000'0000'0000) >> 13) & 0b0111'1100'0000'0000) |	// Exponent
@@ -31,14 +32,17 @@ namespace aeh
 			return h;
 		}
 
-		constexpr auto as_float() const noexcept -> float
+#if AEH_HAS_STD_BIT
+		constexpr
+#endif
+		auto as_float() const noexcept -> float
 		{
 			uint32_t const float_state =
 				((state & 0b1000'0000'0000'0000) << 16) |									// Sign
 				(((state & 0b0111'1100'0000'0000) + 0b0001'1100'0000'0000'0000) << 13) |	// Exponent
 				((state & 0b0011'1111'1111) << 13);											// Mantissa
 
-			return std::bit_cast<float>(float_state);
+			return bit_cast<float>(float_state);
 		}
 
 		uint16_t state = 0;

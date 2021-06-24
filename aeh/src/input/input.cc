@@ -1,6 +1,7 @@
 #include "input.hh"
 #include "debug/unreachable.hh"
 #include "binary_io.hh"
+#include <cstring>
 
 namespace aeh::in
 {
@@ -640,7 +641,7 @@ namespace aeh::in
 	{
 		return static_cast<PreviousFrame const &>(a) == static_cast<PreviousFrame const &>(b)
 			&& a.mouse_wheel == b.mouse_wheel
-			&& strncmp(a.text_input.data(), b.text_input.data(), a.text_input.size()) == 0;
+			&& std::strncmp(a.text_input.data(), b.text_input.data(), a.text_input.size()) == 0;
 	}
 
 	auto operator != (Frame const & a, Frame const & b) noexcept -> bool

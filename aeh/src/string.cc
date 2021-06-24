@@ -1,4 +1,4 @@
-#include "string.hh"
+﻿#include "string.hh"
 #include "debug/assert.hh"
 #include <imgui.h> // Needed to include <imgui_internal.h>
 #include <imgui_internal.h> // ImTextCharFromUtf8
@@ -202,8 +202,22 @@ namespace aeh
 			return path.substr(start + 1);
 	}
 
+	void c_string_copy(std::span<char> dest, char const src[])
+	{
+		debug_assert(src != nullptr);
+
+		const auto dest_size = dest.size();
+		debug_assert(dest_size > 0);
+
+		size_t i = 0;
+		for (; i < dest_size - 1 && src[i] != 0; ++i)
+			dest[i] = src[i];
+		dest[i] = '\0';
+	}
+
 } // namespace aeh
 
+// TODO: use portable-file-dialogs
 #if AEH_WINDOWS
 #include <Windows.h>
 
@@ -307,18 +321,23 @@ namespace aeh
 
 		return {};
 	}
+} // namespace aeh
+#endif
 
+namespace aeh
+{
 	namespace detail
 	{
-		auto view_as_utf8_advance(std::u8string_view text, size_t & index) noexcept -> unsigned
+		auto view_as_utf8_advance(std::u8string_view text, size_t & index) noexcept -> char32_t
 		{
-			unsigned code_point;
-			int const chars_in_codepoint = ImTextCharFromUtf8(&code_point, reinterpret_cast<char const *>(text.data()) + index, reinterpret_cast<char const *>(text.data()) + text.size());
+			unsigned code_point_unsigned;
+			int const chars_in_codepoint = ImTextCharFromUtf8(&code_point_unsigned, reinterpret_cast<char const *>(text.data()) + index, reinterpret_cast<char const *>(text.data()) + text.size());
 			debug_assert_msg(chars_in_codepoint > 0, "String passed to render_text_justified is not well formed UTF-8.");
+
+			const auto code_point = static_cast<char32_t>(code_point_unsigned);
 			index += chars_in_codepoint;
 			return code_point;
 		}
 	} // namespace detail
 
 } // namespace aeh
-#endif

@@ -42,7 +42,8 @@ namespace aeh
 
 		constexpr auto set_pointer(Pointee * p) -> PointerUnion &
 		{
-			pointer_and_extra_data = Pointee * ((value() & extra_data_mask) | size_t(p));
+			using PointeePtr = Pointee *; // Otherwise gcc 10.2.0 gets confused
+			pointer_and_extra_data = PointeePtr((value() & extra_data_mask) | size_t(p));
 			return *this;
 		}
 		constexpr auto set_extra_data(ExtraData s) -> PointerUnion &

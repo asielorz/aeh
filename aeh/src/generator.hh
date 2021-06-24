@@ -2,6 +2,8 @@
 
 #include <optional>
 #include <concepts>
+#include <iterator>
+#include <functional>
 
 namespace aeh
 {

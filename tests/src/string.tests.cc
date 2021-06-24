@@ -1,4 +1,4 @@
-#include "string.hh"
+ï»¿#include "string.hh"
 #include <catch2/catch.hpp>
 #include <array>
 
@@ -108,19 +108,56 @@ TEST_CASE("Splitting at compile time")
 TEST_CASE("Ascii text is utf8")
 {
 	constexpr std::u8string_view text = u8"A good ol' ascii string!";
-	std::vector<unsigned> const code_points = to_vector(aeh::view_as_utf8(text));
+	std::vector<char32_t> const code_points = to_vector(aeh::view_as_utf8(text));
 
 	REQUIRE(std::equal(text.begin(), text.end(), code_points.begin(), code_points.end()));
 }
 
 TEST_CASE("Non ascii chars take more than one byte")
 {
-	constexpr std::u8string_view text = u8"eñe";
-	std::vector<unsigned> const code_points = to_vector(aeh::view_as_utf8(text));
+	constexpr std::u8string_view text = u8"eÃ±e";
+	std::vector<char32_t> const code_points = to_vector(aeh::view_as_utf8(text));
 
 	REQUIRE(code_points.size() < text.size());
 	REQUIRE(code_points.size() == 3);
-	REQUIRE(code_points[0] == u'e');
-	REQUIRE(code_points[1] == u'ñ');
-	REQUIRE(code_points[2] == u'e');
+	REQUIRE(code_points[0] == U'e');
+	REQUIRE(code_points[1] == U'Ã±');
+	REQUIRE(code_points[2] == U'e');
+}
+
+TEST_CASE("c_string_copy copies like strcpy but with a max buffer size")
+{
+	constexpr size_t source_size = 10;
+	constexpr char source[] = "123456789\0This part shouldn't be accessible";
+
+	constexpr char padding_char = char{ 1 };
+
+	{
+		char dest[source_size];
+		std::fill(std::begin(dest), std::end(dest), padding_char);
+
+		SECTION("Fits")
+		{
+			aeh::c_string_copy(dest, source);
+			REQUIRE(std::string_view(std::data(dest), source_size) == std::string_view(std::data(source), source_size));
+		}
+
+		SECTION("Doesn't fit")
+		{
+			aeh::c_string_copy(std::span<char>(dest, std::size(dest) - 2), source);
+			REQUIRE(std::string_view(std::data(dest), std::size(dest) - 2) == std::string(std::string_view(std::data(source), source_size - 3)) + '\0');
+		}
+	}
+
+	// Fits with extra space: the extra space is not written to
+	{
+		char dest_big[source_size + 5];
+		std::fill(std::begin(dest_big), std::end(dest_big), padding_char);
+
+		aeh::c_string_copy(dest_big, source);
+		REQUIRE(std::string_view(std::data(dest_big), source_size) == std::string_view(std::data(source), source_size));
+
+		constexpr auto remaining_size = std::size(dest_big) - source_size;
+		REQUIRE(std::string_view(std::data(dest_big) + source_size, remaining_size) == std::string(remaining_size, padding_char));
+	}
 }

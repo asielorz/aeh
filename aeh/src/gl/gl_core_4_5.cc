@@ -4,6 +4,11 @@
 #include <stddef.h>
 #include "gl_core_4_5.hh"
 
+// Added by Andoni
+#if defined(_MSC_VER) && !defined(__clang__)
+#	pragma warning(disable:4191) // 'reinterpret_cast': unsafe conversion from 'PROC' to 'function pointer from OpenGL'
+#endif
+
 #if defined(__APPLE__)
 #include <dlfcn.h>
 
