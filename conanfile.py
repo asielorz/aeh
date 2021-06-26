@@ -1,4 +1,5 @@
 import conans
+import conans.tools
 import conans.errors
 import os.path
 
@@ -58,9 +59,7 @@ class AehConan(conans.ConanFile):
     def configure(self):
         required_cpp_std = "20"
         if not conans.tools.valid_min_cppstd(self, required_cpp_std):
-            # We don't actually abort here because conan's
-            # support for setting the C++ standard is not good enough just yet
-            self.output.warn("aeh requires C++" + required_cpp_std)
+            raise conans.errors.ConanInvalidConfiguration("aeh requires C++" + required_cpp_std)
 
     def _configure_cmake(self):
         cmake = conans.CMake(self)

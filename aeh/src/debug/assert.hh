@@ -95,7 +95,7 @@ namespace aeh::debug
 #		define AEH_DEBUGBREAK() raise(SIGTRAP)
 #	endif
 #else
-	// TODO: other compilers/platforms (còpy more from catch2?)
+	// TODO: other compilers/platforms (copy more from catch2?)
 	// TODO: check if under debugger?
 	AEH_MESSAGE_INFO("debugbreak not implemented")
 #endif
