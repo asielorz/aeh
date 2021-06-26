@@ -1,41 +1,41 @@
 namespace aeh
 {
 
-	template <typename InputStream, typename T, typename = std::enable_if_t<std::is_trivially_copyable_v<T>>>
+	template <typename InputStream, aeh::is_trivially_copyable T>
 	InputStream & read_binary(InputStream & is, T & t) noexcept
 	{
 		is.read(reinterpret_cast<char *>(std::addressof(t)), sizeof(T));
 		return is;
 	}
 
-	template <typename InputStream, typename T, typename = std::enable_if_t<std::is_trivially_copyable_v<T>>>
+	template <typename InputStream, aeh::is_trivially_copyable T>
 	InputStream & read_binary(InputStream & is, T t[], int n) noexcept
 	{
 		is.read(reinterpret_cast<char *>(t), sizeof(T) * n);
 		return is;
 	}
 	
-	template <typename InputStream, typename T, typename = std::enable_if_t<std::is_trivially_copyable_v<T>>>
+	template <typename InputStream, aeh::is_trivially_copyable T>
 	InputStream & read_binary(InputStream & is, std::span<T> t) noexcept
 	{
 		return read_binary(is, t.data(), t.size());
 	}
 
-	template <typename OutputStream, typename T, typename = std::enable_if_t<std::is_trivially_copyable_v<T>>>
+	template <typename OutputStream, aeh::is_trivially_copyable T>
 	OutputStream & write_binary(OutputStream & os, T const & t) noexcept
 	{
 		os.write(reinterpret_cast<const char *>(std::addressof(t)), sizeof(T));
 		return os;
 	}
 
-	template <typename OutputStream, typename T, typename = std::enable_if_t<std::is_trivially_copyable_v<T>>>
+	template <typename OutputStream, aeh::is_trivially_copyable T>
 	OutputStream & write_binary(OutputStream & os, T const t[], int n) noexcept
 	{
 		os.write(reinterpret_cast<const char *>(t), sizeof(T) * n);
 		return os;
 	}
 
-	template <typename OutputStream, typename T, typename = std::enable_if_t<std::is_trivially_copyable_v<T>>>
+	template <typename OutputStream, aeh::is_trivially_copyable T>
 	OutputStream & write_binary(OutputStream & os, std::span<T const> t) noexcept
 	{
 		return write_binary(os, t.data(), t.size());
@@ -56,7 +56,7 @@ namespace aeh
 		reinterpret_cast<T *&>(p)++;
 	}
 
-	template <typename InputStream, typename T, typename FileIdentifierHeader, typename = std::enable_if_t<std::is_trivially_copyable_v<T>>>
+	template <typename InputStream, aeh::is_trivially_copyable T, typename FileIdentifierHeader>
 	auto read_binary_file(InputStream & is, T & t, FileIdentifierHeader const & expected_file_identifier) noexcept -> bool
 	{
 		FileIdentifierHeader file_identifier;
@@ -80,7 +80,7 @@ namespace aeh
 		return true;
 	}
 
-	template <typename OutputStream, typename T, typename FileIdentifierHeader, typename = std::enable_if_t<std::is_trivially_copyable_v<T>>>
+	template <typename OutputStream, aeh::is_trivially_copyable T, typename FileIdentifierHeader>
 	auto write_binary_file(OutputStream & os, T const & t, FileIdentifierHeader const & file_identifier) noexcept -> void
 	{
 		aeh::write_binary(os, file_identifier);
@@ -98,7 +98,7 @@ namespace aeh
 		return end_position - current_position;
 	}
 
-	template <typename T, typename = std::enable_if_t<std::is_trivially_copyable_v<T>>>
+	template <aeh::is_trivially_copyable T>
 	auto checksum(T const & t) noexcept -> uint64_t
 	{
 		return checksum(std::addressof(t), sizeof(T));

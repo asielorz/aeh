@@ -57,7 +57,6 @@ namespace aeh
 	constexpr auto is_number = [](char c) noexcept -> bool { return (c >= '0' && c <= '9'); };
 	constexpr auto is_letter = [](char c) noexcept -> bool { return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z'); };
 
-#if AEH_WINDOWS
 	//! Opens a windows path selection dialog window and returns the selected paths.
 	std::vector<std::string> browse();
 	//! Will return empty string on failure to select a path or if multiple paths are selected.
@@ -65,7 +64,6 @@ namespace aeh
 	//! Dumps windows output directly to buffer. Used by the other browse functions.
 	//! Returns true if at least one file has been selected.
 	bool browse(char buffer[], size_t size) noexcept;
-#endif
 
 	//! Returns an aeh::generator object that generates the splitted string parts.
 	constexpr auto split(std::string_view text, char delimiter) noexcept;

@@ -15,6 +15,9 @@ union SDL_Event;
 
 namespace aeh::main_loop
 {
+	//! Must be called before creating windows
+	bool initialize_sdl(uint32_t extra_sdl_init_flags = 0);
+
 	struct Options
 	{
 		bool clear_every_frame = true;

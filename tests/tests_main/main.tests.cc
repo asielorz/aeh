@@ -10,7 +10,7 @@ auto run_tests(int argc, char const * const argv[]) noexcept -> int
 	if (result != 0)
 	{
 		aeh::debug::message_box("A test failed", "One of the tests failed. Look at the console for more information.", aeh::debug::MBType::Ok | aeh::debug::MBIcon::Information);
-		system_pause();
+		aeh::debug::system_pause();
 	}
 	return result;
 }

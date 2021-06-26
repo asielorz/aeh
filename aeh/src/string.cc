@@ -1,5 +1,6 @@
 ﻿#include "string.hh"
 #include "debug/assert.hh"
+#include "internal/portable_file_dialogs.hh"
 #include <imgui.h> // Needed to include <imgui_internal.h>
 #include <imgui_internal.h> // ImTextCharFromUtf8
 #include <fstream>
@@ -215,15 +216,7 @@ namespace aeh
 		dest[i] = '\0';
 	}
 
-} // namespace aeh
-
-// TODO: use portable-file-dialogs
 #if AEH_WINDOWS
-#include <Windows.h>
-
-namespace aeh
-{
-
 	bool browse(char buffer[], size_t size) noexcept
 	{
 		buffer[0] = '\0';
@@ -253,9 +246,14 @@ namespace aeh
 		//Set the path of the file selected, if there's one
 		return (GetOpenFileName(&opf) && buffer[0] != '\0');
 	}
+#endif
 
 	std::vector<std::string> browse()
 	{
+#if !AEH_WINDOWS
+		// TODO: Finish me
+		return pfd::open_file("Open file selection", "my_replay.replay").result();
+#else
 		std::vector<std::string> selected_files;
 
 		char buffer[1024];
@@ -296,33 +294,40 @@ namespace aeh
 		}
 
 		return selected_files;
+#endif
 	}
 
 	std::string browse_single_file()
 	{
-		char buffer[1024];
+		return pfd::save_file("Replay export selection", "my_replay.replay", { "World of Traps replay files", "*.replay" }).result();
+		//auto result = pfd::open_file("Replay export selection", "my_replay.replay"/*, { "All Files", "*" }*/).result();
+		//if (result.size() > 0)
+		//	return std::move(result[0]);
 
-		//Set the path of the file selected, if there's one
-		if (browse(buffer, 1024))
-		{
-			// Check if there's a single path or more than one
-			const std::string data = { buffer, buffer + 1024 };
-			const size_t first_end = data.find('\0');
-			const char * const double_null = "\0\0";
-			const size_t end = data.find(std::string(double_null, double_null + 2));
+		//return {};
 
-			// If there's a single path, return it
-			if (first_end == end)
-			{
-				buffer[end] = '\0';
-				return buffer;
-			}
-		}
+		//char buffer[1024];
 
-		return {};
+		////Set the path of the file selected, if there's one
+		//if (browse(buffer, 1024))
+		//{
+		//	// Check if there's a single path or more than one
+		//	const std::string data = { buffer, buffer + 1024 };
+		//	const size_t first_end = data.find('\0');
+		//	const char * const double_null = "\0\0";
+		//	const size_t end = data.find(std::string(double_null, double_null + 2));
+
+		//	// If there's a single path, return it
+		//	if (first_end == end)
+		//	{
+		//		buffer[end] = '\0';
+		//		return buffer;
+		//	}
+		//}
+
+		//return {};
 	}
 } // namespace aeh
-#endif
 
 namespace aeh
 {

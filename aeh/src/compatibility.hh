@@ -115,6 +115,12 @@
 #	define AEH_WINDOWS false
 #endif
 
+#if defined(linux) || defined(__linux) || defined(__linux__) // From catch2
+#	define AEH_LINUX true
+#else
+#	define AEH_LINUX false
+#endif
+
 // We use a macro so that MSVC's sprintf_s can deduce the size of 'buffer'
 #if AEH_MSVC
 #	define AEH_SPRINTF(buffer, format, ...) sprintf_s(buffer, format, __VA_ARGS__)
@@ -122,15 +128,12 @@
 #	define AEH_SPRINTF(buffer, format, ...) std::sprintf(buffer, format, __VA_ARGS__)
 #endif
 
-inline void system_pause()
-{
-#if AEH_WINDOWS
-	std::system("pause");
+// We use a macro so that MSVC's sscanf_s can deduce the size of 'buffer'
+#if AEH_MSVC
+#	define AEH_SSCANF(buffer, format, ...) sscanf_s(buffer, format, __VA_ARGS__)
 #else
-	std::fputs("Press any key to continue . . . ", stderr);
-	std::getchar();
+#	define AEH_SSCANF(buffer, format, ...) std::sscanf(buffer, format, __VA_ARGS__)
 #endif
-}
 
 #if AEH_MSVC
 #	define AEH_FORCEINLINE __forceinline

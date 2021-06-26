@@ -15,7 +15,10 @@ namespace aeh
 	{
 		constexpr half() noexcept = default;
 
-		constexpr static auto from_float(float value) noexcept -> half
+#if AEH_HAS_STD_BIT_CAST
+		constexpr
+#endif
+			static auto from_float(float value) noexcept -> half
 		{
 			uint32_t const float_state = bit_cast<uint32_t>(value);
 			uint16_t const half_state =

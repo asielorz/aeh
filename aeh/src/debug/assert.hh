@@ -1,6 +1,8 @@
 #pragma once
 
 #include "compatibility.hh"
+#include <cstdlib>
+#include <cstdio>
 
 namespace aeh::debug
 {
@@ -28,10 +30,26 @@ namespace aeh::debug
 	};
 	struct MBFlags
 	{
+		constexpr MBFlags(MBType type_, MBIcon icon_) noexcept
+			: type(type_)
+			, icon(icon_)
+		{}
+
+		constexpr MBFlags(MBType type_) noexcept
+			: type(type_)
+			, icon(MBIcon::Error)
+		{}
+
+		constexpr MBFlags(MBIcon icon_) noexcept
+			: type(MBType::Ok)
+			, icon(icon_)
+		{}
+
 		MBType type;
 		MBIcon icon;
 	};
-	constexpr MBFlags operator | (MBType type, MBIcon icon) noexcept { return MBFlags{ type, icon }; }
+	[[nodiscard]] constexpr MBFlags operator | (MBType type, MBIcon icon) noexcept { return MBFlags{ type, icon }; }
+	[[nodiscard]] constexpr MBFlags operator | (MBIcon icon, MBType type) noexcept { return MBFlags{ type, icon }; }
 
 	enum struct MBRet
 	{
@@ -47,6 +65,7 @@ namespace aeh::debug
 	};
 
 	MBRet message_box(const char * title, const char * message, MBFlags flags = MBType::Ok | MBIcon::Error) noexcept;
+	MBRet message_box(const char8_t * title, const char8_t * message, MBFlags flags = MBType::Ok | MBIcon::Error) noexcept;
 
 	//! Shows a message box with error icon and the abort, retry and ignore buttons.
 	//! If abort is clicked, the program ends.
@@ -63,7 +82,33 @@ namespace aeh::debug
 	void not_implemented_ok(char const location[] = nullptr);
 
 	//! Breaks into the debugger
-	void debugbreak() noexcept;
+#if AEH_MSVC
+#	define AEH_DEBUGBREAK()	__debugbreak()
+#elif AEH_LINUX // from catch2
+	// If we can use inline assembler, do it because this allows us to break
+	// directly at the location of the failing check instead of breaking inside
+	// raise() called from it, i.e. one stack frame below.
+#	if defined(__GNUC__) && (defined(__i386) || defined(__x86_64))
+#		define AEH_DEBUGBREAK() asm volatile ("int $3") /* NOLINT */
+#	else // Fall back to the generic way.
+#		include <signal.h>
+#		define AEH_DEBUGBREAK() raise(SIGTRAP)
+#	endif
+#else
+	// TODO: other compilers/platforms (còpy more from catch2?)
+	// TODO: check if under debugger?
+	AEH_MESSAGE_INFO("debugbreak not implemented")
+#endif
+
+	inline void system_pause()
+	{
+#if AEH_WINDOWS
+		std::system("pause");
+#else
+		std::fputs("Press any key to continue . . . ", stderr);
+		std::getchar();
+#endif
+	}
 
 	namespace detail
 	{

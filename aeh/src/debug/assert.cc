@@ -1,13 +1,7 @@
 #include "assert.hh"
-#include <string>
-
-AEH_WARNING_PUSH()
-AEH_MSVC_PRAGMA(warning(disable: 4355)) // 'this' used as a base class initializer
-AEH_MSVC_PRAGMA(warning(disable: 4191)) // conversion from different function pointer types
-#	include <portable-file-dialogs.h>
-AEH_WARNING_POP()
-
 #include "unreachable.hh"
+#include "internal/portable_file_dialogs.hh"
+#include <string>
 
 namespace aeh::debug
 {
@@ -75,17 +69,6 @@ namespace aeh::debug
 		}
 	} // namespace assert_locals
 
-	// TODO: maybe use the implementation from catch? (catch_debugger.h)
-	void debugbreak() noexcept
-	{
-#if AEH_MSVC
-		__debugbreak();
-#else
-		AEH_MESSAGE_INFO("debugbreak not implemented")
-#endif
-		// TODO: other compilers/platforms
-	}
-
 	MBRet message_box(const char * title, const char * message, MBFlags flags) noexcept
 	{
 		const pfd::choice type = assert_locals::type_to_pfd(flags.type);
@@ -94,6 +77,11 @@ namespace aeh::debug
 		const pfd::button result_button = pfd::message(title, message, type, icon).result();
 
 		return assert_locals::pfd_button_to_mbret(result_button);
+	}
+
+	MBRet message_box(const char8_t * title, const char8_t * message, MBFlags flags) noexcept
+	{
+		return message_box(reinterpret_cast<const char*>(title), reinterpret_cast<const char*>(message), flags);
 	}
 
 	MBRet message_box_abort_retry_ignore(const char * title, const char * message) noexcept
@@ -106,7 +94,7 @@ namespace aeh::debug
 			std::abort();
 			break;
 		case MBRet::Retry:
-			debugbreak();
+			AEH_DEBUGBREAK();
 			break;
 		default:
 			break;

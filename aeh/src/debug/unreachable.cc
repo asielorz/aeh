@@ -12,7 +12,7 @@ namespace aeh::debug
 		{
 			MBRet const ret = message_box(title, message, MBType::RetryCancel | MBIcon::Error);
 			if (ret == MBRet::Retry)
-				debugbreak();
+				AEH_DEBUGBREAK();
 
 			std::quick_exit(1);
 		}

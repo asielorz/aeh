@@ -3,17 +3,24 @@
 #include "main_loop.hh"
 
 #include "gl/gl_core_4_5.hh"
+#include "debug/assert.hh"
 #include <SDL.h>
 #include <thread>
 
-namespace
+namespace aeh::main_loop
 {
-	bool initialize_SDL()
+	static bool sdl_initialized = false;
+
+	bool initialize_sdl(uint32_t const extra_sdl_init_flags)
 	{
+		static_assert(std::is_same_v<std::remove_const_t<decltype(extra_sdl_init_flags)>, Uint32>, "Type mismatch between aeh and SDL");
+
+		debug_assert_msg(!sdl_initialized, "Initializing SDL multiple times");
+
 		// Setup SDL
-		if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_GAMECONTROLLER) != 0)
+		if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_GAMECONTROLLER | extra_sdl_init_flags) != 0)
 		{
-			printf("Error: %s\n", SDL_GetError());
+			debug::message_box("SDL_Init failed", ("SDL_Init failed. Error: " + std::string(SDL_GetError())).c_str(), debug::MBIcon::Error | debug::MBType::Ok);
 			return false;
 		}
 
@@ -30,18 +37,26 @@ namespace
 		SDL_GL_SetSwapInterval(1); // Enable vsync
 		SDL_GameControllerEventState(SDL_ENABLE); // Enable controllers sending events.
 
+		sdl_initialized = true;
+
 		return true;
 	}
+} // namespace aeh::main_loop
 
+namespace
+{
 	bool load_opengl_functions()
 	{
 		const gl::exts::LoadTest loaded = gl::sys::LoadFunctions();
 		if (!loaded)
+		{
+			aeh::debug::message_box("OpenGL initialization failed", ("Failed to initialize OpenGL.\nNumber of functions that failed to load: " + std::to_string(loaded.GetNumMissing())).c_str(), aeh::debug::MBIcon::Error | aeh::debug::MBType::Ok);
 			return false;
+		}
 
 		const int numFunctionsFailed = loaded.GetNumMissing();
 		if (numFunctionsFailed > 0)
-			printf("Number of gl functions that failed to load: %d\n", numFunctionsFailed);
+			std::fprintf(stderr, "Number of gl functions that failed to load: %d\n", numFunctionsFailed);
 
 		return true;
 	}
@@ -131,8 +146,8 @@ namespace aeh::main_loop
 {
 	Window Window::open_new(NewWindowOptions const & options)
 	{
-		static bool sdl_init_ok = initialize_SDL();
-		if (!sdl_init_ok)
+		debug_assert_msg(sdl_initialized, "Must call aeh::initialize_sdl() before calling aeh::main_loop::open_new()");
+		if (!sdl_initialized)
 			return {};
 
 		Window new_window = create_window(options);

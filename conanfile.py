@@ -2,7 +2,7 @@ import conans
 import conans.errors
 import os.path
 
-required_conan_version = ">=1.30.2" # The version I had when I first wrote the recipo
+required_conan_version = ">=1.30.2" # The version I had when I first wrote the recipe
 
 class AehConan(conans.ConanFile):
     name = "aeh"
@@ -53,18 +53,10 @@ class AehConan(conans.ConanFile):
             self.requires("sdl2/2.0.14@bincrafters/stable")
             self.requires("opengl/system")
 
-            if self.settings.os == "Linux":
-                # Audio stuff we don't use
-                # (that actually make the installation fail if we try to build with them)
-                self.options["sdl2"].alsa = False
-                self.options["sdl2"].jack = False
-                self.options["sdl2"].nas = False
-                self.options["sdl2"].pulse = False
-
         self.requires("portable-file-dialogs/0.1.0")
 
     def configure(self):
-        required_cpp_std = "17"
+        required_cpp_std = "20"
         if not conans.tools.valid_min_cppstd(self, required_cpp_std):
             # We don't actually abort here because conan's
             # support for setting the C++ standard is not good enough just yet

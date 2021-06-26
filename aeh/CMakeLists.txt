@@ -76,6 +76,7 @@ target_sources(aeh PRIVATE
 	src/change_stack.inl
 	src/circular.hh
 	src/compatibility.hh
+	src/concepts.hh
 	src/expected.hh
 	src/file_vector.cc
 	src/file_vector.hh
@@ -122,6 +123,8 @@ target_sources(aeh PRIVATE
 	src/debug/assert.hh
 	src/debug/unreachable.cc
 	src/debug/unreachable.hh
+
+	src/internal/portable_file_dialogs.hh
 
 	src/main_loop/demo_crtp_base.hh
 	src/main_loop/demo_crtp_base.inl
