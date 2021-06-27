@@ -9,14 +9,21 @@
 #include <tuple>
 #include <optional>
 #include <chrono>
+#include <glm/vec2.hpp>
 
 struct SDL_Window;
 union SDL_Event;
 
 namespace aeh::main_loop
 {
+	struct InitializationOptions
+	{
+		uint32_t extra_sdl_init_flags = 0;
+		glm::ivec2 extra_opengl_version_requirements{ 0, 0 };
+	};
+
 	//! Must be called before creating windows
-	bool initialize_sdl(uint32_t extra_sdl_init_flags = 0);
+	bool initialize_sdl(InitializationOptions options);
 
 	struct Options
 	{

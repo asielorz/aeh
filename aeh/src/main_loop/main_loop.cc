@@ -11,31 +11,37 @@ namespace aeh::main_loop
 {
 	static bool sdl_initialized = false;
 
-	bool initialize_sdl(uint32_t const extra_sdl_init_flags)
+	
+	bool initialize_sdl(InitializationOptions options)
 	{
-		static_assert(std::is_same_v<std::remove_const_t<decltype(extra_sdl_init_flags)>, Uint32>, "Type mismatch between aeh and SDL");
+		static_assert(std::is_same_v<decltype(InitializationOptions::extra_sdl_init_flags), Uint32>, "Type mismatch between aeh and SDL");
 
 		debug_assert_msg(!sdl_initialized, "Initializing SDL multiple times");
 
 		// Setup SDL
-		if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_GAMECONTROLLER | extra_sdl_init_flags) != 0)
+		if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_GAMECONTROLLER | options.extra_sdl_init_flags) != 0)
 		{
 			debug::message_box("SDL_Init failed", ("SDL_Init failed. Error: " + std::string(SDL_GetError())).c_str(), debug::MBIcon::Error | debug::MBType::Ok);
 			return false;
 		}
+		
+		const glm::ivec2 opengl_version = glm::max(options.extra_opengl_version_requirements, glm::ivec2{ 3, 3 });
+		std::printf("Requesting OpenGL version %d.%d\n", opengl_version.x, opengl_version.y);
 
-		// Setup window
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 		SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 		SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 4);
-		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 5);
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, opengl_version.x);
+		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, opengl_version.y);
 		SDL_DisplayMode current;
 		SDL_GetCurrentDisplayMode(0, &current);
 		SDL_GL_SetSwapInterval(1); // Enable vsync
 		SDL_GameControllerEventState(SDL_ENABLE); // Enable controllers sending events.
+
+		if (const char* video_driver = SDL_GetCurrentVideoDriver())
+			std::printf("Video driver: %s\n", video_driver);
 
 		sdl_initialized = true;
 
@@ -71,7 +77,7 @@ namespace
 		gl::Enable(gl::BLEND);
 		gl::BlendFunc(gl::SRC_ALPHA, gl::ONE_MINUS_SRC_ALPHA);
 
-		gl::ClearColor(0, 0, 0, 1);
+		gl::ClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	}
 
 	aeh::main_loop::Window create_window(aeh::main_loop::NewWindowOptions const & options)
@@ -150,13 +156,30 @@ namespace aeh::main_loop
 		if (!sdl_initialized)
 			return {};
 
-		Window new_window = create_window(options);
-
-		if ((!new_window.window) || (!new_window.opengl_context))
-			return {};
-
 		static bool gl_init_ok = load_opengl_functions();
 		if (!gl_init_ok)
+			return {};
+
+		Window new_window = create_window(options);
+		if (!new_window.opengl_context)
+		{
+			int gl_major;
+			int gl_minor;
+			const bool major_success = SDL_GL_GetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, &gl_major) == 0;
+			const bool minor_success = SDL_GL_GetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, &gl_minor) == 0;
+
+			std::string message;
+			message += "This probably means the requested OpenGL version (";
+			message += (major_success) ? std::to_string(gl_major) : std::string({ '?' });
+			message += '.';
+			message += (minor_success) ? std::to_string(gl_minor) : std::string({ '?' });
+			message += ") is not supported.\n\nPlease check the supported version of OpenGL in your system";
+			debug::message_box("Failed to create OpenGL context", message.c_str(), debug::MBIcon::Error | debug::MBType::Ok);
+			
+			return {};
+		}
+
+		if (!new_window.window)
 			return {};
 
 		set_initial_opengl_configuration();
