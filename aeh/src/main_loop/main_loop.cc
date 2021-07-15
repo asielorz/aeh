@@ -25,7 +25,7 @@ namespace aeh::main_loop
 			return false;
 		}
 		
-		const glm::ivec2 opengl_version = glm::max(options.extra_opengl_version_requirements, glm::ivec2{ 3, 3 });
+		const glm::ivec2 opengl_version = glm::max(options.extra_opengl_version_requirements, glm::ivec2(3, 3));
 		std::printf("Requesting OpenGL version %d.%d\n", opengl_version.x, opengl_version.y);
 
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
@@ -156,11 +156,8 @@ namespace aeh::main_loop
 		if (!sdl_initialized)
 			return {};
 
-		static bool gl_init_ok = load_opengl_functions();
-		if (!gl_init_ok)
-			return {};
-
 		Window new_window = create_window(options);
+
 		if (!new_window.opengl_context)
 		{
 			int gl_major;
@@ -180,6 +177,12 @@ namespace aeh::main_loop
 		}
 
 		if (!new_window.window)
+			return {};
+
+		// Must happen after the window is created. OpenGL needs a window to exist in order to
+		// be able to initialize. This is not the case with Vulkan.
+		static bool gl_init_ok = load_opengl_functions();
+		if (!gl_init_ok)
 			return {};
 
 		set_initial_opengl_configuration();

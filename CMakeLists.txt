@@ -38,7 +38,7 @@ else() # Development, running directly from cmake
 
 	conan_add_remote(
 		NAME bincrafters
-		URL https://api.bintray.com/conan/bincrafters/public-conan
+		URL https://bincrafters.jfrog.io/artifactory/api/conan/public-conan
 	)
 
 	set(conan_options)

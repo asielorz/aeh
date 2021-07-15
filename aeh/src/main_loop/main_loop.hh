@@ -19,7 +19,7 @@ namespace aeh::main_loop
 	struct InitializationOptions
 	{
 		uint32_t extra_sdl_init_flags = 0;
-		glm::ivec2 extra_opengl_version_requirements{ 0, 0 };
+		glm::ivec2 extra_opengl_version_requirements = {0, 0};
 	};
 
 	//! Must be called before creating windows
