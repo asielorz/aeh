@@ -75,9 +75,9 @@ namespace aeh
 		constexpr operator std::span<T const>() const noexcept;
 
 		constexpr auto clear() noexcept -> void;
-		constexpr auto push_back(T const & t) noexcept(std::is_nothrow_copy_constructible_v<T>)->T &;
+		constexpr auto push_back(T const & t) noexcept(std::is_nothrow_copy_constructible_v<T>) -> T &;
 		constexpr auto push_back(T && t) noexcept(std::is_nothrow_move_constructible_v<T>)->T &;
-		template <typename ... Args> constexpr auto emplace_back(Args && ... args) noexcept(std::is_nothrow_constructible_v<T, Args...>)->T &;
+		template <typename ... Args> constexpr auto emplace_back(Args && ... args) noexcept(std::is_nothrow_constructible_v<T, Args...>) -> T &;
 		constexpr auto pop_back() noexcept -> void;
 		constexpr auto resize(size_t new_size) noexcept -> void;
 		constexpr auto resize(size_t new_size, T const & value) noexcept -> void;
