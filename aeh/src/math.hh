@@ -179,7 +179,20 @@ namespace aeh::math
 		return (val >= min) && (val <= max);
 	}
 
-	template <typename T>
+	template <typename T> requires std::integral<T> || std::random_access_iterator<T>
+	T circular_clamp(T val, const T & min, const T & max) noexcept
+	{
+		const auto interval = (max - min) + 1;
+
+		while (val > max)
+			val -= interval;
+		while (val < min)
+			val += interval;
+
+		return val;
+	}
+
+	template <std::floating_point T>
 	T circular_clamp(T val, const T & min, const T & max) noexcept
 	{
 		const T interval = max - min;

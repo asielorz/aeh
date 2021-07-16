@@ -55,6 +55,8 @@ namespace aeh::in
 			_3 = binary_literal(0100'0000'0000'0000),
 			_4 = binary_literal(0110'0000'0000'0000),
 		};
+		
+		enum struct ControlState { up = 0, released = 1, pressed = 2, down = 3 };
 	} // inline namespace enums
 
 	enum struct BoundControllerButton : uint16_t {};
@@ -158,7 +160,6 @@ namespace aeh::in
 	[[nodiscard]] auto is_released(Input const & input, BoundControllerInput control, float threshold) noexcept -> bool;
 	[[nodiscard]] auto is_released(Input const & input, Control control, float threshold) noexcept -> bool;
 
-	enum struct ControlState { up = 0, released = 1, pressed = 2, down = 3 };
 	[[nodiscard]] auto make_control_state(bool currently_down, bool previously_down) noexcept -> ControlState;
 
 	[[nodiscard]] auto current_state(Input const & input, Key key) noexcept -> ControlState;
