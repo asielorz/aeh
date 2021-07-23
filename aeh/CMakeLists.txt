@@ -132,8 +132,6 @@ target_sources(aeh PRIVATE
 	src/main_loop/imgui_plugin.hh
 	src/main_loop/input_plugin.cc
 	src/main_loop/input_plugin.hh
-	src/main_loop/long_interaction.hh
-	src/main_loop/long_interaction.inl
 	src/main_loop/main_loop.cc
 	src/main_loop/main_loop.hh
 	src/main_loop/main_loop.inl
