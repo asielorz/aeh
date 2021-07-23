@@ -209,6 +209,21 @@ TEST_CASE("permute takes a function that takes a span<T> and may mutate it, then
 	REQUIRE(b[8] == 8);
 }
 
+TEST_CASE("Immutable arrays can be compared lexicographically")
+{
+	auto a = aeh::msp::immutable_array<int>::from_ilist({1, 2, 3});
+	auto b = aeh::msp::immutable_array<int>::from_ilist({3, 2, 1});
+
+	REQUIRE(a < b);
+	REQUIRE(a <= b);
+	REQUIRE(b > a);
+	REQUIRE(b >= a);
+	REQUIRE(a >= a);
+	REQUIRE(b >= b);
+	REQUIRE(a <= a);
+	REQUIRE(b <= b);
+}
+
 //**********************************************************************************************************************
 
 TEST_CASE("immutable_array_builder can be constructed with a given size")
