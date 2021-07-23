@@ -74,7 +74,7 @@ namespace aeh::main_loop
 		else
 		{
 			input = in::update(input, current_frame);
-			in::update(controller_repeater, loop.dt, input);
+			controller_repeater = in::update(controller_repeater, loop.dt, input);
 		}
 		return InputExtension{input, controller_repeater};
 	}

@@ -33,7 +33,7 @@ namespace aeh::in
 		float threshold = 0.5f;
 	};
 
-	void update(ControllerRepeater & repeater, float dt, Input const & input) noexcept;
+	[[nodiscard]] auto update(ControllerRepeater const & repeater, float dt, Input const & input) noexcept -> ControllerRepeater;
 	[[nodiscard]] auto is_pressed_or_repeated(Input const & input, BoundControllerButton button, ControllerRepeater const & repeater) noexcept -> bool;
 	[[nodiscard]] auto is_pressed_or_repeated_positive(Input const & input, BoundControllerAxis button, ControllerRepeater const & repeater) noexcept -> bool;
 	[[nodiscard]] auto is_pressed_or_repeated_negative(Input const & input, BoundControllerAxis button, ControllerRepeater const & repeater) noexcept -> bool;

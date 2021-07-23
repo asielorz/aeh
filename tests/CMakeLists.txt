@@ -9,8 +9,10 @@ add_executable(aeh_tests
 	src/function_ref.tests.cc
 	src/generator.tests.cc
 	src/half.tests.cc
+	src/immutable_array.tests.cc
 	src/input.tests.cc
 	src/json_string_builder.tests.cc
+	src/minimalistic_shared_ptr.tests.cc
 	src/pointer_union.tests.cc
 	src/string.tests.cc
 	src/tuple.tests.cc

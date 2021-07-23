@@ -1,6 +1,7 @@
 #pragma once
 
 #include <atomic>
+#include <compare>
 
 // Non intrusive reference counter type with no weak pointer, no shared pointer to subobject,
 // no casting and no taking ownership of already allocated objects. 
@@ -54,6 +55,8 @@ namespace aeh::msp
         [[nodiscard]] auto is_unique() const noexcept -> bool;
         constexpr explicit operator bool () const noexcept { return shared_object != nullptr; }
 
+        void swap(shared_ptr<T, Deleter> & other) noexcept { using std::swap; swap(shared_object, other.shared_object); swap(deleter, other.deleter); }
+
         friend struct shared_ptr<T const, Deleter>;
 
     protected:
@@ -66,7 +69,7 @@ namespace aeh::msp
         void release_ownership() noexcept;
 
         shared_object_type * shared_object;
-        Deleter deleter;
+        [[no_unique_address]] Deleter deleter;
     };
 
     template <typename T, typename Deleter = default_delete>
@@ -90,6 +93,7 @@ namespace aeh::msp
 
         auto operator = (shared_ptr<T> const & other) noexcept -> shared_ptr<T> &;
         auto operator = (shared_ptr<T> && other) noexcept -> shared_ptr<T> &;
+        auto operator = (std::nullptr_t) noexcept -> shared_ptr<T> &;
     };
 
     template <typename T, typename Deleter>
@@ -102,8 +106,10 @@ namespace aeh::msp
         constexpr shared_ptr(std::nullptr_t) noexcept;
         explicit shared_ptr(shared<T> * object_to_take_ownership_of) noexcept;
         explicit shared_ptr(shared<T> * object_to_take_ownership_of, Deleter d) noexcept;
-        shared_ptr(shared_ptr<T> const & other) noexcept ;
+        shared_ptr(shared_ptr<T> const & other) noexcept;
+        shared_ptr(shared_ptr<T const> const & other) noexcept;
         shared_ptr(shared_ptr<T> && other) noexcept;
+        shared_ptr(shared_ptr<T const> && other) noexcept;
 
         template <typename ... Args> 
         [[nodiscard]] static auto make_new(Args && ... args) -> shared_ptr<T const, Deleter>;
@@ -115,14 +121,13 @@ namespace aeh::msp
         auto operator = (shared_ptr<T const> && other) noexcept -> shared_ptr<T const> &;
         auto operator = (shared_ptr<T> const & other) noexcept -> shared_ptr<T const> &;
         auto operator = (shared_ptr<T> && other) noexcept -> shared_ptr<T const> &;
+        auto operator = (std::nullptr_t) noexcept -> shared_ptr<T const> &;
     };
 
-    template <typename T, typename D>  [[nodiscard]] constexpr bool operator == (shared_ptr<T, D> const & a, shared_ptr<T, D> const & b) noexcept;
-    template <typename T, typename D>  [[nodiscard]] constexpr bool operator != (shared_ptr<T, D> const & a, shared_ptr<T, D> const & b) noexcept;
-    template <typename T, typename D>  [[nodiscard]] constexpr bool operator <  (shared_ptr<T, D> const & a, shared_ptr<T, D> const & b) noexcept;
-    template <typename T, typename D>  [[nodiscard]] constexpr bool operator <= (shared_ptr<T, D> const & a, shared_ptr<T, D> const & b) noexcept;
-    template <typename T, typename D>  [[nodiscard]] constexpr bool operator >  (shared_ptr<T, D> const & a, shared_ptr<T, D> const & b) noexcept;
-    template <typename T, typename D>  [[nodiscard]] constexpr bool operator >= (shared_ptr<T, D> const & a, shared_ptr<T, D> const & b) noexcept;
+    template <typename T, typename D> [[nodiscard]] constexpr auto operator == (shared_ptr<T, D> const & a, shared_ptr<T, D> const & b) noexcept -> bool;
+    template <typename T, typename D> [[nodiscard]] constexpr auto operator <=> (shared_ptr<T, D> const & a, shared_ptr<T, D> const & b) noexcept -> std::strong_ordering;
+
+    template <typename T, typename D> [[nodiscard]] constexpr auto operator == (shared_ptr<T, D> const & a, std::nullptr_t) noexcept -> bool;
 
 } // namespace aeh::msp
 

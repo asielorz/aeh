@@ -1,4 +1,4 @@
-#include "flexible_immutable_array.hh"
+#include "immutable_array.hh"
 
 namespace aeh::msp::detail
 {

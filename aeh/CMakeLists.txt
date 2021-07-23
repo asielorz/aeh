@@ -156,9 +156,9 @@ target_sources(aeh PRIVATE
 
 	src/msp/copy_on_write.hh
 	src/msp/copy_on_write.inl
-	src/msp/flexible_immutable_array.cc
-	src/msp/flexible_immutable_array.hh
-	src/msp/flexible_immutable_array.inl
+	src/msp/immutable_array.cc
+	src/msp/immutable_array.hh
+	src/msp/immutable_array.inl
 	src/msp/minimalistic_shared_ptr.hh
 	src/msp/minimalistic_shared_ptr.inl
 )

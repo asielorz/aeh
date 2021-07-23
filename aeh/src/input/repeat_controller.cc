@@ -24,8 +24,10 @@ namespace aeh::in
 			return entry.value >= first_wait;
 	}
 
-	void update(ControllerRepeater & repeater, float dt, Input const & input) noexcept
+	auto update(ControllerRepeater const & previous, float dt, Input const & input) noexcept -> ControllerRepeater
 	{
+		ControllerRepeater repeater = previous;
+
 		for (int controller_index = 0; controller_index < 4; ++controller_index)
 		{
 			Controller const controller = controller_enum_from_index(controller_index);
@@ -81,6 +83,8 @@ namespace aeh::in
 					reset(triggers[i]);
 			}
 		}
+		
+		return repeater;
 	}
 
 	auto is_pressed_or_repeated(Input const & input, BoundControllerButton button, ControllerRepeater const & repeater) noexcept -> bool

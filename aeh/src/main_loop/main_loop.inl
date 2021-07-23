@@ -28,8 +28,8 @@ namespace aeh::main_loop
 			done = main_loop::detail::update(window,
 				[&demo, &locals](SDL_Event const & ev) { main_loop::detail::call_process_event(demo, ev, locals); });
 
-			auto controller = main_loop::UpdateInput(dt, window, done, exit_code);
-			main_loop::detail::call_update(demo, controller, locals);
+			auto update_input = main_loop::UpdateInput(dt, window, done, exit_code);
+			main_loop::detail::call_update(demo, update_input, locals);
 
 			// Rendering
 			if (!done)

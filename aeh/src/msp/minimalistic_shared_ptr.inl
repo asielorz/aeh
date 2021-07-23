@@ -1,12 +1,10 @@
 namespace aeh::msp
 {
 
-    template <typename T, typename D>  constexpr bool operator == (shared_ptr<T, D> const & a, shared_ptr<T, D> const & b) noexcept { return a.get() == b.get(); }
-    template <typename T, typename D>  constexpr bool operator != (shared_ptr<T, D> const & a, shared_ptr<T, D> const & b) noexcept { return a.get() != b.get(); }
-    template <typename T, typename D>  constexpr bool operator <  (shared_ptr<T, D> const & a, shared_ptr<T, D> const & b) noexcept { return a.get() <  b.get(); }
-    template <typename T, typename D>  constexpr bool operator <= (shared_ptr<T, D> const & a, shared_ptr<T, D> const & b) noexcept { return a.get() <= b.get(); }
-    template <typename T, typename D>  constexpr bool operator >  (shared_ptr<T, D> const & a, shared_ptr<T, D> const & b) noexcept { return a.get() >  b.get(); }
-    template <typename T, typename D>  constexpr bool operator >= (shared_ptr<T, D> const & a, shared_ptr<T, D> const & b) noexcept { return a.get() >= b.get(); }
+    template <typename T, typename D> constexpr auto operator == (shared_ptr<T, D> const & a, shared_ptr<T, D> const & b) noexcept -> bool { return a.get() == b.get(); }
+    template <typename T, typename D> constexpr auto operator <=> (shared_ptr<T, D> const & a, shared_ptr<T, D> const & b) noexcept -> std::strong_ordering { return a.get() <=> b.get(); }
+    
+    template <typename T, typename D> constexpr auto operator == (shared_ptr<T, D> const & a, std::nullptr_t) noexcept -> bool { return !static_cast<bool>(a); };
 
     //*********************************************************************************************************************************
     // shared
@@ -38,8 +36,11 @@ namespace aeh::msp
     template <typename T, typename Deleter>
     void shared_ptr_base<T, Deleter>::reset(shared_object_type * object_to_take_ownership_of) noexcept
     {
-        release_ownership();
-        take_ownership_of(object_to_take_ownership_of);
+        if (object_to_take_ownership_of != shared_object)
+        {
+            release_ownership();
+            take_ownership_of(object_to_take_ownership_of);
+        }
     }
 
     template <typename T, typename Deleter>
@@ -144,10 +145,15 @@ namespace aeh::msp
     template <typename T, typename Deleter>
     auto shared_ptr<T, Deleter>::operator = (shared_ptr<T> && other) noexcept -> shared_ptr<T> &
     {
-        this->release_ownership(); 
-        this->shared_object = other.shared_object;
-        other.shared_object = nullptr; 
+        shared_ptr(std::move(other)).swap(*this);
         return *this; 
+    }
+
+    template <typename T, typename Deleter>
+    auto shared_ptr<T, Deleter>::operator = (std::nullptr_t) noexcept -> shared_ptr<T> &
+    {
+        this->reset();
+        return *this;
     }
 
     //*********************************************************************************************************************************
@@ -185,10 +191,24 @@ namespace aeh::msp
     }
 
     template <typename T, typename Deleter>
+    shared_ptr<T const, Deleter>::shared_ptr(shared_ptr<T const> const & other) noexcept
+        : shared_ptr_base<T const, Deleter>(other.deleter)
+    {
+        this->take_ownership_of(other.shared_object);
+    }
+
+    template <typename T, typename Deleter>
     shared_ptr<T const, Deleter>::shared_ptr(shared_ptr<T> && other) noexcept
         : shared_ptr_base<T const, Deleter>(other.shared_object, std::move(other.deleter)) 
     {
         other.shared_object = nullptr; 
+    }
+
+    template <typename T, typename Deleter>
+    shared_ptr<T const, Deleter>::shared_ptr(shared_ptr<T const> && other) noexcept
+        : shared_ptr_base<T const, Deleter>(other.shared_object, std::move(other.deleter))
+    {
+        other.shared_object = nullptr;
     }
 
     template <typename T, typename Deleter>
@@ -217,9 +237,7 @@ namespace aeh::msp
     template <typename T, typename Deleter>
    auto shared_ptr<T const, Deleter>::operator = (shared_ptr<T const> && other) noexcept -> shared_ptr<T const> &
     {
-        this->release_ownership();
-        this->shared_object = other.shared_object(); 
-        other.shared_object = nullptr; 
+        shared_ptr(std::move(other)).swap(*this);
         return *this; 
     }
 
@@ -233,10 +251,15 @@ namespace aeh::msp
     template <typename T, typename Deleter>
     auto shared_ptr<T const, Deleter>::operator = (shared_ptr<T> && other) noexcept -> shared_ptr<T const> &
     {
-        this->release_ownership(); 
-        this->shared_object = other.shared_object(); 
-        other.shared_object = nullptr; 
+        shared_ptr(std::move(other)).swap(*this);
         return *this; 
+    }
+
+    template <typename T, typename Deleter>
+    auto shared_ptr<T const, Deleter>::operator = (std::nullptr_t) noexcept -> shared_ptr<T const> &
+    {
+        this->reset();
+        return *this;
     }
 
 } // namespace aeh::msp
