@@ -200,3 +200,8 @@ TEST_CASE("nullptr assignment")
 	b = nullptr;
 	REQUIRE(b == nullptr);
 }
+
+TEST_CASE("A shared_ptr with an empty deleter has the same size as a pointer")
+{
+	static_assert(sizeof(aeh::msp::shared_ptr<int>) == sizeof(void *));
+}

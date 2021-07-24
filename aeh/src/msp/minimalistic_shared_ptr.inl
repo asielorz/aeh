@@ -59,6 +59,16 @@ namespace aeh::msp
     }
 
     template <typename T, typename Deleter>
+    void shared_ptr_base<T, Deleter>::swap(shared_ptr<T, Deleter> & other) noexcept 
+    {
+        using std::swap; 
+        swap(shared_object, other.shared_object); 
+
+        if constexpr (!std::is_empty_v<Deleter>)
+            swap(deleter(), other.deleter());
+    }
+
+    template <typename T, typename Deleter>
     void shared_ptr_base<T, Deleter>::take_ownership_of(shared_object_type * object_to_take_ownership_of) noexcept
     {
         shared_object = object_to_take_ownership_of;
@@ -73,7 +83,7 @@ namespace aeh::msp
         {
             int const count_after_decrement = shared_object->reference_counter -= 1;
             if (count_after_decrement == 0)
-                deleter(shared_object);
+                deleter()(shared_object);
         }
     }
 
@@ -107,14 +117,14 @@ namespace aeh::msp
 
     template <typename T, typename Deleter>
     shared_ptr<T, Deleter>::shared_ptr(shared_ptr<T> const & other) noexcept
-        : shared_ptr_base<T, Deleter>(other.deleter) 
+        : shared_ptr_base<T, Deleter>(other.deleter()) 
     { 
         this->take_ownership_of(other.shared_object); 
     }
 
     template <typename T, typename Deleter>
     shared_ptr<T, Deleter>::shared_ptr(shared_ptr<T> && other) noexcept
-        : shared_ptr_base<T, Deleter>(other.shared_object, std::move(other.deleter)) 
+        : shared_ptr_base<T, Deleter>(other.shared_object, std::move(other.deleter())) 
     {
         other.shared_object = nullptr; 
     }
@@ -185,28 +195,28 @@ namespace aeh::msp
 
     template <typename T, typename Deleter>
     shared_ptr<T const, Deleter>::shared_ptr(shared_ptr<T> const & other) noexcept 
-        : shared_ptr_base<T const, Deleter>(other.deleter) 
+        : shared_ptr_base<T const, Deleter>(other.deleter()) 
     {
         this->take_ownership_of(other.shared_object); 
     }
 
     template <typename T, typename Deleter>
     shared_ptr<T const, Deleter>::shared_ptr(shared_ptr<T const> const & other) noexcept
-        : shared_ptr_base<T const, Deleter>(other.deleter)
+        : shared_ptr_base<T const, Deleter>(other.deleter())
     {
         this->take_ownership_of(other.shared_object);
     }
 
     template <typename T, typename Deleter>
     shared_ptr<T const, Deleter>::shared_ptr(shared_ptr<T> && other) noexcept
-        : shared_ptr_base<T const, Deleter>(other.shared_object, std::move(other.deleter)) 
+        : shared_ptr_base<T const, Deleter>(other.shared_object, std::move(other.deleter())) 
     {
         other.shared_object = nullptr; 
     }
 
     template <typename T, typename Deleter>
     shared_ptr<T const, Deleter>::shared_ptr(shared_ptr<T const> && other) noexcept
-        : shared_ptr_base<T const, Deleter>(other.shared_object, std::move(other.deleter))
+        : shared_ptr_base<T const, Deleter>(other.shared_object, std::move(other.deleter()))
     {
         other.shared_object = nullptr;
     }

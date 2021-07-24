@@ -37,8 +37,8 @@ namespace aeh::msp
     template <typename T, typename Deleter>
     struct shared_ptr;
 
-    template <typename T, typename Deleter = default_delete>
-    struct shared_ptr_base
+    template <typename T, typename Deleter>
+    struct shared_ptr_base : private Deleter
     {
         using shared_object_type = shared<std::remove_const_t<T>>;
 
@@ -55,21 +55,23 @@ namespace aeh::msp
         [[nodiscard]] auto is_unique() const noexcept -> bool;
         constexpr explicit operator bool () const noexcept { return shared_object != nullptr; }
 
-        void swap(shared_ptr<T, Deleter> & other) noexcept { using std::swap; swap(shared_object, other.shared_object); swap(deleter, other.deleter); }
+        void swap(shared_ptr<T, Deleter> & other) noexcept;
 
         friend struct shared_ptr<T const, Deleter>;
 
     protected:
-        constexpr shared_ptr_base(Deleter d) noexcept : deleter(std::move(d)) {}
+        constexpr shared_ptr_base(Deleter d) noexcept : Deleter(std::move(d)) {}
         constexpr shared_ptr_base(shared_object_type * object_to_take_ownership_of, Deleter d) noexcept
-            : shared_object(object_to_take_ownership_of) 
-            , deleter(std::move(d))
+            : Deleter(std::move(d))
+            , shared_object(object_to_take_ownership_of) 
         {}
         void take_ownership_of(shared_object_type * object_to_take_ownership_of) noexcept;
         void release_ownership() noexcept;
 
+        [[nodiscard]] auto deleter() noexcept -> Deleter & { return static_cast<Deleter &>(*this); }
+        [[nodiscard]] auto deleter() const noexcept -> Deleter const & { return static_cast<Deleter const &>(*this); }
+
         shared_object_type * shared_object;
-        [[no_unique_address]] Deleter deleter;
     };
 
     template <typename T, typename Deleter = default_delete>
