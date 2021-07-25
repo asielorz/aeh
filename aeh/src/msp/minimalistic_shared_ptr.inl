@@ -6,6 +6,8 @@ namespace aeh::msp
     
     template <typename T, typename D> constexpr auto operator == (shared_ptr<T, D> const & a, std::nullptr_t) noexcept -> bool { return !static_cast<bool>(a); };
 
+    template <typename T, typename D> constexpr auto swap(shared_ptr<T, D> & a, shared_ptr<T, D> & b) noexcept -> void { a.swap(b); }
+
     //*********************************************************************************************************************************
     // shared
 

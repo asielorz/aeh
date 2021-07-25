@@ -131,6 +131,8 @@ namespace aeh::msp
 
     template <typename T, typename D> [[nodiscard]] constexpr auto operator == (shared_ptr<T, D> const & a, std::nullptr_t) noexcept -> bool;
 
+    template <typename T, typename D> constexpr auto swap(shared_ptr<T, D> & a, shared_ptr<T, D> & b) noexcept -> void;
+
 } // namespace aeh::msp
 
 #include "minimalistic_shared_ptr.inl"

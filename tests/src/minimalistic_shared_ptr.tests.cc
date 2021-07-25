@@ -190,7 +190,7 @@ TEST_CASE("Move assignment from mutable to const shared_ptr")
 	REQUIRE(b.is_unique());
 }
 
-TEST_CASE("nullptr assignment")
+TEST_CASE("nullptr assignment to shared_ptr")
 {
 	aeh::msp::shared_ptr<int> a = aeh::msp::shared_ptr<int>::make_new(5);
 	a = nullptr;
@@ -204,4 +204,15 @@ TEST_CASE("nullptr assignment")
 TEST_CASE("A shared_ptr with an empty deleter has the same size as a pointer")
 {
 	static_assert(sizeof(aeh::msp::shared_ptr<int>) == sizeof(void *));
+}
+
+TEST_CASE("ADL swap for shared_ptr as an optimization over std::swap")
+{
+	aeh::msp::shared_ptr<int> a = aeh::msp::shared_ptr<int>::make_new(5);
+	aeh::msp::shared_ptr<int> b = aeh::msp::shared_ptr<int>::make_new(6);
+
+	swap(a, b);
+
+	REQUIRE(*a == 6);
+	REQUIRE(*b == 5);
 }
