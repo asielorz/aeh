@@ -41,7 +41,7 @@ namespace aeh::main_loop
 		return prepare_frame_to_process_SDL_events(input.current);
 	}
 
-	void reset_after_inactivity(in::Input & input)
+	static void reset_after_inactivity(in::Input & input)
 	{
 		int16_t const curr_mouse_pos_x = input.current.mouse_pos_x;
 		int16_t const curr_mouse_pos_y = input.current.mouse_pos_y;

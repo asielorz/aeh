@@ -2,20 +2,24 @@
 #include <catch2/catch.hpp>
 
 #include "debug/assert.hh"
+#include "tests_main.hh"
 
-auto run_tests(int argc, char const * const argv[]) noexcept -> int
+namespace aeh
 {
-	// TODO: option for non-interactive
-	int const result = Catch::Session().run(argc, argv);
-	if (result != 0)
+	auto run_tests(int argc, char const * const argv[]) noexcept -> int
 	{
-		aeh::debug::message_box("A test failed", "One of the tests failed. Look at the console for more information.", aeh::debug::MBType::Ok | aeh::debug::MBIcon::Information);
-		aeh::debug::system_pause();
+		// TODO: option for non-interactive
+		int const result = Catch::Session().run(argc, argv);
+		if (result != 0)
+		{
+			aeh::debug::message_box("A test failed", "One of the tests failed. Look at the console for more information.", aeh::debug::MBType::Ok | aeh::debug::MBIcon::Information);
+			aeh::debug::system_pause();
+		}
+		return result;
 	}
-	return result;
-}
+} // namespace aeh
 
 auto main(int argc, char const * const argv[]) -> int
 {
-	return run_tests(argc, argv);
+	return aeh::run_tests(argc, argv);
 }

@@ -7,6 +7,7 @@
 #include <iterator> // reverse_iterator
 #include <algorithm> // rotate
 #include <memory> // destroy
+#include <limits>
 
 namespace aeh
 {

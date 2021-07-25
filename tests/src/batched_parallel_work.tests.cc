@@ -5,7 +5,7 @@
 namespace tests
 {
 
-    std::optional<size_t> filter_out_evens(size_t i)
+    static std::optional<size_t> filter_out_evens(size_t i)
     {
         if (i % 2 == 0)
             return std::nullopt;
@@ -14,7 +14,7 @@ namespace tests
     }
 
     template <typename Container>
-    auto push_back_to_if_valid(Container & c)
+    static auto push_back_to_if_valid(Container & c)
     {
         return [&c](std::optional<typename Container::value_type> results[], size_t result_count)
         {

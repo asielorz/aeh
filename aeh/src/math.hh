@@ -91,6 +91,9 @@ namespace aeh::math
 	//! Returns dividend / divisor. If remainder is not 0, rounds up instead of down.
 	[[nodiscard]] int div_round_up(int dividend, int divisor) noexcept;
 
+	//! Steer value towards target by step.
+	[[nodiscard]] float steer_towards(float value, float target, float step) noexcept;
+
 	//! Represents a 3D rotation in spherical coordinates.
 	//! Zenith is vector (0, 1, 0) and azimuth is vector (1, 0, 0).
 	//! Latitude is the angle between the forward vector and the zenith, in the range [-pi, pi].

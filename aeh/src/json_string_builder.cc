@@ -6,19 +6,19 @@ using namespace std::string_view_literals;
 namespace aeh::json
 {
 
-    void remove_last_comma(std::string & s)
+    static void remove_last_comma(std::string & s)
     {
         if (s.size() > 0 && s.back() == ',')
             s.pop_back();
     }
     
-    void write_value_string(std::string & json_string, std::string_view str)
+    static void write_value_string(std::string & json_string, std::string_view str)
     {
         json_string += str;
         json_string += ',';
     }
     
-    void append_json_escaped_string(std::string & builder, std::string_view str)
+    static void append_json_escaped_string(std::string & builder, std::string_view str)
     {
         builder += '"';
         for (char c : str)

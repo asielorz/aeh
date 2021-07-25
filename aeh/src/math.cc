@@ -203,6 +203,16 @@ namespace aeh::math
 		return result + (remainder > 0);
 	}
 
+	float steer_towards(float value, float target, float step) noexcept
+	{
+		if (abs(value - target) < step)
+			return target;
+		else if (value > target)
+			return value - step;
+		else
+			return value + step;
+	}
+
 	glm::vec3 forward(SphereCoords c) noexcept
 	{
 		return {

@@ -1,5 +1,6 @@
 add_library(tests_main OBJECT
     main.tests.cc
+    tests_main.hh
 )
 add_library(aeh::tests_main ALIAS tests_main)
 

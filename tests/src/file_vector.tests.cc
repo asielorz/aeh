@@ -194,7 +194,7 @@ TEST_CASE("Add takes a file name, which is then concatenated with the base path"
 	REQUIRE(fake_filesystem["base/important document.txt"] == 30);
 }
 
-std::string dummy_path()
+static std::string dummy_path()
 {
 	return "";
 }

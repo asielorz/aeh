@@ -1,7 +1,7 @@
 #include "input/input.hh"
 #include <catch2/catch.hpp>
 
-auto make_control_state_naive(bool currently_down, bool previously_down) noexcept -> aeh::in::ControlState
+static auto make_control_state_naive(bool currently_down, bool previously_down) noexcept -> aeh::in::ControlState
 {
 	if (currently_down)
 	{

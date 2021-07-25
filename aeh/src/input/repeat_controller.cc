@@ -4,19 +4,19 @@
 namespace aeh::in
 {
 
-	void reset(ControllerRepeater::Entry & entry)
+	static void reset(ControllerRepeater::Entry & entry)
 	{
 		entry.value = 0;
 		entry.repeating = false;
 	}
 
-	void loop(ControllerRepeater::Entry & entry)
+	static void loop(ControllerRepeater::Entry & entry)
 	{
 		entry.value = 0;
 		entry.repeating = true;
 	}
 
-	auto is_ready(ControllerRepeater::Entry entry, float period, float first_wait) -> bool
+	static auto is_ready(ControllerRepeater::Entry entry, float period, float first_wait) -> bool
 	{
 		if (entry.repeating)
 			return entry.value >= period;

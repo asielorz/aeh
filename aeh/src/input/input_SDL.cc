@@ -10,7 +10,7 @@
 namespace aeh::in
 {
 
-	auto SDL_scancode_to_key(int scancode) noexcept -> std::optional<Key>
+	static auto SDL_scancode_to_key(int scancode) noexcept -> std::optional<Key>
  	{
 		switch (scancode)
 		{
@@ -167,7 +167,7 @@ namespace aeh::in
 		return std::nullopt;
 	}
 
-	auto SDL_controller_button_to_enum(int button) -> std::optional<ControllerButton>
+	static auto SDL_controller_button_to_enum(int button) -> std::optional<ControllerButton>
 	{
 		switch (button)
 		{
@@ -190,7 +190,7 @@ namespace aeh::in
 		return std::nullopt;
 	}
 
-	auto SDL_controller_axis_to_enum(int button) -> std::optional<ControllerAxis>
+	static auto SDL_controller_axis_to_enum(int button) -> std::optional<ControllerAxis>
 	{
 		switch (button)
 		{
