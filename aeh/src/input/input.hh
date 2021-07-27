@@ -182,6 +182,7 @@ namespace aeh::in
 	[[nodiscard]] auto mouse_pos_prev_y(Input const& input) noexcept -> int16_t;
 	[[nodiscard]] auto mouse_move_x(Input const & input) noexcept -> int16_t;
 	[[nodiscard]] auto mouse_move_y(Input const & input) noexcept -> int16_t;
+	[[nodiscard]] auto mouse_moved(Input const & input) noexcept -> bool;
 	[[nodiscard]] auto mouse_wheel(Input const & input) noexcept -> int;
 	[[nodiscard]] auto mouse_wheel_horizontal(Input const & input) noexcept -> int;
 

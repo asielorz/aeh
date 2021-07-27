@@ -334,6 +334,11 @@ namespace aeh::in
 		return input.current.mouse_pos_y - input.previous.mouse_pos_y;
 	}
 
+	auto mouse_moved(Input const & input) noexcept -> bool
+	{
+		return (mouse_move_x(input) != 0) || (mouse_move_y(input) != 0);
+	}
+
 	auto text_input(Input const & input) noexcept -> std::string_view
 	{
 		return input.current.text_input.data();
