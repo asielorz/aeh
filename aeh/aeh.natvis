@@ -40,4 +40,15 @@
     </Expand>
   </Type>
 
+  <Type Name="aeh::ChangeStack&lt;*&gt;">
+    <DisplayString>{changes}</DisplayString>
+    <Expand>
+      <Item Name="Current item">changes[currently_active]</Item>
+      <Item Name="Current index">currently_active</Item>
+      <Item Name="Size">changes.size()</Item>
+      <Item Name="Last saved">last_saved</Item>
+      <ExpandedItem>changes,view(simple)</ExpandedItem>
+    </Expand>
+  </Type>
+
 </AutoVisualizer>
