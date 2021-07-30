@@ -60,11 +60,17 @@ namespace aeh::msp
 
         [[nodiscard]] static auto from_ilist(std::initializer_list<T> ilist) -> immutable_array;
 
-        template <typename ForwardIterator>
+        template <std::forward_iterator ForwardIterator> requires std::convertible_to<std::iter_value_t<ForwardIterator>, T>
         [[nodiscard]] static auto copy_of_range(ForwardIterator first, ForwardIterator last) -> immutable_array;
 
-        template <typename ForwardIterator>
+        template <std::ranges::forward_range ForwardRange> requires std::convertible_to<std::ranges::range_value_t<ForwardRange>, T>
+        [[nodiscard]] static auto copy_of_range(ForwardRange const & range) -> immutable_array;
+
+        template <std::forward_iterator ForwardIterator> requires std::convertible_to<std::iter_value_t<ForwardIterator>, T>
         [[nodiscard]] static auto move_from_range(ForwardIterator first, ForwardIterator last) -> immutable_array;
+        
+        template <std::ranges::forward_range ForwardRange> requires std::convertible_to<std::ranges::range_value_t<ForwardRange>, T>
+        [[nodiscard]] static auto move_from_range(ForwardRange && range) -> immutable_array;
 
         template <aeh::invocable_r<std::vector<T>, std::vector<T>> F>
         [[nodiscard]] auto transform(F && f) const -> immutable_array;
@@ -96,7 +102,7 @@ namespace aeh::msp
         shared_ptr<detail::flexible_immutable_array<T>> ptr;
     };
 
-    template <typename T> [[nodiscard]] auto operator == (immutable_array<T> const & a, immutable_array<T> const & b) noexcept -> bool;
+    template <std::equality_comparable T> [[nodiscard]] auto operator == (immutable_array<T> const & a, immutable_array<T> const & b) noexcept -> bool;
     template <typename T> [[nodiscard]] auto operator <=> (immutable_array<T> const & a, immutable_array<T> const & b) noexcept;
 
     template <typename T>

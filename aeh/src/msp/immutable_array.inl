@@ -55,7 +55,7 @@ namespace aeh::msp
     }
 
     template <typename T>
-    template <typename ForwardIterator>
+    template <std::forward_iterator ForwardIterator> requires std::convertible_to<std::iter_value_t<ForwardIterator>, T>
     auto immutable_array<T>::copy_of_range(ForwardIterator first, ForwardIterator last) -> immutable_array
     {
         size_t const size = std::distance(first, last);
@@ -72,7 +72,14 @@ namespace aeh::msp
     }
 
     template <typename T>
-    template <typename ForwardIterator>
+    template <std::ranges::forward_range ForwardRange> requires std::convertible_to<std::ranges::range_value_t<ForwardRange>, T>
+    auto immutable_array<T>::copy_of_range(ForwardRange const & range) -> immutable_array
+    {
+        return copy_of_range(range.begin(), range.end());
+    }
+
+    template <typename T>
+    template <std::forward_iterator ForwardIterator> requires std::convertible_to<std::iter_value_t<ForwardIterator>, T>
     auto immutable_array<T>::move_from_range(ForwardIterator first, ForwardIterator last) -> immutable_array
     {
         size_t const size = std::distance(first, last);
@@ -86,6 +93,13 @@ namespace aeh::msp
         new_array->value.size_ = size;
         std::uninitialized_move(first, last, static_cast<T *>(new_array->value.data_));
         return acquire_ownership_of(shared_ptr<detail::flexible_immutable_array<T>>(new_array));
+    }
+
+    template <typename T>
+    template <std::ranges::forward_range ForwardRange> requires std::convertible_to<std::ranges::range_value_t<ForwardRange>, T>
+    auto immutable_array<T>::move_from_range(ForwardRange && range) -> immutable_array
+    {
+        return move_from_range(range.begin(), range.end());
     }
 
     template <typename T>
