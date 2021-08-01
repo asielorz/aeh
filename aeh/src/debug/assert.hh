@@ -4,6 +4,29 @@
 #include <cstdlib>
 #include <cstdio>
 
+//! Breaks into the debugger (from catch2)
+#if defined _MSC_VER
+#	define AEH_DEBUGBREAK()	__debugbreak()
+#elif defined(__MINGW32__)
+	extern "C" __declspec(dllimport) void __stdcall DebugBreak();
+#	define AEH_DEBUGBREAK() DebugBreak()
+#elif AEH_LINUX
+	// If we can use inline assembler, do it because this allows us to break
+	// directly at the location of the failing check instead of breaking inside
+	// raise() called from it, i.e. one stack frame below.
+#	if defined(__GNUC__) && (defined(__i386) || defined(__x86_64))
+#		define AEH_DEBUGBREAK() asm volatile ("int $3") /* NOLINT */
+#	else // Fall back to the generic way.
+#		include <signal.h>
+#		define AEH_DEBUGBREAK() raise(SIGTRAP)
+#	endif
+#else
+	// TODO: other compilers/platforms (copy more from catch2?)
+	// TODO: check if under debugger?
+	AEH_MESSAGE_INFO("debugbreak not implemented")
+#	define AEH_DEBUGBREAK() std::abort()
+#endif
+
 namespace aeh::debug
 {
 	enum struct MBType
@@ -80,25 +103,6 @@ namespace aeh::debug
 	//! Shows a message box alerting that the called function has not been implemented. First shows an abort-retry-ignore message box, second uses an ok message box.
 	MBRet not_implemented(char const location[] = nullptr);
 	void not_implemented_ok(char const location[] = nullptr);
-
-	//! Breaks into the debugger
-#if AEH_MSVC
-#	define AEH_DEBUGBREAK()	__debugbreak()
-#elif AEH_LINUX // from catch2
-	// If we can use inline assembler, do it because this allows us to break
-	// directly at the location of the failing check instead of breaking inside
-	// raise() called from it, i.e. one stack frame below.
-#	if defined(__GNUC__) && (defined(__i386) || defined(__x86_64))
-#		define AEH_DEBUGBREAK() asm volatile ("int $3") /* NOLINT */
-#	else // Fall back to the generic way.
-#		include <signal.h>
-#		define AEH_DEBUGBREAK() raise(SIGTRAP)
-#	endif
-#else
-	// TODO: other compilers/platforms (copy more from catch2?)
-	// TODO: check if under debugger?
-	AEH_MESSAGE_INFO("debugbreak not implemented")
-#endif
 
 	inline void system_pause()
 	{

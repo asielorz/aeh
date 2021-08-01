@@ -13,8 +13,11 @@ namespace aeh::debug
 			MBRet const ret = message_box(title, message, MBType::RetryCancel | MBIcon::Error);
 			if (ret == MBRet::Retry)
 				AEH_DEBUGBREAK();
-
+#if AEH_MINGW
+			std::abort();
+#else
 			std::quick_exit(1);
+#endif
 		}
 	}
 

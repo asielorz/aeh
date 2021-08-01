@@ -91,7 +91,11 @@ namespace aeh::debug
 		switch (message_box_opt)
 		{
 		case MBRet::Abort:
+#if AEH_MINGW
 			std::abort();
+#else
+			std::quick_exit(1);
+#endif
 			break;
 		case MBRet::Retry:
 			AEH_DEBUGBREAK();

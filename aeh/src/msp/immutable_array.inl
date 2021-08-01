@@ -123,7 +123,7 @@ namespace aeh::msp
         return builder.finish();
     }
 
-    template <typename T>
+    template <std::equality_comparable T>
     auto operator == (immutable_array<T> const & a, immutable_array<T> const & b) noexcept -> bool
     {
         return (a.data() == b.data()) || std::equal(a.begin(), a.end(), b.begin(), b.end());

@@ -1,5 +1,14 @@
 #pragma once
 
+#define AEH_MINGW false
+
+#ifdef __MINGW32__
+#	undef AEH_MINGW
+#	define AEH_MINGW true
+
+#	define STRSAFE_NO_DEPRECATE // Don't remove sprintf and some other "unsafe" functions
+#endif
+
 #include <cstddef>
 #include <cstdio>
 #include <cstdlib>
