@@ -101,22 +101,63 @@
 #	define AEH_MESSAGE_DIAG(x)
 #endif
 
-#define AEH_WARNING_PUSH() \
-	AEH_MSVC_PRAGMA(warning(push))\
-	AEH_GCC_PRAGMA(GCC diagnostic push)\
-	AEH_CLANG_PRAGMA(clang diagnostic push)
+#define AEH_WARNING_PUSH()
+#define AEH_WARNING_POP()
 
-#define AEH_WARNING_POP() \
-	AEH_MSVC_PRAGMA(warning(pop))\
-	AEH_GCC_PRAGMA(GCC diagnostic pop)\
-	AEH_CLANG_PRAGMA(clang diagnostic pop)
+#if AEH_MSVC
+#	define AEH_MSVC_WARNING_PUSH() __pragma(warning(push))
+#	define AEH_MSVC_WARNING_DISABLE(warning_code) __pragma(warning(disable: warning_code))
+#	define AEH_MSVC_WARNING_POP() __pragma(warning(pop))
+
+#	undef AEH_WARNING_PUSH
+#	define AEH_WARNING_PUSH() AEH_MSVC_WARNING_PUSH()
+
+#	undef AEH_WARNING_POP
+#	define AEH_WARNING_POP() AEH_MSVC_WARNING_POP()
+#else
+#	define AEH_MSVC_WARNING_PUSH()
+#	define AEH_MSVC_WARNING_DISABLE(warning_code)
+#	define AEH_MSVC_WARNING_POP()
+#endif
+
+#if AEH_GCC
+#	define AEH_GCC_WARNING_PUSH() _Pragma("GCC diagnostic push")
+#	define AEH_GCC_WARNING_DISABLE(warning_flag) _Pragma("GCC diagnostic ignored \"" warning_flag "\"")
+#	define AEH_GCC_WARNING_POP() _Pragma("GCC diagnostic pop")
+
+#	undef AEH_WARNING_PUSH
+#	define AEH_WARNING_PUSH() AEH_GCC_WARNING_PUSH()
+
+#	undef AEH_WARNING_POP
+#	define AEH_WARNING_POP() AEH_GCC_WARNING_POP()
+#else
+#	define AEH_GCC_WARNING_PUSH()
+#	define AEH_GCC_WARNING_DISABLE(warning_flag)
+#	define AEH_GCC_WARNING_POP()
+#endif
+
+#if AEH_CLANG
+#	define AEH_CLANG_WARNING_PUSH() _Pragma("clang diagnostic push")
+#	define AEH_CLANG_WARNING_DISABLE(warning_flag) _Pragma("clang diagnostic ignored" warning_flag "\"")
+#	define AEH_CLANG_WARNING_POP() _Pragma("clang diagnostic pop")
+
+#	undef AEH_WARNING_PUSH
+#	define AEH_WARNING_PUSH() AEH_CLANG_WARNING_PUSH()
+
+#	undef AEH_WARNING_POP
+#	define AEH_WARNING_POP() AEH_CLANG_WARNING_POP()
+#else
+#	define AEH_CLANG_WARNING_PUSH()
+#	define AEH_CLANG_WARNING_DISABLE(warning_flag)
+#	define AEH_CLANG_WARNING_POP()
+#endif
 
 #define AEH_IGNORE_WARNING_NAMELESS_STRUCT() \
 	AEH_WARNING_PUSH()	\
-	AEH_MSVC_PRAGMA(warning(disable : 4201)) /* nameless struct/union */ \
-	AEH_GCC_PRAGMA(GCC diagnostic ignored "-Wpedantic") /* there is no more specific flag */ \
-	AEH_CLANG_PRAGMA(clang diagnostic ignored "-Wgnu-anonymous-struct") \
-	AEH_CLANG_PRAGMA(clang diagnostic ignored "-Wnested-anon-types")
+	AEH_MSVC_WARNING_DISABLE(4201) /* nameless struct/union */ \
+	AEH_GCC_WARNING_DISABLE("-Wpedantic") /* there is no more specific flag */ \
+	AEH_CLANG_WARNING_DISABLE("-Wgnu-anonymous-struct") \
+	AEH_CLANG_WARNING_DISABLE("-Wnested-anon-types")
 
 #ifdef _WIN32
 #	define AEH_WINDOWS true

@@ -194,10 +194,13 @@ TEST_CASE("Add takes a file name, which is then concatenated with the base path"
 	REQUIRE(fake_filesystem["base/important document.txt"] == 30);
 }
 
+AEH_MSVC_WARNING_PUSH()
+AEH_MSVC_WARNING_DISABLE(4505) // 'dummy_path': unreferenced local function has been removed
 static std::string dummy_path()
 {
 	return "";
 }
+AEH_MSVC_WARNING_POP()
 
 TEST_CASE("FileVector can be instanced with the provided base path traits")
 {
