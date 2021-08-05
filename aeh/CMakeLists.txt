@@ -117,6 +117,8 @@ target_sources(aeh PRIVATE
 	src/value_ptr.hh
 	src/viewport.cc
 	src/viewport.hh
+	src/virtual_memory.cc
+	src/virtual_memory.hh
 	src/warning_macro.hh
 
 	src/debug/assert.cc
