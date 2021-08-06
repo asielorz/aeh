@@ -27,6 +27,11 @@ namespace aeh
 
 #endif
 
+	auto align_to_os_memory_page_boundary(size_t n) noexcept -> size_t
+	{
+		return align(n, os_memory_page_size);
+	}
+
 	VirtualMemoryRegion::VirtualMemoryRegion(VirtualMemoryRegion && other) noexcept
 		: memory(other.memory)
 		, physical_memory_backed_size(other.physical_memory_backed_size)
@@ -62,8 +67,7 @@ namespace aeh
 		if (number_of_bytes == 0)
 			return VirtualMemoryRegion();
 
-		// Align to page boundary.
-		number_of_bytes = align(number_of_bytes, os_memory_page_size);
+		number_of_bytes = align_to_os_memory_page_boundary(number_of_bytes);
 
 		VirtualMemoryRegion virtual_memory_region;
 

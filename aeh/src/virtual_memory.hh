@@ -5,6 +5,8 @@ namespace aeh
 
 	extern size_t const os_memory_page_size;
 
+	auto align_to_os_memory_page_boundary(size_t n) noexcept -> size_t;
+
 	struct VirtualMemoryRegion
 	{
 		VirtualMemoryRegion() noexcept = default;

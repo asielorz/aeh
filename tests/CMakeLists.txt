@@ -12,6 +12,7 @@ add_executable(aeh_tests
 	src/immutable_array.tests.cc
 	src/input.tests.cc
 	src/json_string_builder.tests.cc
+	src/memory_arena.tests.cc
 	src/minimalistic_shared_ptr.tests.cc
 	src/pointer_union.tests.cc
 	src/string.tests.cc

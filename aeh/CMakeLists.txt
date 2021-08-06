@@ -97,6 +97,8 @@ target_sources(aeh PRIVATE
 	src/map.hh
 	src/math.cc
 	src/math.hh
+	src/memory_arena.cc
+	src/memory_arena.hh
 	src/monadic_optional.hh
 	src/multicomparison.hh
 	src/out.hh
