@@ -22,7 +22,7 @@ TEST_CASE("make_new makes a new heap allocated object and returns a shared_ptr t
 	REQUIRE(p.use_count() == 1);
 }
 
-TEST_CASE("shared_ptr can be copied")
+TEST_CASE("shared_ptr can be copied and both copies point at the same shared object")
 {
 	aeh::msp::shared_ptr<int> a = aeh::msp::shared_ptr<int>::make_new(5);
 	auto b = a;
@@ -40,7 +40,7 @@ TEST_CASE("shared_ptr can be copied")
 	REQUIRE(*b == 6);
 }
 
-TEST_CASE("shared_ptr can be copy assigned")
+TEST_CASE("shared_ptr can be copy assigned and both copies point at the same shared object")
 {
 	aeh::msp::shared_ptr<int> a = aeh::msp::shared_ptr<int>::make_new(5);
 	aeh::msp::shared_ptr<int> b;
@@ -59,7 +59,7 @@ TEST_CASE("shared_ptr can be copy assigned")
 	REQUIRE(*b == 6);
 }
 
-TEST_CASE("shared_ptr can be moved")
+TEST_CASE("shared_ptr can be moved. Moved from shared_ptr is null.")
 {
 	aeh::msp::shared_ptr<int> a = aeh::msp::shared_ptr<int>::make_new(5);
 
@@ -77,7 +77,7 @@ TEST_CASE("shared_ptr can be moved")
 	REQUIRE(b.use_count() == 1);
 }
 
-TEST_CASE("shared_ptr can be move assigned")
+TEST_CASE("shared_ptr can be move assigned. Moved from shared_ptr is null.")
 {
 	aeh::msp::shared_ptr<int> a = aeh::msp::shared_ptr<int>::make_new(5);
 	aeh::msp::shared_ptr<int> b;
@@ -97,7 +97,7 @@ TEST_CASE("shared_ptr can be move assigned")
 	REQUIRE(b.use_count() == 1);
 }
 
-TEST_CASE("shared_ptr behaves correctly when assigning pointers with same value")
+TEST_CASE("Assigning two shared_ptrs pointing at the same shared object is a noop.")
 {
 	aeh::msp::shared_ptr<int> a = aeh::msp::shared_ptr<int>::make_new(5);
 	auto b = a;
@@ -116,7 +116,7 @@ TEST_CASE("shared_ptr behaves correctly when assigning pointers with same value"
 	REQUIRE(b.use_count() == 2);
 }
 
-TEST_CASE("shared_ptr can be self assigned")
+TEST_CASE("Self copy assignment on shared_ptr is a noop.")
 {
 	aeh::msp::shared_ptr<int> a = aeh::msp::shared_ptr<int>::make_new(5);
 	a = a;
@@ -126,7 +126,7 @@ TEST_CASE("shared_ptr can be self assigned")
 	REQUIRE(a.use_count() == 1);
 }
 
-TEST_CASE("shared_ptr can be self move assigned")
+TEST_CASE("Self move assignment on a shared_ptr is a noop.")
 {
 	aeh::msp::shared_ptr<int> a = aeh::msp::shared_ptr<int>::make_new(5);
 	a = std::move(a);
@@ -136,7 +136,7 @@ TEST_CASE("shared_ptr can be self move assigned")
 	REQUIRE(a.use_count() == 1);
 }
 
-TEST_CASE("A shared_ptr can point to a const object")
+TEST_CASE("A shared_ptr can point to a const object. Dereference returns a const reference.")
 {
 	aeh::msp::shared_ptr<int const> a = aeh::msp::shared_ptr<int const>::make_new(5);
 
@@ -157,7 +157,7 @@ TEST_CASE("A shared_ptr to const can be constructed from a shared_ptr to mutable
 	REQUIRE(*b == 10);
 }
 
-TEST_CASE("shared_ptr to const can be self assigned")
+TEST_CASE("Self copy assignment on a shared_ptr to const is a noop.")
 {
 	auto a = aeh::msp::shared_ptr<int const>::make_new(5);
 	a = a;
@@ -167,7 +167,7 @@ TEST_CASE("shared_ptr to const can be self assigned")
 	REQUIRE(a.use_count() == 1);
 }
 
-TEST_CASE("shared_ptr to const can be self move assigned")
+TEST_CASE("Self move assignment on a shared_ptr to const is a noop.")
 {
 	auto a = aeh::msp::shared_ptr<int const>::make_new(5);
 	a = std::move(a);
@@ -190,7 +190,7 @@ TEST_CASE("Move assignment from mutable to const shared_ptr")
 	REQUIRE(b.is_unique());
 }
 
-TEST_CASE("nullptr assignment to shared_ptr")
+TEST_CASE("Assigning nullptr to shared_ptr leaves it an a null state.")
 {
 	aeh::msp::shared_ptr<int> a = aeh::msp::shared_ptr<int>::make_new(5);
 	a = nullptr;
