@@ -32,23 +32,35 @@ namespace aeh
 		}
 	}
 
+	static auto load_whole_file_impl(std::ifstream& file) noexcept -> std::optional<std::string>
+	{
+		// The "naive" way of doing it, reading using std::istreambuf_iterator
+		// is unnecessarily slow:
+		// https://stackoverflow.com/a/2602060/11929731
+		// https://insanecoding.blogspot.com/2011/11/how-to-read-in-file-in-c.html
+		if (!file.is_open())
+			return std::nullopt;
+
+		file.seekg(0, std::ios::end);
+
+		std::string contents;
+		contents.resize(file.tellg());
+
+		file.seekg(0, std::ios::beg);
+		file.read(&contents[0], contents.size());
+		return contents;
+	}
+
 	auto load_whole_file(std::string_view path) noexcept -> std::optional<std::string>
 	{
-		auto const null_terminated_path = make_null_terminated(path);
-		std::ifstream file(null_terminated_path.data());
-		if (file.is_open())
-			return std::string(std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>());
-		else
-			return std::nullopt;
+		std::ifstream file(make_null_terminated(path).data());
+		return load_whole_file_impl(file);
 	}
 
 	auto load_whole_file(std::filesystem::path const & path) noexcept -> std::optional<std::string>
 	{
 		std::ifstream file(path);
-		if (file.is_open())
-			return std::string(std::istreambuf_iterator<char>(file), std::istreambuf_iterator<char>());
-		else
-			return std::nullopt;
+		return load_whole_file_impl(file);
 	}
 
 	auto replace(std::string_view string, std::string_view old_substr, std::string_view new_substr) noexcept -> std::string
