@@ -73,6 +73,16 @@ namespace aeh
 		return result;
 	}
 
+	void replace_in_place(std::string& string, std::string_view const old_substr, std::string_view const new_substr) noexcept
+	{
+		std::size_t i = 0;
+		while ((i = string.find(old_substr, i)) != std::string::npos)
+		{
+			string.replace(i, old_substr.size(), new_substr);
+			i += new_substr.size();
+		}
+	}
+
 	auto make_string_view(char const first[], char const last[]) noexcept -> std::string_view
 	{
 		debug_assert(last >= first);

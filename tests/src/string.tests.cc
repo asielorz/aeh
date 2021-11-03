@@ -4,30 +4,62 @@
 
 TEST_CASE("replace with single chars")
 {
-	std::string s = aeh::replace("some test string", "s", "z");
-	REQUIRE(s == "zome tezt ztring");
+	constexpr std::string_view source = "some test string";
+	constexpr std::string_view old = "s";
+	constexpr std::string_view new_ = "z";
+	constexpr std::string_view expected = "zome tezt ztring";
+
+	REQUIRE(aeh::replace(source, old, new_) == expected);
+
+	std::string str(source);
+	aeh::replace_in_place(str, old, new_);
+	REQUIRE(str == expected);
 }
 
 TEST_CASE("replace with nothing")
 {
-	std::string s = aeh::replace("some test string", "s", "");
-	REQUIRE(s == "ome tet tring");
+	constexpr std::string_view source = "some test string";
+	constexpr std::string_view old = "s";
+	constexpr std::string_view new_ = "";
+	constexpr std::string_view expected = "ome tet tring";
+
+	REQUIRE(aeh::replace(source, old, new_) == expected);
+
+	std::string str(source);
+	aeh::replace_in_place(str, old, new_);
+	REQUIRE(str == expected);
 }
 
 TEST_CASE("replace of different sizes")
 {
-	std::string s = aeh::replace("some test string", "st", "asdf");
-	REQUIRE(s == "some teasdf asdfring");
+	constexpr std::string_view source = "some test string";
+	constexpr std::string_view old = "st";
+	constexpr std::string_view new_ = "asdf";
+	constexpr std::string_view expected = "some teasdf asdfring";
+
+	REQUIRE(aeh::replace(source, old, new_) == expected);
+
+	std::string str(source);
+	aeh::replace_in_place(str, old, new_);
+	REQUIRE(str == expected);
 }
 
 TEST_CASE("replace doesn't find anything")
 {
-	std::string s = aeh::replace("some test string", "foo", "bar");
-	REQUIRE(s == "some test string");
+	constexpr std::string_view source = "some test string";
+	constexpr std::string_view old = "foo";
+	constexpr std::string_view new_ = "bar";
+	constexpr std::string_view expected = "some test string";
+
+	REQUIRE(aeh::replace(source, old, new_) == expected);
+
+	std::string str(source);
+	aeh::replace_in_place(str, old, new_);
+	REQUIRE(str == expected);
 }
 
 template <typename F>
-auto to_vector(aeh::generator<F> g) -> std::vector<typename aeh::generator<F>::value_type>
+static auto to_vector(aeh::generator<F> g) -> std::vector<typename aeh::generator<F>::value_type>
 {
 	std::vector<typename aeh::generator<F>::value_type> result;
 	result.reserve(16);

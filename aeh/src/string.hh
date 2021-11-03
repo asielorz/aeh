@@ -26,6 +26,7 @@ namespace aeh
 	auto load_whole_file(std::string_view path) noexcept -> std::optional<std::string>;
 	auto load_whole_file(std::filesystem::path const & path) noexcept -> std::optional<std::string>;
 	auto replace(std::string_view string, std::string_view old_substr, std::string_view new_substr) noexcept -> std::string;
+	void replace_in_place(std::string& string, std::string_view old_substr, std::string_view new_substr) noexcept;
 
 	auto make_string_view(char const first[], char const last[]) noexcept -> std::string_view;
 	auto begin_ptr(std::string_view sv) noexcept -> char const *;
