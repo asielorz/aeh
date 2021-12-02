@@ -23,4 +23,9 @@ namespace aeh
         return T(seed);
     }
 
+    // 64 bit RNG described by Knuth. Very small and very fast. Quality of generated numbers is not that good.
+    // Use for things where a lot of random numbers are needed, and their quality at beating statistical tests
+    // is not that important, like animating particles.
+    using knuth_lcg = std::linear_congruential_engine<uint64_t, 6364136223846793005U, 1442695040888963407U, 0U>;
+
 } // namespace aeh
