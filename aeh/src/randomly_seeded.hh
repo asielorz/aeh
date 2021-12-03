@@ -23,6 +23,26 @@ namespace aeh
         return T(seed);
     }
 
+    template <typename RNG>
+    struct rng_seed_sequence
+    {
+        RNG & rng;
+
+        template <typename It>
+        auto generate(It first, It last) -> void
+        {
+            for (auto it = first; it != last; ++it)
+                *it = rng();
+        }
+    };
+
+    template <typename OutputRNG, typename InputRNG>
+    auto split_rng(InputRNG & rng) -> OutputRNG
+    {
+        auto seed = rng_seed_sequence(rng);
+        return OutputRNG(seed);
+    }
+
     // 64 bit RNG described by Knuth. Very small and very fast. Quality of generated numbers is not that good.
     // Use for things where a lot of random numbers are needed, and their quality at beating statistical tests
     // is not that important, like animating particles.
