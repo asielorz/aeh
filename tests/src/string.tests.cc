@@ -124,6 +124,7 @@ constexpr auto compile_time_split(std::string_view str, char delim) noexcept -> 
 	result[1] = *split_generator();
 	result[2] = *split_generator();
 	result[3] = *split_generator();
+	debug_assert(split_generator() == std::nullopt);
 	return result;
 }
 
@@ -135,6 +136,33 @@ TEST_CASE("Splitting at compile time")
 	STATIC_REQUIRE(splitted[1] == "0");
 	STATIC_REQUIRE(splitted[2] == "0");
 	STATIC_REQUIRE(splitted[3] == "1");
+}
+
+TEST_CASE("Splitting unicode")
+{
+	using namespace std::string_view_literals;
+
+	{
+		auto const expected = std::vector<std::u8string_view>{ u8"Cañón", u8"Crêpe", u8"日本語" };
+		constexpr std::u8string_view text = u8"Cañón|Crêpe|日本語";
+
+		auto const splitted = to_vector(aeh::split(text, u8'|'));
+
+		REQUIRE(splitted == expected);
+	}
+
+	constexpr std::array splitted = []
+	{
+		// We can't use a char8_t for the delimiter
+		// since 😎 takes more than one code point
+		auto gen = aeh::split(u8"今日は😎世界!", u8"😎"sv);
+		const auto res = std::array{ *gen(), *gen() };
+		debug_assert(!gen().has_value());
+		return res;
+	}();
+	STATIC_REQUIRE(splitted.size() == 2);
+	STATIC_REQUIRE(splitted[0] == u8"今日は");
+	STATIC_REQUIRE(splitted[1] == u8"世界!");
 }
 
 TEST_CASE("Ascii text is utf8")
