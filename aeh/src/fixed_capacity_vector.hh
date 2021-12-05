@@ -85,6 +85,18 @@ namespace aeh
 		constexpr auto erase(const_iterator pos) noexcept -> iterator;
 		constexpr auto erase(const_iterator first, const_iterator last) noexcept -> const_iterator;
 
+		template <std::ranges::input_range R>
+		constexpr auto assign(R const & range)
+			noexcept(std::is_nothrow_constructible_v<T, std::ranges::range_value_t<R>>)
+			-> void
+			requires(std::is_constructible_v<T, std::ranges::range_value_t<R>>);
+
+		template <std::input_iterator It> 
+		constexpr auto assign(It first, It last)
+			noexcept(std::is_nothrow_constructible_v<T, std::iter_value_t<It>>)
+			-> void
+			requires(std::is_constructible_v<T, std::iter_value_t<It>>);
+
 	private:
 		std::aligned_storage_t<sizeof(T) * Capacity, alignof(T)> buffer = {0};
 		size_t size_ = 0;

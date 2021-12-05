@@ -320,6 +320,29 @@ namespace aeh
 	}
 
 	template <typename T, size_t Capacity>
+	template <std::ranges::input_range R>
+	constexpr auto fixed_capacity_vector<T, Capacity>::assign(R const & range)
+		noexcept(std::is_nothrow_constructible_v<T, std::ranges::range_value_t<R>>)
+		-> void
+		requires(std::is_constructible_v<T, std::ranges::range_value_t<R>>)
+	{
+		assign(range.begin(), range.end());
+	}
+
+	template <typename T, size_t Capacity>
+	template <std::input_iterator It>
+	constexpr auto fixed_capacity_vector<T, Capacity>::assign(It first, It last)
+		noexcept(std::is_nothrow_constructible_v<T, std::iter_value_t<It>>)
+		-> void
+		requires(std::is_constructible_v<T, std::iter_value_t<It>>)
+	{
+		debug_assert(std::distance(first, last) <= Capacity);
+		clear();
+		for (It it = first; it != last; ++it)
+			emplace_back(*it);
+	}
+
+	template <typename T, size_t Capacity>
 	constexpr auto operator == (fixed_capacity_vector<T, Capacity> const & a, fixed_capacity_vector<T, Capacity> const & b) noexcept -> bool
 	{
 		return std::equal(a.begin(), a.end(), b.begin(), b.end());
