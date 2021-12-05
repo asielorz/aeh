@@ -75,22 +75,22 @@ namespace aeh
 
 	constexpr std::array<AllowedFileType, 1> default_allowed_file_types = {AllowedFileType::all_files_allowed()};
 
-	struct OpenSingleFileOptions
+	struct BrowseOpenSingleFileOptions
 	{
 		std::u8string_view title = u8"Open file";
 		std::span<AllowedFileType const> allowed_file_types = default_allowed_file_types;
 	};
 
-	struct OpenMultipleFileOptions
+	struct BrowseOpenMultipleFileOptions
 	{
 		std::u8string_view title = u8"Open files";
 		std::span<AllowedFileType const> allowed_file_types = default_allowed_file_types;
 	};
 
-	auto open_single_file(OpenSingleFileOptions options = {}) -> std::optional<std::filesystem::path>;
-	auto open_multiple_files(OpenMultipleFileOptions options = {}) -> std::vector<std::filesystem::path>;
+	auto browse_open_single_file(BrowseOpenSingleFileOptions options = {}) -> std::optional<std::filesystem::path>;
+	auto browse_open_multiple_files(BrowseOpenMultipleFileOptions options = {}) -> std::vector<std::filesystem::path>;
 
-	struct SaveFileOptions
+	struct BrowseSaveFileOptions
 	{
 		std::u8string_view title = u8"Save file";
 		std::filesystem::path default_path;
@@ -98,15 +98,15 @@ namespace aeh
 		std::span<AllowedFileType const> allowed_file_types = default_allowed_file_types;
 	};
 
-	auto save_file(SaveFileOptions options = {}) -> std::optional<std::filesystem::path>;
+	auto browse_save_file(BrowseSaveFileOptions options = {}) -> std::optional<std::filesystem::path>;
 
-	struct OpenDirectoryOptions
+	struct BrowseDirectoryOptions
 	{
 		std::u8string_view title = u8"Open folder";
 		std::filesystem::path default_path;
 	};
 
-	auto open_directory(OpenDirectoryOptions options = {}) -> std::optional<std::filesystem::path>;
+	auto browse_directory(BrowseDirectoryOptions options = {}) -> std::optional<std::filesystem::path>;
 
 	//! Returns an aeh::generator object that generates the splitted string parts.
 	constexpr auto split(std::string_view text, char delimiter) noexcept;

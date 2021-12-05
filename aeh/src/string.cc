@@ -306,7 +306,7 @@ namespace aeh
 		return extension_filters;
 	}
 
-	static auto open_files_impl(OpenMultipleFileOptions options,  bool single_file) -> std::vector<std::string>
+	static auto open_files_impl(BrowseOpenMultipleFileOptions options,  bool single_file) -> std::vector<std::string>
 	{
 		return pfd::open_file(
 			std::string(reinterpret_cast<char const *>(options.title.data()), options.title.size()),
@@ -315,9 +315,9 @@ namespace aeh
 			((single_file) ? pfd::opt::none : pfd::opt::multiselect)).result();
 	}
 
-	auto open_single_file(OpenSingleFileOptions options) -> std::optional<std::filesystem::path>
+	auto browse_open_single_file(BrowseOpenSingleFileOptions options) -> std::optional<std::filesystem::path>
 	{
-		auto const files = open_files_impl(OpenMultipleFileOptions{ .title = options.title, .allowed_file_types = options.allowed_file_types }, true);
+		auto const files = open_files_impl(BrowseOpenMultipleFileOptions{ .title = options.title, .allowed_file_types = options.allowed_file_types }, true);
 
 		if (files.empty())
 			return std::nullopt;
@@ -333,7 +333,7 @@ namespace aeh
 		));
 	}
 
-	auto open_multiple_files(OpenMultipleFileOptions options) -> std::vector<std::filesystem::path>
+	auto browse_open_multiple_files(BrowseOpenMultipleFileOptions options) -> std::vector<std::filesystem::path>
 	{
 		auto const files = open_files_impl(options, false);
 
@@ -356,7 +356,7 @@ namespace aeh
 		return paths;
 	}
 
-	auto save_file(SaveFileOptions options) -> std::optional<std::filesystem::path>
+	auto browse_save_file(BrowseSaveFileOptions options) -> std::optional<std::filesystem::path>
 	{
 		auto const default_path_utf8 = options.default_path.u8string();
 
@@ -376,7 +376,7 @@ namespace aeh
 		));
 	}
 
-	auto open_directory(OpenDirectoryOptions options) -> std::optional<std::filesystem::path>
+	auto browse_directory(BrowseDirectoryOptions options) -> std::optional<std::filesystem::path>
 	{
 		debug_assert(options.default_path.empty() || std::filesystem::is_directory(options.default_path));
 
