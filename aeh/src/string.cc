@@ -249,11 +249,16 @@ namespace aeh
 	{
 		// Translate extension filters to the shitty format the library asks for.
 		// The format is as follows:
-		// - Every odd entry in the vector is the description of the file type
-		//   e.g. Portable Document Format (PDF)
-		// - Every even entry in the vector is an extension expressed with a wildcard,
+		// - Every odd entry in the vector is a string decribing the file type
+		//   e.g. "Portable Document Format (PDF)"
+		// - Every even entry in the vector is a string containing
+		//   one or more extensions expressed with wildcards (*).
+		//   These extensions are the allowed extensions for the file type described by the previous
+		//   entry. Each extension is separated by whitespace from the following one
 		//   referring to the previous entry in the vector
-		//   e.g. *.pdf
+		//   e.g. "*.pdf *.portabledocumentformat"
+		//
+		//   I know ".portabledocumentformat" is not a real extension, but I didn't want to change the example
 		if (extensions.empty())
 		{
 			using namespace std::string_literals;
@@ -268,6 +273,9 @@ namespace aeh
 		{
 			using namespace std::string_view_literals;
 
+			// We add all the supported extensions between parenthesis
+			// to the file type description. Most applications do it that
+			// way and it's helpful
 			std::string extension_description;
 			extension_description.append(reinterpret_cast<char const*>(extension_info.description.data()), extension_info.description.size());
 
@@ -306,7 +314,7 @@ namespace aeh
 		return extension_filters;
 	}
 
-	static auto open_files_impl(BrowseOpenMultipleFileOptions options,  bool single_file) -> std::vector<std::string>
+	static auto open_files_impl(BrowseOpenMultipleFileOptions options, bool single_file) -> std::vector<std::string>
 	{
 		return pfd::open_file(
 			std::string(reinterpret_cast<char const *>(options.title.data()), options.title.size()),
