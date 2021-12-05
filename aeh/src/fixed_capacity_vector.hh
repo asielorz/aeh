@@ -91,8 +91,8 @@ namespace aeh
 			-> void
 			requires(std::is_constructible_v<T, std::ranges::range_value_t<R>>);
 
-		template <std::input_iterator It> 
-		constexpr auto assign(It first, It last)
+		template <std::input_iterator It, std::sentinel_for<It> Sentinel> 
+		constexpr auto assign(It first, Sentinel last)
 			noexcept(std::is_nothrow_constructible_v<T, std::iter_value_t<It>>)
 			-> void
 			requires(std::is_constructible_v<T, std::iter_value_t<It>>);

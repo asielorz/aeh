@@ -330,8 +330,8 @@ namespace aeh
 	}
 
 	template <typename T, size_t Capacity>
-	template <std::input_iterator It>
-	constexpr auto fixed_capacity_vector<T, Capacity>::assign(It first, It last)
+	template <std::input_iterator It, std::sentinel_for<It> Sentinel>
+	constexpr auto fixed_capacity_vector<T, Capacity>::assign(It first, Sentinel last)
 		noexcept(std::is_nothrow_constructible_v<T, std::iter_value_t<It>>)
 		-> void
 		requires(std::is_constructible_v<T, std::iter_value_t<It>>)
