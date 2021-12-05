@@ -238,6 +238,13 @@ namespace aeh
 		dest[i] = '\0';
 	}
 
+	void c_string_copy(std::span<char> dest, std::string_view src)
+	{
+		size_t const name_length_truncated = std::min(src.size(), dest.size() - 1);
+		std::copy(src.begin(), src.begin() + name_length_truncated, dest.begin());
+		dest[name_length_truncated] = '\0';
+	}
+
 #if AEH_WINDOWS
 	bool browse(char buffer[], size_t size) noexcept
 	{

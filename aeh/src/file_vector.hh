@@ -44,6 +44,8 @@ namespace aeh
 
 		[[nodiscard]] auto files() const noexcept -> std::span<File<T> const> { return all_files; }
 		operator std::span<File<T> const>() const noexcept { return all_files; }
+		auto size() const noexcept -> size_t { return all_files.size(); }
+		auto operator [] (size_t i) const noexcept -> File<T> const & { return all_files[i]; }
 
 		auto add(T object, std::string_view filename) -> bool;
 		auto remove(int index) -> bool;

@@ -78,6 +78,7 @@ namespace aeh
 	//! Like strncpy but guarantees that the destination is null terminated,
 	//! even when a truncation occurs. The extra space (if any) is not written to
 	void c_string_copy(std::span<char> dest, char const src[]);
+	void c_string_copy(std::span<char> dest, std::string_view src);
 
 } // namespace aeh
 
