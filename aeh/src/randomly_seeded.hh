@@ -23,7 +23,8 @@ namespace aeh
         return T(seed);
     }
 
-    template <typename RNG>
+    template <std::uniform_random_bit_generator RNG>
+        requires std::same_as<std::invoke_result_t<RNG &>, uint32_t> // A seed sequence is required to generate 32 bit integers.
     struct rng_seed_sequence
     {
         RNG & rng;
@@ -36,7 +37,8 @@ namespace aeh
         }
     };
 
-    template <typename OutputRNG, typename InputRNG>
+    template <std::uniform_random_bit_generator OutputRNG, std::uniform_random_bit_generator InputRNG>
+        requires std::same_as<std::invoke_result_t<InputRNG &>, uint32_t>
     auto split_rng(InputRNG & rng) -> OutputRNG
     {
         auto seed = rng_seed_sequence(rng);
