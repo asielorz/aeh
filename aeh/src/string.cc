@@ -245,116 +245,156 @@ namespace aeh
 		dest[name_length_truncated] = '\0';
 	}
 
-#if AEH_WINDOWS
-	bool browse(char buffer[], size_t size) noexcept
+	static auto allowed_file_types_to_library_format(std::span<AllowedFileType const> extensions) -> std::vector<std::string>
 	{
-		buffer[0] = '\0';
-
-		//Open a file Dialog Box
-		OPENFILENAME opf;
-		opf.hwndOwner = 0;
-		opf.lpstrFilter = NULL;
-		opf.lpstrCustomFilter = 0;
-		opf.nMaxCustFilter = 0L;
-		opf.nFilterIndex = 1L;
-		opf.lpstrFile = buffer;
-		opf.lpstrFile[0] = '\0';
-		opf.nMaxFile = static_cast<DWORD>(size - 2);
-		opf.lpstrFileTitle = 0;
-		opf.nMaxFileTitle = 50;
-		opf.lpstrInitialDir = NULL;
-		opf.lpstrTitle = NULL;
-		opf.nFileOffset = 0;
-		//opf.nFilemExtension    = 2;
-		opf.lpstrDefExt = NULL;
-		opf.lpfnHook = NULL;
-		opf.lCustData = 0;
-		opf.Flags = (DWORD)(OFN_ALLOWMULTISELECT | OFN_EXPLORER | OFN_NOCHANGEDIR);
-		opf.lStructSize = sizeof(OPENFILENAMEW);
-
-		//Set the path of the file selected, if there's one
-		return (GetOpenFileName(&opf) && buffer[0] != '\0');
-	}
-#endif
-
-	std::vector<std::string> browse()
-	{
-#if !AEH_WINDOWS
-		// TODO: Finish me
-		return pfd::open_file("Open file selection", "my_replay.replay").result();
-#else
-		std::vector<std::string> selected_files;
-
-		char buffer[1024];
-
-		//Set the path of the file selected, if there's one
-		if (browse(buffer, 1024))
+		// Translate extension filters to the shitty format the library asks for.
+		// The format is as follows:
+		// - Every odd entry in the vector is the description of the file type
+		//   e.g. Portable Document Format (PDF)
+		// - Every even entry in the vector is an extension expressed with a wildcard,
+		//   referring to the previous entry in the vector
+		//   e.g. *.pdf
+		if (extensions.empty())
 		{
-			// Replace all null characters for '?' in order to operate on them with string algorithms. Use '?' because it's a reserved character so we know a path will never contain it
-			std::replace(std::begin(buffer), std::end(buffer) - 1, '\0', '?');
-			const std::string data = { buffer, buffer + 1024 };
+			using namespace std::string_literals;
 
-			// Check if there's a single path or more than one
-			const size_t first_end = data.find('?');
-			const size_t end = data.find("??");
-
-			// If there's a single path, return it
-			if (first_end == end)
-			{
-				buffer[end] = '\0';
-				selected_files.push_back(buffer);
-			}
-			// For more than one path, windows gives the output in the format folder?path1?path2?...pathn??
-			else
-			{
-				// Extract the folder in order to compose paths as folder + filename
-				const std::string folder = std::string(data.substr(0, first_end)) + '\\';
-
-				// Extract all filenames in a loop
-				size_t next_end = first_end;
-				while (next_end != end)
-				{
-					const size_t begin = next_end + 1;
-					next_end = data.find('?', begin);
-					const std::string filename = data.substr(begin, next_end - begin);
-					selected_files.push_back(folder + filename);
-				}
-			}
+			return { "All Files"s, "*"s };
 		}
 
-		return selected_files;
-#endif
+		std::vector<std::string> extension_filters;
+		extension_filters.reserve(extensions.size() * 2);
+
+		for (AllowedFileType const& extension_info : extensions)
+		{
+			using namespace std::string_view_literals;
+
+			std::string extension_description;
+			extension_description.append(reinterpret_cast<char const*>(extension_info.description.data()), extension_info.description.size());
+
+			if (!extension_info.extensions.empty())
+				extension_description += " (*"sv;
+
+			std::string extension_wildcard;
+
+			for (auto const extension : extension_info.extensions)
+			{
+				debug_assert(!extension.empty() && extension[0] == u8'.');
+
+				extension_wildcard += '*';
+				extension_wildcard.append(reinterpret_cast<char const*>(extension.data()), extension.size());
+				extension_wildcard += ' ';
+
+				extension_description.append(reinterpret_cast<char const*>(extension.data()), extension.size());
+				extension_description += ";*"sv;
+			}
+
+			if (!extension_info.extensions.empty())
+			{
+				debug_assert(!extension_wildcard.empty() && extension_wildcard.back() == ' ');
+				extension_wildcard.pop_back();
+
+				debug_assert(extension_description.size() >= 2); // ;*
+				extension_description.pop_back();
+				extension_description.pop_back();
+				extension_description += ')';
+			}
+
+			extension_filters.emplace_back(std::move(extension_description));
+			extension_filters.emplace_back(std::move(extension_wildcard));
+		}
+
+		return extension_filters;
 	}
 
-	std::string browse_single_file()
+	static auto open_files_impl(OpenMultipleFileOptions options,  bool single_file) -> std::vector<std::string>
 	{
-		return pfd::save_file("Replay export selection", "my_replay.replay", { "World of Traps replay files", "*.replay" }).result();
-		//auto result = pfd::open_file("Replay export selection", "my_replay.replay"/*, { "All Files", "*" }*/).result();
-		//if (result.size() > 0)
-		//	return std::move(result[0]);
+		return pfd::open_file(
+			std::string(reinterpret_cast<char const *>(options.title.data()), options.title.size()),
+			{}, // default filename
+			allowed_file_types_to_library_format(options.allowed_file_types),
+			((single_file) ? pfd::opt::none : pfd::opt::multiselect)).result();
+	}
 
-		//return {};
+	auto open_single_file(OpenSingleFileOptions options) -> std::optional<std::filesystem::path>
+	{
+		auto const files = open_files_impl(OpenMultipleFileOptions{ .title = options.title, .allowed_file_types = options.allowed_file_types }, true);
 
-		//char buffer[1024];
+		if (files.empty())
+			return std::nullopt;
 
-		////Set the path of the file selected, if there's one
-		//if (browse(buffer, 1024))
-		//{
-		//	// Check if there's a single path or more than one
-		//	const std::string data = { buffer, buffer + 1024 };
-		//	const size_t first_end = data.find('\0');
-		//	const char * const double_null = "\0\0";
-		//	const size_t end = data.find(std::string(double_null, double_null + 2));
+		auto const & file = files.front();
 
-		//	// If there's a single path, return it
-		//	if (first_end == end)
-		//	{
-		//		buffer[end] = '\0';
-		//		return buffer;
-		//	}
-		//}
+		// The library gives paths in UTF-8, so we need
+		// to tell std::filesystem::path they are indeed UTF-8
+		// to convert to the correct native encoding (mostly on windows)
+		return std::filesystem::path(std::u8string_view(
+			reinterpret_cast<char8_t const *>(file.data()),
+			file.size()
+		));
+	}
 
-		//return {};
+	auto open_multiple_files(OpenMultipleFileOptions options) -> std::vector<std::filesystem::path>
+	{
+		auto const files = open_files_impl(options, false);
+
+		if (files.empty())
+			return {};
+
+		std::vector<std::filesystem::path> paths;
+		paths.reserve(files.size());
+
+		// The library gives paths in UTF-8, so we need
+		// to tell std::filesystem::path they are indeed UTF-8
+		// to convert to the correct native encoding (mostly on windows)
+		std::transform(files.cbegin(), files.cend(), std::back_inserter(paths), [](std::string const & file)
+		{
+			return std::filesystem::path(std::u8string_view(
+				reinterpret_cast<char8_t const *>(file.data()), file.size()
+			));
+		});
+
+		return paths;
+	}
+
+	auto save_file(SaveFileOptions options) -> std::optional<std::filesystem::path>
+	{
+		auto const default_path_utf8 = options.default_path.u8string();
+
+		auto const file = pfd::save_file(
+			std::string(reinterpret_cast<char const *>(options.title.data()), options.title.size()),
+			std::string(reinterpret_cast<char const *>(default_path_utf8.data()), default_path_utf8.size()),
+			allowed_file_types_to_library_format(options.allowed_file_types),
+			((options.file_overwrite_warning) ? pfd::opt::force_overwrite : pfd::opt::none)
+		).result();
+
+		if (file.empty())
+			return std::nullopt;
+
+		return std::filesystem::path(std::u8string_view(
+			reinterpret_cast<char8_t const *>(file.data()),
+			file.size()
+		));
+	}
+
+	auto open_directory(OpenDirectoryOptions options) -> std::optional<std::filesystem::path>
+	{
+		debug_assert(options.default_path.empty() || std::filesystem::is_directory(options.default_path));
+
+		auto const default_path_utf8 = options.default_path.u8string();
+
+		auto const file = pfd::select_folder(
+			std::string(reinterpret_cast<char const *>(options.title.data()), options.title.size()),
+			std::string(reinterpret_cast<char const *>(default_path_utf8.data()), default_path_utf8.size()),
+			pfd::opt::none
+		).result();
+
+		if (file.empty())
+			return std::nullopt;
+
+		return std::filesystem::path(std::u8string_view(
+			reinterpret_cast<char8_t const *>(file.data()),
+			file.size()
+		));
 	}
 } // namespace aeh
 
