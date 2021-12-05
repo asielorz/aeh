@@ -245,7 +245,7 @@ namespace aeh
 		dest[name_length_truncated] = '\0';
 	}
 
-	static auto allowed_file_types_to_library_format(std::span<AllowedFileType const> extensions) -> std::vector<std::string>
+	static auto allowed_file_types_to_library_format(std::span<AllowedFileType const> allowed_file_types) -> std::vector<std::string>
 	{
 		// Translate extension filters to the shitty format the library asks for.
 		// The format is as follows:
@@ -259,7 +259,7 @@ namespace aeh
 		//   e.g. "*.pdf *.portabledocumentformat"
 		//
 		//   I know ".portabledocumentformat" is not a real extension, but I didn't want to change the example
-		if (extensions.empty())
+		if (allowed_file_types.empty())
 		{
 			using namespace std::string_literals;
 
@@ -267,9 +267,9 @@ namespace aeh
 		}
 
 		std::vector<std::string> extension_filters;
-		extension_filters.reserve(extensions.size() * 2);
+		extension_filters.reserve(allowed_file_types.size() * 2);
 
-		for (AllowedFileType const& extension_info : extensions)
+		for (AllowedFileType const & allowed_file_type : allowed_file_types)
 		{
 			using namespace std::string_view_literals;
 
@@ -277,26 +277,27 @@ namespace aeh
 			// to the file type description. Most applications do it that
 			// way and it's helpful
 			std::string extension_description;
-			extension_description.append(reinterpret_cast<char const*>(extension_info.description.data()), extension_info.description.size());
+			extension_description.append(reinterpret_cast<char const *>(allowed_file_type.description.data()), allowed_file_type.description.size());
 
-			if (!extension_info.extensions.empty())
+			if (!allowed_file_type.extensions.empty())
 				extension_description += " (*"sv;
 
 			std::string extension_wildcard;
 
-			for (auto const extension : extension_info.extensions)
+			for (auto const extension : allowed_file_type.extensions)
 			{
-				debug_assert(!extension.empty() && extension[0] == u8'.');
+				// Empty extension means any file
+				debug_assert(extension.empty() || extension[0] == u8'.');
 
 				extension_wildcard += '*';
-				extension_wildcard.append(reinterpret_cast<char const*>(extension.data()), extension.size());
+				extension_wildcard.append(reinterpret_cast<char const *>(extension.data()), extension.size());
 				extension_wildcard += ' ';
 
-				extension_description.append(reinterpret_cast<char const*>(extension.data()), extension.size());
+				extension_description.append(reinterpret_cast<char const *>(extension.data()), extension.size());
 				extension_description += ";*"sv;
 			}
 
-			if (!extension_info.extensions.empty())
+			if (!allowed_file_type.extensions.empty())
 			{
 				debug_assert(!extension_wildcard.empty() && extension_wildcard.back() == ' ');
 				extension_wildcard.pop_back();
