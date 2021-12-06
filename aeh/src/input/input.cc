@@ -364,6 +364,11 @@ namespace aeh::in
 		return input.current.window_height;
 	}
 
+	auto aspect_ratio(Input const & input) noexcept -> float
+	{
+		return float(window_width(input)) / float(window_height(input));
+	}
+
 	auto window_resize_x(Input const & input) noexcept -> int16_t
 	{
 		return input.current.window_width - input.previous.window_width;

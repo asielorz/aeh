@@ -188,6 +188,7 @@ namespace aeh::in
 
 	[[nodiscard]] auto window_width(Input const & input) noexcept -> int16_t;
 	[[nodiscard]] auto window_height(Input const & input) noexcept -> int16_t;
+	[[nodiscard]] auto aspect_ratio(Input const & input) noexcept -> float;
 	[[nodiscard]] auto window_resize_x(Input const & input) noexcept -> int16_t;
 	[[nodiscard]] auto window_resize_y(Input const & input) noexcept -> int16_t;
 	[[nodiscard]] auto window_resized(Input const & input) noexcept -> bool;

@@ -46,8 +46,8 @@ namespace aeh
 		constexpr T const & value() const & noexcept { return std::get<0>(value_or_error); }
 		constexpr T const && value() const && noexcept { return std::move(std::get<0>(value_or_error)); }
 
-		constexpr T * operator -> () & noexcept { return &value(); }
-		constexpr T const * operator -> () && noexcept { return &value(); }
+		constexpr T * operator -> () noexcept { return &value(); }
+		constexpr T const * operator -> () const noexcept { return &value(); }
 
 		constexpr ErrorT & error() & noexcept { return std::get<1>(value_or_error).value; }
 		constexpr ErrorT && error() && noexcept { return std::move(std::get<1>(value_or_error).value); }
