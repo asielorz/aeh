@@ -98,6 +98,9 @@ namespace aeh::math
 	//! Steer value towards target by step.
 	[[nodiscard]] float steer_towards(float value, float target, float step) noexcept;
 
+	//! Makes x be a multiple of divisor, always truncating the value downwards.
+	float truncate_to_multiple_of(float x, float divisor);
+
 	//! Represents a 3D rotation in spherical coordinates.
 	//! Zenith is vector (0, 1, 0) and azimuth is vector (1, 0, 0).
 	//! Latitude is the angle between the forward vector and the zenith, in the range [-pi, pi].

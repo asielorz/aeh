@@ -213,6 +213,11 @@ namespace aeh::math
 			return value + step;
 	}
 
+	float truncate_to_multiple_of(float x, float divisor)
+	{
+		return floor(x * (1 / divisor)) * divisor;
+	}
+
 	glm::vec3 forward(SphereCoords c) noexcept
 	{
 		return {
