@@ -41,25 +41,24 @@ namespace aeh::main_loop
 		return prepare_frame_to_process_SDL_events(input.current);
 	}
 
-	static void reset_after_inactivity(in::Input & input)
+	static void reset_after_inactivity(in::Input & input, in::Frame const & current_frame)
 	{
-		int16_t const curr_mouse_pos_x = input.current.mouse_pos_x;
-		int16_t const curr_mouse_pos_y = input.current.mouse_pos_y;
-		int16_t const curr_window_width = input.current.window_width;
-		int16_t const curr_window_height = input.current.window_height;
-		int16_t const prev_mouse_pos_x = input.previous.mouse_pos_x;
-		int16_t const prev_mouse_pos_y = input.previous.mouse_pos_y;
-		int16_t const prev_window_width = input.previous.window_width;
-		int16_t const prev_window_height = input.previous.window_height;
+		// Do not reset fields that do not make sense to reset, like mpuse position and window size. It is unlikely that a freeze
+		// caused mouse position or window size to become (0, 0). Instead, update them regularly to account for changes to these
+		// during the freeze and have the newest possible values.
+		int16_t const mouse_pos_x = input.current.mouse_pos_x;
+		int16_t const mouse_pos_y = input.current.mouse_pos_y;
+		int16_t const window_width = input.current.window_width;
+		int16_t const window_height = input.current.window_height;
 		input = {};
-		input.current.mouse_pos_x = curr_mouse_pos_x;
-		input.current.mouse_pos_y = curr_mouse_pos_y;
-		input.current.window_width = curr_window_width;
-		input.current.window_height = curr_window_height;
-		input.previous.mouse_pos_x = prev_mouse_pos_x;
-		input.previous.mouse_pos_y = prev_mouse_pos_y;
-		input.previous.window_width = prev_window_width;
-		input.previous.window_height = prev_window_height;
+		input.current.mouse_pos_x = current_frame.mouse_pos_x;
+		input.current.mouse_pos_y = current_frame.mouse_pos_y;
+		input.current.window_width = current_frame.window_width;
+		input.current.window_height = current_frame.window_height;
+		input.previous.mouse_pos_x = mouse_pos_x;
+		input.previous.mouse_pos_y = mouse_pos_y;
+		input.previous.window_width = window_width;
+		input.previous.window_height = window_height;
 	}
 
 	auto InputPlugin::update(UpdateInput loop, in::Frame const & current_frame) noexcept -> InputExtension
@@ -68,7 +67,7 @@ namespace aeh::main_loop
 		constexpr float frame_duration = 1.0f / 60.0f;
 		if (loop.dt > 10 * frame_duration)
 		{
-			reset_after_inactivity(input);
+			reset_after_inactivity(input, current_frame);
 			controller_repeater = {};
 		}
 		else
