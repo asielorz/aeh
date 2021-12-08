@@ -81,6 +81,10 @@ namespace aeh::math
 	template <typename T>
 	[[nodiscard]] T lerp(const T & start, const T & end, float t) noexcept;
 
+	//! Given the start and end of a lerp and a value x, return the t such that lerp(start, end, t) == x.
+	template <std::floating_point T>
+	[[nodiscard]] T inverse_lerp(const T & start, const T & end, const T & x) noexcept;
+
 	template <typename Point>
 	[[nodiscard]] Point reflect_point(const Point& point, const Point& ref) noexcept;
 
@@ -212,6 +216,12 @@ namespace aeh::math
 	T lerp(const T & start, const T & end, float t) noexcept
 	{
 		return start + (end - start) * t;
+	}
+
+	template <std::floating_point T>
+	T inverse_lerp(const T & start, const T & end, const T & x) noexcept
+	{
+		return (x - start) / (end - start);
 	}
 
 	template <typename Point>
