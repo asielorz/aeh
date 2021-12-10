@@ -85,6 +85,11 @@ namespace aeh::math
 	template <std::floating_point T>
 	[[nodiscard]] T inverse_lerp(const T & start, const T & end, const T & x) noexcept;
 
+	//! Compute the position in a bezier curve of 2, 3 or 4 points at t.
+	template <typename T, std::floating_point F> [[nodiscard]] constexpr T bezier(T const & a, T const & b, F t) noexcept;
+	template <typename T, std::floating_point F> [[nodiscard]] constexpr float bezier(T const & a, T const & b, T const & c, F t) noexcept;
+	template <typename T, std::floating_point F> [[nodiscard]] constexpr float bezier(T const & a, T const & b, T const & c, T const & d, F t) noexcept;
+
 	template <typename Point>
 	[[nodiscard]] Point reflect_point(const Point& point, const Point& ref) noexcept;
 
@@ -225,6 +230,24 @@ namespace aeh::math
 	T inverse_lerp(const T & start, const T & end, const T & x) noexcept
 	{
 		return (x - start) / (end - start);
+	}
+
+	template <typename T, std::floating_point F>
+	[[nodiscard]] constexpr T bezier(T const & a, T const & b, F t) noexcept
+	{
+		return a + (b - a) * t;
+	}
+
+	template <typename T, std::floating_point F>
+	[[nodiscard]] constexpr float bezier(T const & a, T const & b, T const & c, F t) noexcept
+	{
+		return bezier(bezier(a, b, t), bezier(b, c, t), t);
+	}
+
+	template <typename T, std::floating_point F>
+	[[nodiscard]] constexpr float bezier(T const & a, T const & b, T const & c, T const & d, F t) noexcept
+	{
+		return bezier(bezier(a, b, c, t), bezier(b, c, d, t), t);
 	}
 
 	template <typename Point>
