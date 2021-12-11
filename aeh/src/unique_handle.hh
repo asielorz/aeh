@@ -27,7 +27,7 @@ namespace aeh
 
 		explicit operator bool() const noexcept;
 
-		//! Non owning view over a handle managed by a unique_handle object
+		//! Non owning view over a handle managed by a unique_handle object. It is allowed to mutate the resource it references.
 		struct mutable_view
 		{
 			mutable_view() noexcept;
@@ -43,6 +43,7 @@ namespace aeh
 			HandleT handle;
 		};
 
+		//! Non owning view over a handle managed by a unique_handle object. The resource referenced should never be mutated through this reference.
 		struct view
 		{
 			view() noexcept;
