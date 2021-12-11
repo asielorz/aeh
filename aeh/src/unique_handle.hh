@@ -27,12 +27,28 @@ namespace aeh
 
 		explicit operator bool() const noexcept;
 
-		//! Non owning view over a handle managed by a unique_handle object
+		//! Non owning mutable_view over a handle managed by a unique_handle object
+		struct mutable_view
+		{
+			mutable_view() noexcept;
+			explicit mutable_view(HandleT handle_) noexcept;
+			mutable_view(unique_handle & handle_) noexcept;
+
+			explicit operator HandleT() const noexcept;
+			[[nodiscard]] HandleT get() const noexcept;
+
+			explicit operator bool() const noexcept;
+
+		private:
+			HandleT handle;
+		};
+
 		struct view
 		{
 			view() noexcept;
 			explicit view(HandleT handle_) noexcept;
 			view(const unique_handle & handle_) noexcept;
+			view(mutable_view handle_) noexcept;
 
 			explicit operator HandleT() const noexcept;
 			[[nodiscard]] HandleT get() const noexcept;

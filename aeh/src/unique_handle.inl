@@ -53,6 +53,43 @@ namespace aeh
 		return get() != null_value;
 	}
 
+	//*******************************************************************************************
+
+	template <typename HandleT, function_ptr<void(HandleT)> deleter, HandleT null_value>
+	unique_handle<HandleT, deleter, null_value>::mutable_view::mutable_view() noexcept
+		: handle(null_value)
+	{}
+
+	template <typename HandleT, function_ptr<void(HandleT)> deleter, HandleT null_value>
+	unique_handle<HandleT, deleter, null_value>::mutable_view::mutable_view(HandleT handle_) noexcept
+		: handle(handle_)
+	{}
+
+	template <typename HandleT, function_ptr<void(HandleT)> deleter, HandleT null_value>
+	unique_handle<HandleT, deleter, null_value>::mutable_view::mutable_view(unique_handle & handle_) noexcept
+		: handle(handle_.get())
+	{}
+
+	template <typename HandleT, function_ptr<void(HandleT)> deleter, HandleT null_value>
+	unique_handle<HandleT, deleter, null_value>::mutable_view::operator HandleT() const noexcept
+	{
+		return handle;
+	}
+
+	template <typename HandleT, function_ptr<void(HandleT)> deleter, HandleT null_value>
+	HandleT unique_handle<HandleT, deleter, null_value>::mutable_view::get() const noexcept
+	{
+		return handle;
+	}
+
+	template <typename HandleT, function_ptr<void(HandleT)> deleter, HandleT null_value>
+	unique_handle<HandleT, deleter, null_value>::mutable_view::operator bool() const noexcept
+	{
+		return get() != null_value;
+	}
+
+	//*******************************************************************************************
+
 	template <typename HandleT, function_ptr<void(HandleT)> deleter, HandleT null_value>
 	unique_handle<HandleT, deleter, null_value>::view::view() noexcept
 		: handle(null_value)
@@ -65,6 +102,11 @@ namespace aeh
 
 	template <typename HandleT, function_ptr<void(HandleT)> deleter, HandleT null_value>
 	unique_handle<HandleT, deleter, null_value>::view::view(const unique_handle & handle_) noexcept
+		: handle(handle_.get())
+	{}
+
+	template <typename HandleT, function_ptr<void(HandleT)> deleter, HandleT null_value>
+	unique_handle<HandleT, deleter, null_value>::view::view(mutable_view handle_) noexcept
 		: handle(handle_.get())
 	{}
 
