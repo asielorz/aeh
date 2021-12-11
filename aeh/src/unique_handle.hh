@@ -27,7 +27,7 @@ namespace aeh
 
 		explicit operator bool() const noexcept;
 
-		//! Non owning mutable_view over a handle managed by a unique_handle object
+		//! Non owning view over a handle managed by a unique_handle object
 		struct mutable_view
 		{
 			mutable_view() noexcept;
