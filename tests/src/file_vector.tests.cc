@@ -2,201 +2,219 @@
 #include <catch2/catch.hpp>
 #include <map>
 
-template <typename T>
-using FakeFilesystem = std::map<std::string, T>;
+using FakeFilesystem = std::map<std::filesystem::path, std::string>;
 
-template <typename T>
-struct TestBasePathTrait
+// Will "commit" contents to a string on destruction.
+struct TestOstringstream : public std::ostringstream
 {
-	TestBasePathTrait(FakeFilesystem<T> & m, std::string p = "") noexcept : base_path_(std::move(p)), fake_filesystem(&m) {}
+	explicit TestOstringstream(std::string * string_to_write_to_) noexcept
+		: std::ostringstream(std::ios::binary)
+		, string_to_write_to(string_to_write_to_)
+	{}
 
-	std::string base_path() const { return base_path_; }
-	std::vector<std::string> files_in_base_path() const 
+	TestOstringstream(TestOstringstream && other) noexcept
+		: std::ostringstream(std::move(other))
 	{
-		std::vector<std::string> paths;
+		string_to_write_to = other.string_to_write_to;
+		other.string_to_write_to = nullptr;
+	}
+
+	~TestOstringstream()
+	{
+		if (string_to_write_to)
+			*string_to_write_to = str();
+	}
+
+	std::string * string_to_write_to;
+};
+
+struct TestFilesystemTrait
+{
+	TestFilesystemTrait(FakeFilesystem & m) noexcept
+		: fake_filesystem(&m) 
+	{}
+
+	std::vector<std::filesystem::path> files() const 
+	{
+		std::vector<std::filesystem::path> paths;
 		paths.reserve(fake_filesystem->size());
 		for (auto const & [path, content] : *fake_filesystem)
 			paths.push_back(path);
 		return paths;
 	}
 
+	auto remove(std::filesystem::path const & filename) const -> bool
+	{
+		return fake_filesystem->erase(filename) != 0;
+	}
+
+	auto open_to_read(std::filesystem::path const & filename) const -> std::optional<std::istringstream>
+	{
+		auto const it = fake_filesystem->find(filename);
+		if (it == fake_filesystem->end())
+			return std::nullopt;
+		else
+			return std::istringstream(it->second, std::ios::binary);
+	}
+
+	auto open_to_write(std::filesystem::path const & filename) const -> std::optional<TestOstringstream>
+	{
+		std::string & content = (*fake_filesystem)[filename];
+		return TestOstringstream(&content);
+	}
+
 private:
-	std::string base_path_;
-	FakeFilesystem<T> * fake_filesystem;
+	FakeFilesystem * fake_filesystem;
 };
 
 template <typename T>
 struct TestLoadTrait
 {
-	TestLoadTrait(FakeFilesystem<T> & m) noexcept : fake_filesystem(&m) {}
-
-	std::optional<T> load(char const path[]) const 
+	std::optional<T> load(std::istream & input_stream) const 
 	{
-		auto const it = fake_filesystem->find(path);
-		if (it != fake_filesystem->end())
-			return it->second;
-		else
+		T t;
+		input_stream >> t;
+		if (input_stream.fail())
 			return std::nullopt;
+		else
+			return t;
 	}
 
-	bool save(char const path[], T content) const
+	bool save(std::ostream & output_stream, T content) const
 	{
-		(*fake_filesystem)[path] = content;
-		return true;
+		output_stream << content;
+		return output_stream.good();
 	}
-
-	bool remove(char const path[]) const
-	{
-		return fake_filesystem->erase(path) == 1;
-	}
-
-private:
-	FakeFilesystem<T> * fake_filesystem;
 };
 
-using TestFileVector = aeh::FileVector<int, TestBasePathTrait<int>, TestLoadTrait<int>>;
+using TestFileVector = aeh::FileVector<int, TestFilesystemTrait, TestLoadTrait<int>>;
 
 TEST_CASE("A file vector must be loaded from a base path and will contain an object for each file on that folder")
 {
-	FakeFilesystem<int> fake_filesystem = {
-		{"bar", -5},
-		{"baz", 0},
-		{"foo", 3},
-		{"quux", 100'000},
+	FakeFilesystem fake_filesystem = {
+		{"bar", "-5"},
+		{"baz", "0"},
+		{"foo", "3"},
+		{"quux", "100000"},
 	};
 
-	auto v = TestFileVector::load(TestBasePathTrait<int>(fake_filesystem), TestLoadTrait<int>(fake_filesystem));
-	std::span<aeh::File<int> const> const files = v.files();
+	auto v = TestFileVector::load(TestFilesystemTrait(fake_filesystem));
 
-	REQUIRE(files.size() == 4);
+	REQUIRE(v.size() == 4);
 
-	REQUIRE(files[0].path == "bar");
-	REQUIRE(files[0].content == -5);
+	REQUIRE(v.filename_at(0) == "bar");
+	REQUIRE(v[0] == -5);
 
-	REQUIRE(files[1].path == "baz");
-	REQUIRE(files[1].content == 0);
+	REQUIRE(v.filename_at(1) == "baz");
+	REQUIRE(v[1] == 0);
 
-	REQUIRE(files[2].path == "foo");
-	REQUIRE(files[2].content == 3);
+	REQUIRE(v.filename_at(2) == "foo");
+	REQUIRE(v[2] == 3);
 
-	REQUIRE(files[3].path == "quux");
-	REQUIRE(files[3].content == 100'000);
+	REQUIRE(v.filename_at(3) == "quux");
+	REQUIRE(v[3] == 100'000);
 }
 
 TEST_CASE("Elements can be inserted to the vector. A new file is created in the filesystem for each element added")
 {
-	FakeFilesystem<int> fake_filesystem = {
-		{"bar", -5},
-		{"baz", 0},
-		{"foo", 3},
-		{"quux", 100'000},
+	FakeFilesystem fake_filesystem = {
+		{"bar", "-5"},
+		{"baz", "0"},
+		{"foo", "3"},
+		{"quux", "100000"},
 	};
 
-	auto v = TestFileVector::load(TestBasePathTrait<int>(fake_filesystem), TestLoadTrait<int>(fake_filesystem));
+	auto v = TestFileVector::load(TestFilesystemTrait(fake_filesystem));
 
 	v.add(10, "hello");
 	v.add(20, "how do you do");
 	v.add(30, "some string");
 
-	std::span<aeh::File<int> const> const files = v.files();
+	REQUIRE(v.size() == 7);
 
-	REQUIRE(files.size() == 7);
-
-	REQUIRE(files[4].path == "hello");
-	REQUIRE(files[4].content == 10);
-	REQUIRE(files[5].path == "how do you do");
-	REQUIRE(files[5].content == 20);
-	REQUIRE(files[6].path == "some string");
-	REQUIRE(files[6].content == 30);
+	REQUIRE(v.filename_at(4) == "hello");
+	REQUIRE(v[4] == 10);
+	REQUIRE(v.filename_at(5) == "how do you do");
+	REQUIRE(v[5] == 20);
+	REQUIRE(v.filename_at(6) == "some string");
+	REQUIRE(v[6] == 30);
 	
 	REQUIRE(fake_filesystem.size() == 7);
 
-	REQUIRE(fake_filesystem[files[4].path] == files[4].content);
-	REQUIRE(fake_filesystem[files[5].path] == files[5].content);
-	REQUIRE(fake_filesystem[files[6].path] == files[6].content);
+	REQUIRE(fake_filesystem[v.filename_at(4)] == std::to_string(v[4]));
+	REQUIRE(fake_filesystem[v.filename_at(5)] == std::to_string(v[5]));
+	REQUIRE(fake_filesystem[v.filename_at(6)] == std::to_string(v[6]));
 }
 
 TEST_CASE("Elements can be removed from the vector. This also removes files from the filesystem")
 {
-	FakeFilesystem<int> fake_filesystem = {
-		{"bar", -5},
-		{"baz", 0},
-		{"foo", 3},
-		{"quux", 100'000},
+	FakeFilesystem fake_filesystem = {
+		{"bar", "-5"},
+		{"baz", "0"},
+		{"foo", "3"},
+		{"quux", "100000"},
 	};
 
-	auto v = TestFileVector::load(TestBasePathTrait<int>(fake_filesystem), TestLoadTrait<int>(fake_filesystem));
+	auto v = TestFileVector::load(TestFilesystemTrait(fake_filesystem));
 
 	v.remove(2); // Remove foo
 
-	std::span<aeh::File<int> const> const files = v.files();
-
-	REQUIRE(files.size() == 3);
+	REQUIRE(v.size() == 3);
 	REQUIRE(fake_filesystem.size() == 3);
 
-	REQUIRE(files[0].path == "bar");
-	REQUIRE(files[0].content == -5);
+	REQUIRE(v.filename_at(0) == "bar");
+	REQUIRE(v[0] == -5);
 
-	REQUIRE(files[1].path == "baz");
-	REQUIRE(files[1].content == 0);
+	REQUIRE(v.filename_at(1) == "baz");
+	REQUIRE(v[1] == 0);
 
-	REQUIRE(files[2].path == "quux");
-	REQUIRE(files[2].content == 100'000);
+	REQUIRE(v.filename_at(2) == "quux");
+	REQUIRE(v[2] == 100'000);
 
-	REQUIRE(fake_filesystem["bar"] == -5);
-	REQUIRE(fake_filesystem["baz"] == 0);
-	REQUIRE(fake_filesystem["quux"] == 100'000);
+	REQUIRE(fake_filesystem["bar"] == std::to_string(-5));
+	REQUIRE(fake_filesystem["baz"] == std::to_string(0));
+	REQUIRE(fake_filesystem["quux"] == std::to_string(100'000));
 	REQUIRE(fake_filesystem.contains("foo") == false);
 }
 
 TEST_CASE("A value can be replaced with another. This also updates the file")
 {
-	FakeFilesystem<int> fake_filesystem = {
-		{"bar", -5},
-		{"baz", 0},
-		{"foo", 3},
-		{"quux", 100'000},
+	FakeFilesystem fake_filesystem = {
+		{"bar", "-5"},
+		{"baz", "0"},
+		{"foo", "3"},
+		{"quux", "100000"},
 	};
 
-	auto v = TestFileVector::load(TestBasePathTrait<int>(fake_filesystem), TestLoadTrait<int>(fake_filesystem));
+	auto v = TestFileVector::load(TestFilesystemTrait(fake_filesystem));
 	
 	v.replace(1, -78);
 
-	REQUIRE(v.files()[1].content == -78);
-	REQUIRE(fake_filesystem["baz"] == -78);
+	REQUIRE(v[1] == -78);
+	REQUIRE(fake_filesystem["baz"] == std::to_string(-78));
 }
 
-TEST_CASE("Add takes a file name, which is then concatenated with the base path")
+TEST_CASE("A file vector can be converted to a span of const Ts")
 {
-	FakeFilesystem<int> fake_filesystem = {};
+	FakeFilesystem fake_filesystem = {
+		{"bar", "-5"},
+		{"baz", "0"},
+		{"foo", "3"},
+		{"quux", "100000"},
+	};
 
-	auto v = TestFileVector::load(TestBasePathTrait<int>(fake_filesystem, "base/"), TestLoadTrait<int>(fake_filesystem));
+	auto v = TestFileVector::load(TestFilesystemTrait(fake_filesystem));
 
-	v.add(10, "file1.txt");
-	v.add(20, "other_file.txt");
-	v.add(30, "important document.txt");
-
-	std::span<aeh::File<int> const> const files = v.files();
-
-	REQUIRE(files.size() == 3);
-
-	REQUIRE(files[0].path == "base/file1.txt");
-	REQUIRE(files[0].content == 10);
-	REQUIRE(files[1].path == "base/other_file.txt");
-	REQUIRE(files[1].content == 20);
-	REQUIRE(files[2].path == "base/important document.txt");
-	REQUIRE(files[2].content == 30);
-
-	REQUIRE(fake_filesystem.size() == 3);
-
-	REQUIRE(fake_filesystem["base/file1.txt"] == 10);
-	REQUIRE(fake_filesystem["base/other_file.txt"] == 20);
-	REQUIRE(fake_filesystem["base/important document.txt"] == 30);
+	std::span<int const> s = v;
+	REQUIRE(s[0] == -5);
+	REQUIRE(s[1] == 0);
+	REQUIRE(s[2] == 3);
+	REQUIRE(s[3] == 100'000);
 }
 
 AEH_MSVC_WARNING_PUSH()
 AEH_MSVC_WARNING_DISABLE(4505) // 'dummy_path': unreferenced local function has been removed
-static std::string dummy_path()
+static std::filesystem::path dummy_path()
 {
 	return "";
 }

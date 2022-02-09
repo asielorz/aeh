@@ -5,81 +5,96 @@
 #include <vector>
 #include <span>
 #include <optional>
+#include <concepts>
+#include <filesystem>
+#include <fstream>
 
 namespace aeh
 {
 
-	template <typename T>
-	struct File
-	{
-		std::string path;
-		T content;
-	};
-
 	template <typename R, typename T>
 	concept range_of = std::ranges::range<R> && std::same_as<T, std::ranges::range_value_t<R>>;
 
-	template <typename T>
-	concept is_base_path_trait = std::movable<T> && requires (T const t) { 
-		{t.base_path()} -> std::same_as<std::string>;
-		{t.files_in_base_path()} -> range_of<std::string>;
+	template <typename T, typename Base>
+	concept reference_to_derived_from = std::is_lvalue_reference_v<T> && std::derived_from<std::remove_reference_t<T>, Base>;
+
+	template <typename T, typename Base>
+	concept optional_of_derived_from = requires(T t)
+	{
+		{static_cast<bool>(t)};
+		{*t} -> reference_to_derived_from<Base>;
+	};
+
+	template <typename Trait>
+	concept is_filesystem_trait = std::movable<Trait> && requires (Trait const trait, std::filesystem::path const & filename) {
+		{trait.files()} -> range_of<std::filesystem::path>;
+		{trait.remove(filename)} -> std::same_as<bool>;
+		{trait.open_to_read(filename)} -> optional_of_derived_from<std::istream>;
+		{trait.open_to_write(filename)} -> optional_of_derived_from<std::ostream>;
 	};
 
 	template <typename Trait, typename T>
-	concept is_load_trait = requires (Trait const trait, T const t, char const * const path) { 
-		{trait.load(path)} -> std::same_as<std::optional<T>>;
-		{trait.save(path, t)} -> std::same_as<bool>;
-		{trait.remove(path)} -> std::same_as<bool>;
+	concept is_load_trait = requires (Trait const trait, T const t, std::istream & input_stream, std::ostream & output_stream) { 
+		{trait.load(input_stream)} -> std::same_as<std::optional<T>>;
+		{trait.save(output_stream, t)} -> std::same_as<bool>;
 	};
 
-	template <typename T, is_base_path_trait BasePathTrait, is_load_trait<T> LoadTrait>
+	template <typename T, is_filesystem_trait FilesystemTrait, is_load_trait<T> LoadTrait>
 	struct FileVector
 	{
-		static auto load(BasePathTrait base_path_trait_ = {}, LoadTrait load_trait_ = {}) -> FileVector;
+		static auto load(FilesystemTrait filesystem_trait_ = {}, LoadTrait load_trait_ = {}) -> FileVector;
 
 		FileVector(FileVector const &) = delete;
 		FileVector operator = (FileVector const &) = delete;
 		FileVector(FileVector &&) noexcept = default;
 		FileVector & operator = (FileVector &&) noexcept = default;
 
-		[[nodiscard]] auto files() const noexcept -> std::span<File<T> const> { return all_files; }
-		operator std::span<File<T> const>() const noexcept { return all_files; }
-		auto size() const noexcept -> size_t { return all_files.size(); }
-		auto operator [] (size_t i) const noexcept -> File<T> const & { return all_files[i]; }
+		[[nodiscard]] auto values() const noexcept -> std::span<T const> { return elements; }
+		operator std::span<T const>() const noexcept { return elements; }
+		[[nodiscard]] auto size() const noexcept -> size_t { return elements.size(); }
+		[[nodiscard]] auto operator [] (size_t i) const noexcept -> T const & { return elements[i]; }
+		[[nodiscard]] auto filename_at(size_t i) const noexcept -> std::filesystem::path const & { return filenames[i]; }
 
-		auto add(T object, std::string_view filename) -> bool;
+		auto add(T object, std::filesystem::path filename) -> bool;
 		auto remove(int index) -> bool;
 		auto replace(int index, T new_value) -> bool;
 
 	private:
-		FileVector(BasePathTrait base_path_trait_, LoadTrait load_trait_) noexcept 
-			: base_path_trait(std::move(base_path_trait_)) 
+		FileVector(FilesystemTrait filesystem_trait_, LoadTrait load_trait_) noexcept
+			: filesystem_trait(std::move(filesystem_trait_)) 
 			, load_trait(load_trait_)
 		{}
 
-		std::vector<File<T>> all_files;
-		[[no_unique_address]] BasePathTrait base_path_trait;
+		std::vector<T> elements;
+		std::vector<std::filesystem::path> filenames;
+		[[no_unique_address]] FilesystemTrait filesystem_trait;
 		[[no_unique_address]] LoadTrait load_trait;
 	};
 
-	[[nodiscard]] auto all_files_in(char const directory_path[]) -> std::vector<std::string>;
+	[[nodiscard]] auto all_files_in(const std::filesystem::path & directory_path) -> std::vector<std::filesystem::path>;
 
-	template <function_ptr<auto() -> std::string> get_base_path>
+	template <function_ptr<auto() -> std::filesystem::path> get_base_path>
 	struct ConstantBasePathTrait
 	{
-		auto base_path() const -> std::string { return get_base_path(); }
-		auto files_in_base_path() const -> std::vector<std::string> { return all_files_in(base_path().c_str()); }
+		auto base_path() const -> std::filesystem::path { return get_base_path(); }
+		auto files() const -> std::vector<std::filesystem::path> { return all_files_in(base_path()); }
+		auto remove(std::filesystem::path const & filename) const -> bool { return std::filesystem::remove(base_path() / filename);}
+		auto open_to_read(std::filesystem::path const & filename) const -> std::optional<std::ifstream>;
+		auto open_to_write(std::filesystem::path const & filename) const -> std::optional<std::ofstream>;
 	};
 
 	struct VariableBasePathTrait
 	{
-		VariableBasePathTrait(std::string base_path_) noexcept : path(std::move(base_path_)) {}
+		VariableBasePathTrait(std::filesystem::path base_path_) noexcept : path(std::move(base_path_)) {}
 
-		auto base_path() const -> std::string { return path; }
-		auto files_in_base_path() const -> std::vector<std::string> { return all_files_in(base_path().c_str()); }
+		auto base_path() const -> std::filesystem::path { return path; }
+		auto files() const -> std::vector<std::filesystem::path> { return all_files_in(path); }
+		auto remove(std::filesystem::path const & filename) const -> bool;
+		auto open_to_read(std::filesystem::path const & filename) const -> std::optional<std::ifstream>;
+		auto open_to_write(std::filesystem::path const & filename) const -> std::optional<std::ofstream>;
 
 	private:
-		std::string path;
+		std::filesystem::path path;
 	};
 
 } // namespace aeh
