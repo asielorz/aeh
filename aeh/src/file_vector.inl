@@ -7,7 +7,7 @@ namespace aeh
 	auto FileVector<T, BasePathTrait, LoadTrait>::load(BasePathTrait base_path_trait_, LoadTrait load_trait_) -> FileVector
 	{
 		FileVector v = FileVector(std::move(base_path_trait_), std::move(load_trait_));
-		for (std::string path : v.base_path_trait.files_in_base_path())
+		for (std::string const & path : v.base_path_trait.files_in_base_path())
 		{
 			std::optional<T> content = v.load_trait.load(path.c_str());
 			debug_assert(content.has_value());

@@ -35,7 +35,7 @@ namespace aeh
 	template <typename T, is_base_path_trait BasePathTrait, is_load_trait<T> LoadTrait>
 	struct FileVector
 	{
-		static auto load(BasePathTrait base_path_trait_ = {}, LoadTrait load_trait_ = {})->FileVector;
+		static auto load(BasePathTrait base_path_trait_ = {}, LoadTrait load_trait_ = {}) -> FileVector;
 
 		FileVector(FileVector const &) = delete;
 		FileVector operator = (FileVector const &) = delete;
