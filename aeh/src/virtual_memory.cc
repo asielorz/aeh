@@ -7,6 +7,7 @@
 	#include <Windows.h>
 #elif AEH_LINUX
 	#include <unistd.h>
+	#include <sys/mman.h>
 #endif
 
 namespace aeh
