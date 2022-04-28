@@ -7,7 +7,7 @@ namespace aeh
 	auto FileVector<T, FilesystemTrait, LoadTrait>::load(FilesystemTrait filesystem_trait_, LoadTrait load_trait_) -> FileVector
 	{
 		FileVector v = FileVector(std::move(filesystem_trait_), std::move(load_trait_));
-		for (std::filesystem::path const & filename : v.filesystem_trait.files())
+		for (path_type const & filename : v.filesystem_trait.files())
 		{
 			auto file = v.filesystem_trait.open_to_read(filename);
 			debug_assert(static_cast<bool>(file));
@@ -20,7 +20,7 @@ namespace aeh
 	}
 
 	template <typename T, is_filesystem_trait FilesystemTrait, is_load_trait<T> LoadTrait>
-	auto FileVector<T, FilesystemTrait, LoadTrait>::add(T object, std::filesystem::path filename) -> bool
+	auto FileVector<T, FilesystemTrait, LoadTrait>::add(T object, path_type filename) -> bool
 	{
 		auto file = filesystem_trait.open_to_write(filename);
 		if (!file)

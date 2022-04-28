@@ -26,8 +26,9 @@ namespace aeh
 	};
 
 	template <typename Trait>
-	concept is_filesystem_trait = std::movable<Trait> && requires (Trait const trait, std::filesystem::path const & filename) {
-		{trait.files()} -> range_of<std::filesystem::path>;
+	concept is_filesystem_trait = std::movable<Trait> && requires (Trait const trait, typename Trait::path_type const & filename) {
+		std::regular<typename Trait::path_type>;
+		{trait.files()} -> range_of<typename Trait::path_type>;
 		{trait.remove(filename)} -> std::same_as<bool>;
 		{trait.open_to_read(filename)} -> optional_of_derived_from<std::istream>;
 		{trait.open_to_write(filename)} -> optional_of_derived_from<std::ostream>;
@@ -42,6 +43,8 @@ namespace aeh
 	template <typename T, is_filesystem_trait FilesystemTrait, is_load_trait<T> LoadTrait>
 	struct FileVector
 	{
+		using path_type = typename FilesystemTrait::path_type;
+
 		static auto load(FilesystemTrait filesystem_trait_ = {}, LoadTrait load_trait_ = {}) -> FileVector;
 
 		FileVector(FileVector const &) = delete;
@@ -53,9 +56,9 @@ namespace aeh
 		operator std::span<T const>() const noexcept { return elements; }
 		[[nodiscard]] auto size() const noexcept -> size_t { return elements.size(); }
 		[[nodiscard]] auto operator [] (size_t i) const noexcept -> T const & { return elements[i]; }
-		[[nodiscard]] auto filename_at(size_t i) const noexcept -> std::filesystem::path const & { return filenames[i]; }
+		[[nodiscard]] auto filename_at(size_t i) const noexcept -> path_type const & { return filenames[i]; }
 
-		auto add(T object, std::filesystem::path filename) -> bool;
+		auto add(T object, path_type filename) -> bool;
 		auto remove(int index) -> bool;
 		auto replace(int index, T new_value) -> bool;
 
@@ -66,7 +69,7 @@ namespace aeh
 		{}
 
 		std::vector<T> elements;
-		std::vector<std::filesystem::path> filenames;
+		std::vector<path_type> filenames;
 		[[no_unique_address]] FilesystemTrait filesystem_trait;
 		[[no_unique_address]] LoadTrait load_trait;
 	};
@@ -76,6 +79,8 @@ namespace aeh
 	template <function_ptr<auto() -> std::filesystem::path> get_base_path>
 	struct ConstantBasePathTrait
 	{
+		using path_type = std::filesystem::path;
+
 		auto base_path() const -> std::filesystem::path { return get_base_path(); }
 		auto files() const -> std::vector<std::filesystem::path> { return all_files_in(base_path()); }
 		auto remove(std::filesystem::path const & filename) const -> bool { return std::filesystem::remove(base_path() / filename);}
@@ -85,6 +90,8 @@ namespace aeh
 
 	struct VariableBasePathTrait
 	{
+		using path_type = std::filesystem::path;
+
 		VariableBasePathTrait(std::filesystem::path base_path_) noexcept : path(std::move(base_path_)) {}
 
 		auto base_path() const -> std::filesystem::path { return path; }

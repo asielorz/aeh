@@ -28,27 +28,30 @@ struct TestOstringstream : public std::ostringstream
 	std::string * string_to_write_to;
 };
 
-struct TestFilesystemTrait
+template <typename Key>
+struct BasicTestFilesystemTrait
 {
-	TestFilesystemTrait(FakeFilesystem & m) noexcept
+	using path_type = Key;
+
+	BasicTestFilesystemTrait(std::map<Key, std::string> & m) noexcept
 		: fake_filesystem(&m) 
 	{}
 
-	std::vector<std::filesystem::path> files() const 
+	std::vector<Key> files() const
 	{
-		std::vector<std::filesystem::path> paths;
+		std::vector<Key> paths;
 		paths.reserve(fake_filesystem->size());
 		for (auto const & [path, content] : *fake_filesystem)
 			paths.push_back(path);
 		return paths;
 	}
 
-	auto remove(std::filesystem::path const & filename) const -> bool
+	auto remove(Key const & filename) const -> bool
 	{
 		return fake_filesystem->erase(filename) != 0;
 	}
 
-	auto open_to_read(std::filesystem::path const & filename) const -> std::optional<std::istringstream>
+	auto open_to_read(Key const & filename) const -> std::optional<std::istringstream>
 	{
 		auto const it = fake_filesystem->find(filename);
 		if (it == fake_filesystem->end())
@@ -57,15 +60,17 @@ struct TestFilesystemTrait
 			return std::istringstream(it->second, std::ios::binary);
 	}
 
-	auto open_to_write(std::filesystem::path const & filename) const -> std::optional<TestOstringstream>
+	auto open_to_write(Key const & filename) const -> std::optional<TestOstringstream>
 	{
 		std::string & content = (*fake_filesystem)[filename];
 		return TestOstringstream(&content);
 	}
 
 private:
-	FakeFilesystem * fake_filesystem;
+	std::map<Key, std::string> * fake_filesystem;
 };
+
+using TestFilesystemTrait = BasicTestFilesystemTrait<std::filesystem::path>;
 
 template <typename T>
 struct TestLoadTrait
@@ -224,4 +229,32 @@ TEST_CASE("FileVector can be instanced with the provided base path traits")
 {
 	using V1 = aeh::FileVector<int, aeh::ConstantBasePathTrait<dummy_path>, TestLoadTrait<int>>;
 	using V2 = aeh::FileVector<int, aeh::VariableBasePathTrait, TestLoadTrait<int>>;
+}
+
+TEST_CASE("The path type of the filesystem may be defined by the trait. It doesn't need to be always std::filesystem::path")
+{
+	using IntBasedTestFileVector = aeh::FileVector<int, BasicTestFilesystemTrait<int>, TestLoadTrait<int>>;
+
+	std::map<int, std::string> fake_filesystem = {
+		{-4, "-5"},
+		{0, "0"},
+		{45, "3"},
+		{256, "100000"},
+	};
+
+	auto v = IntBasedTestFileVector::load(BasicTestFilesystemTrait<int>(fake_filesystem));
+
+	REQUIRE(v.size() == 4);
+
+	REQUIRE(v.filename_at(0) == -4);
+	REQUIRE(v[0] == -5);
+
+	REQUIRE(v.filename_at(1) == 0);
+	REQUIRE(v[1] == 0);
+
+	REQUIRE(v.filename_at(2) == 45);
+	REQUIRE(v[2] == 3);
+
+	REQUIRE(v.filename_at(3) == 256);
+	REQUIRE(v[3] == 100'000);
 }
