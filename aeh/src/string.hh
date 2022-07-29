@@ -7,6 +7,7 @@
 #include <filesystem>
 #include <span>
 #include <string_view>
+#include <array>
 
 namespace aeh
 {
