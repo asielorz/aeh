@@ -36,11 +36,6 @@ else() # Development, running directly from cmake
 		set(CMAKE_CONFIGURATION_TYPES Debug Release)
 	endif()
 
-	conan_add_remote(
-		NAME bincrafters
-		URL https://bincrafters.jfrog.io/artifactory/api/conan/public-conan
-	)
-
 	set(conan_options)
 	add_conan_bool_option_to_list(conan_options ${AEH_WITH_SDL2} "with_sdl2")
 	add_conan_bool_option_to_list(conan_options ${AEH_WITH_IMGUI} "with_imgui")
