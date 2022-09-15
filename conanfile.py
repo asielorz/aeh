@@ -38,7 +38,7 @@ class AehConan(conans.ConanFile):
 
     def requirements(self):
         if self.options.with_unit_tests:
-            self.requires("catch2/2.13.6")
+            self.requires("catch2/3.1.0")
         
         if self.options.with_glm:
             self.requires("glm/0.9.9.8")

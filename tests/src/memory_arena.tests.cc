@@ -1,5 +1,5 @@
 #include "memory_arena.hh"
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("Bytes can be allocated from a memory arena")
 {

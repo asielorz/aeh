@@ -1,5 +1,5 @@
 #include "virtual_memory.hh"
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <cstring>
 
 TEST_CASE("Default constructed virtual memory region has no memory allocated")
