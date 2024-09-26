@@ -1,6 +1,6 @@
 #include "tuple.hh"
 #include "string.hh"
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("tuple_at calls a function at the ith element")
 {

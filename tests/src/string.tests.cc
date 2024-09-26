@@ -1,5 +1,5 @@
 ﻿#include "string.hh"
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <array>
 
 TEST_CASE("replace with single chars")

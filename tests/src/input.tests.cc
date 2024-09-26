@@ -1,5 +1,5 @@
 #include "input/input.hh"
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 static auto make_control_state_naive(bool currently_down, bool previously_down) noexcept -> aeh::in::ControlState
 {

@@ -1,5 +1,5 @@
 #include "file_vector.hh"
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 #include <map>
 
 using FakeFilesystem = std::map<std::filesystem::path, std::string>;

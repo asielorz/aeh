@@ -1,6 +1,6 @@
 #include "algorithm.hh"
 #include "fixed_capacity_vector.hh"
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 using test_vector = aeh::fixed_capacity_vector<int, 8>;
 

@@ -1,5 +1,5 @@
 #include "memory_arena.hh"
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("Bytes can be allocated from a memory arena")
 {
@@ -46,13 +46,16 @@ TEST_CASE("A MemoryArenaScopeGuard automatically frees all memory allocated whil
 {
 	auto arena = aeh::MemoryArena::with_virtual_region(1024 * 1024);
 	
-	static_cast<int *>(arena.allocate(sizeof(int), alignof(int)));
+	
+	auto const* const ptr1 = static_cast<int *>(arena.allocate(sizeof(int), alignof(int)));
+	static_cast<void>(ptr1);
 	REQUIRE(arena.allocated_bytes() == sizeof(int));
 
 	{
 		auto const guard = aeh::MemoryArenaScopeGuard(arena);
 
-		static_cast<int *>(arena.allocate(sizeof(int), alignof(int)));
+		auto const* const ptr2 = static_cast<int *>(arena.allocate(sizeof(int), alignof(int)));
+		static_cast<void>(ptr2);
 		REQUIRE(arena.allocated_bytes() == 2 * sizeof(int));
 	}
 	// Destructor of `guard`

@@ -1,6 +1,6 @@
 #include "polymorphic_generator.hh"
 #include "string.hh"
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 TEST_CASE("Polymorphic generator is a type erased version of the generator")
 {

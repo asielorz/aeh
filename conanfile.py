@@ -15,7 +15,6 @@ class AehConan(conans.ConanFile):
     description = "C++ utilities library"
     topics = ("utilities")
     settings = "os", "compiler", "build_type", "arch"
-    generators = "cmake", "cmake_find_package", "cmake_find_package_multi"
     options = {
         #"shared": [True, False], # Building as a DLL doesn't currently work
         "with_sdl2" : [True, False],
@@ -39,7 +38,7 @@ class AehConan(conans.ConanFile):
 
     def requirements(self):
         if self.options.with_unit_tests:
-            self.requires("catch2/2.13.6")
+            self.requires("catch2/3.1.0")
         
         if self.options.with_glm:
             self.requires("glm/0.9.9.8")
@@ -51,7 +50,7 @@ class AehConan(conans.ConanFile):
             self.requires("imgui/1.79")
 
         if self.options.with_sdl2:
-            self.requires("sdl2/2.0.14@bincrafters/stable")
+            self.requires("sdl/2.24.0")
             self.requires("opengl/system")
 
         self.requires("portable-file-dialogs/0.1.0")

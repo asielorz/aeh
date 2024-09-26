@@ -1,5 +1,5 @@
 #include "pointer_union.hh"
-#include <catch2/catch.hpp>
+#include <catch2/catch_test_macros.hpp>
 
 using pointer_t = aeh::PointerUnion<int, uint16_t>;
 
