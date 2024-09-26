@@ -15,6 +15,7 @@ add_executable(aeh_tests
 	src/memory_arena.tests.cc
 	src/minimalistic_shared_ptr.tests.cc
 	src/pointer_union.tests.cc
+	src/ring.tests.cc
 	src/string.tests.cc
 	src/tuple.tests.cc
 	src/virtual_memory.tests.cc

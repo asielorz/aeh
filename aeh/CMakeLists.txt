@@ -109,6 +109,8 @@ target_sources(aeh PRIVATE
 	src/priority.hh
 	src/randomly_seeded.hh
 	src/range_function.hh
+	src/ring.hh
+	src/ring.inl
 	src/string.cc
 	src/string.hh
 	src/string.inl

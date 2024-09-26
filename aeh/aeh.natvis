@@ -51,4 +51,24 @@
     </Expand>
   </Type>
 
+  <Type Name="aeh::ring&lt;*&gt;">
+    <DisplayString>{{ size={size_} }}</DisplayString>
+    <Expand>
+      <Synthetic Name="Layout">
+        <DisplayString>{{ capacity={capacity_}, first={first_} }}</DisplayString>
+        <Expand>
+          <IndexListItems>
+            <Size>capacity_</Size>
+            <ValueNode Condition="($i &gt;= first_ &amp;&amp; $i &lt; first_ + size_) || (first_ + size_ &gt; capacity_ &amp;&amp; $i &lt; first_ + size_ - capacity_)">buffer_[$i]</ValueNode>
+          </IndexListItems>
+        </Expand>
+      </Synthetic>
+      
+      <IndexListItems>
+        <Size>size_</Size>
+        <ValueNode>buffer_[(first_ + $i) % capacity_]</ValueNode>
+      </IndexListItems>
+    </Expand>
+  </Type>
+
 </AutoVisualizer>
