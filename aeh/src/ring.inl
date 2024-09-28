@@ -13,7 +13,7 @@ namespace aeh
 	}
 
 	template <std::move_constructible T, typename Allocator>
-	constexpr ring<T, Allocator>::ring(const ring& other)
+	constexpr ring<T, Allocator>::ring(const ring& other) requires std::copy_constructible<T>
 	{
 		reserve(other.size());
 		const auto [r1, r2] = other.data();
@@ -37,7 +37,7 @@ namespace aeh
 	}
 
 	template <std::move_constructible T, typename Allocator>
-	constexpr auto ring<T, Allocator>::operator = (const ring& other) -> ring&
+	constexpr auto ring<T, Allocator>::operator = (const ring& other) -> ring& requires std::copy_constructible<T>
 	{
 		clear();
 		reserve(other.size());
@@ -137,7 +137,7 @@ namespace aeh
 		size_t const insertion_point = (first_ + size_) % capacity_;
 		T* const new_element = buffer_ + insertion_point;
 
-		std::allocator_traits<Allocator>::construct(allocator_, new_element, std::forward<Args>(args)...);
+		std::uninitialized_construct_using_allocator(new_element, allocator_, std::forward<Args>(args)...);
 		size_ += 1;
 		return *new_element;
 	}
@@ -185,6 +185,12 @@ namespace aeh
 	constexpr void ring<T, Allocator>::shrink_to_fit()
 	{
 		change_capacity_to(size());
+	}
+
+	template <std::move_constructible T, typename Allocator>
+	constexpr auto ring<T, Allocator>::get_allocator() const noexcept -> Allocator
+	{
+		return allocator_;
 	}
 
 	template <std::move_constructible T, typename Allocator>

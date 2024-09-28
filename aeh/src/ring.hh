@@ -15,14 +15,15 @@ namespace aeh
 		using reference = T&;
 		using const_reference = T const&;
 		using size_type = size_t;
+		using allocator_type = Allocator;
 
 		constexpr ring() noexcept = default;
 		constexpr explicit ring(Allocator allocator) noexcept;
 		constexpr ~ring();
 
-		constexpr ring(const ring& other);
+		constexpr ring(const ring& other) requires std::copy_constructible<T>;
 		constexpr ring(ring&& other) noexcept;
-		constexpr auto operator = (const ring& other) -> ring&;
+		constexpr auto operator = (const ring& other) -> ring& requires std::copy_constructible<T>;
 		constexpr auto operator = (ring&& other) noexcept -> ring&;
 
 		constexpr auto empty() const noexcept -> bool;
@@ -47,6 +48,8 @@ namespace aeh
 
 		constexpr void reserve(size_t new_capacity);
 		constexpr void shrink_to_fit();
+
+		constexpr auto get_allocator() const noexcept -> Allocator;
 
 	private:
 		constexpr void change_capacity_to(size_t new_capacity);
