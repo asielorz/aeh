@@ -8,7 +8,16 @@
 namespace aeh
 {
 
-	template <std::move_constructible T, typename Allocator = std::allocator<T>>
+	template <typename Alloc, typename T>
+	concept std_allocator =
+		std::copyable<Alloc> &&
+		requires(Alloc alloc, T* p, size_t n) {
+			typename Alloc::value_type;
+			{ alloc.allocate(n) } -> std::same_as<T *>;
+			alloc.deallocate(p, n);
+	};
+
+	template <std::move_constructible T, std_allocator<T> Allocator = std::allocator<T>>
 	struct ring
 	{
 		using value_type = T;

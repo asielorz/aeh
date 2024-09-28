@@ -1,19 +1,20 @@
 namespace aeh
 {
 
-	template <std::move_constructible T, typename Allocator>
+	template <std::move_constructible T, std_allocator<T> Allocator>
 	constexpr ring<T, Allocator>::ring(Allocator allocator) noexcept
 		: allocator_(std::move(allocator))
 	{}
 
-	template <std::move_constructible T, typename Allocator>
+	template <std::move_constructible T, std_allocator<T> Allocator>
 	constexpr ring<T, Allocator>::~ring()
 	{
 		reset();
 	}
 
-	template <std::move_constructible T, typename Allocator>
+	template <std::move_constructible T, std_allocator<T> Allocator>
 	constexpr ring<T, Allocator>::ring(const ring& other) requires std::copy_constructible<T>
+		: allocator_(other.allocator_)
 	{
 		reserve(other.size());
 		const auto [r1, r2] = other.data();
@@ -23,12 +24,13 @@ namespace aeh
 			push_back(t);
 	}
 
-	template <std::move_constructible T, typename Allocator>
+	template <std::move_constructible T, std_allocator<T> Allocator>
 	constexpr ring<T, Allocator>::ring(ring&& other) noexcept
 		: buffer_(other.buffer_)
 		, capacity_(other.capacity_)
 		, first_(other.first_)
 		, size_(other.size_)
+		, allocator_(other.allocator_)
 	{
 		other.buffer_ = nullptr;
 		other.capacity_ = 0;
@@ -36,7 +38,7 @@ namespace aeh
 		other.size_ = 0;
 	}
 
-	template <std::move_constructible T, typename Allocator>
+	template <std::move_constructible T, std_allocator<T> Allocator>
 	constexpr auto ring<T, Allocator>::operator = (const ring& other) -> ring& requires std::copy_constructible<T>
 	{
 		clear();
@@ -49,7 +51,7 @@ namespace aeh
 		return *this;
 	}
 
-	template <std::move_constructible T, typename Allocator>
+	template <std::move_constructible T, std_allocator<T> Allocator>
 	constexpr auto ring<T, Allocator>::operator = (ring&& other) noexcept -> ring&
 	{
 		reset();
@@ -64,39 +66,39 @@ namespace aeh
 		return *this;
 	}
 
-	template <std::move_constructible T, typename Allocator>
+	template <std::move_constructible T, std_allocator<T> Allocator>
 	constexpr auto ring<T, Allocator>::empty() const noexcept -> bool
 	{
 		return size() == 0;
 	}
 
-	template <std::move_constructible T, typename Allocator>
+	template <std::move_constructible T, std_allocator<T> Allocator>
 	constexpr auto ring<T, Allocator>::size() const noexcept -> size_t
 	{
 		return size_;
 	}
 
-	template <std::move_constructible T, typename Allocator>
+	template <std::move_constructible T, std_allocator<T> Allocator>
 	constexpr auto ring<T, Allocator>::capacity() const noexcept -> size_t
 	{
 		return capacity_;
 	}
 
-	template <std::move_constructible T, typename Allocator>
+	template <std::move_constructible T, std_allocator<T> Allocator>
 	constexpr auto ring<T, Allocator>::front() noexcept -> T&
 	{
 		assert(!empty());
 		return *(buffer_ + first_);
 	}
 
-	template <std::move_constructible T, typename Allocator>
+	template <std::move_constructible T, std_allocator<T> Allocator>
 	constexpr auto ring<T, Allocator>::front() const noexcept -> const T&
 	{
 		assert(!empty());
 		return *(buffer_ + first_);
 	}
 
-	template <std::move_constructible T, typename Allocator>
+	template <std::move_constructible T, std_allocator<T> Allocator>
 	constexpr auto ring<T, Allocator>::back() noexcept -> T&
 	{
 		assert(!empty());
@@ -104,7 +106,7 @@ namespace aeh
 		return *(buffer_ + last);
 	}
 
-	template <std::move_constructible T, typename Allocator>
+	template <std::move_constructible T, std_allocator<T> Allocator>
 	constexpr auto ring<T, Allocator>::back() const noexcept -> const T&
 	{
 		assert(!empty());
@@ -112,20 +114,20 @@ namespace aeh
 		return *(buffer_ + last);
 	}
 
-	template <std::move_constructible T, typename Allocator>
+	template <std::move_constructible T, std_allocator<T> Allocator>
 	constexpr auto ring<T, Allocator>::push_back(const T& value) -> T&
 		requires std::copy_constructible<T>
 	{
 		return emplace_back(value);
 	}
 
-	template <std::move_constructible T, typename Allocator>
+	template <std::move_constructible T, std_allocator<T> Allocator>
 	constexpr auto ring<T, Allocator>::push_back(T&& value) -> T&
 	{
 		return emplace_back(std::move(value));
 	}
 
-	template <std::move_constructible T, typename Allocator>
+	template <std::move_constructible T, std_allocator<T> Allocator>
 	template <typename ... Args> requires std::constructible_from<T, Args...>
 	constexpr auto ring<T, Allocator>::emplace_back([[maybe_unused]] Args&& ... args) -> T&
 	{
@@ -142,7 +144,7 @@ namespace aeh
 		return *new_element;
 	}
 
-	template <std::move_constructible T, typename Allocator>
+	template <std::move_constructible T, std_allocator<T> Allocator>
 	constexpr void ring<T, Allocator>::pop_front() noexcept
 	{
 		assert(!empty());
@@ -152,7 +154,7 @@ namespace aeh
 		size_ -= 1;
 	}
 
-	template <std::move_constructible T, typename Allocator>
+	template <std::move_constructible T, std_allocator<T> Allocator>
 	constexpr void ring<T, Allocator>::clear() noexcept
 	{
 		if (!empty())
@@ -165,7 +167,7 @@ namespace aeh
 		}
 	}
 
-	template <std::move_constructible T, typename Allocator>
+	template <std::move_constructible T, std_allocator<T> Allocator>
 	constexpr void ring<T, Allocator>::reset() noexcept
 	{
 		clear();
@@ -174,26 +176,26 @@ namespace aeh
 		capacity_ = 0;
 	}
 
-	template <std::move_constructible T, typename Allocator>
+	template <std::move_constructible T, std_allocator<T> Allocator>
 	constexpr void ring<T, Allocator>::reserve(size_t new_capacity)
 	{
 		if (capacity() < new_capacity)
 			change_capacity_to(new_capacity);
 	}
 
-	template <std::move_constructible T, typename Allocator>
+	template <std::move_constructible T, std_allocator<T> Allocator>
 	constexpr void ring<T, Allocator>::shrink_to_fit()
 	{
 		change_capacity_to(size());
 	}
 
-	template <std::move_constructible T, typename Allocator>
+	template <std::move_constructible T, std_allocator<T> Allocator>
 	constexpr auto ring<T, Allocator>::get_allocator() const noexcept -> Allocator
 	{
 		return allocator_;
 	}
 
-	template <std::move_constructible T, typename Allocator>
+	template <std::move_constructible T, std_allocator<T> Allocator>
 	constexpr void ring<T, Allocator>::change_capacity_to(size_t new_capacity)
 	{
 		if (new_capacity == capacity())
@@ -224,7 +226,7 @@ namespace aeh
 		size_ = new_size;
 	}
 
-	template <std::move_constructible T, typename Allocator>
+	template <std::move_constructible T, std_allocator<T> Allocator>
 	constexpr std::pair<std::span<T>, std::span<T>> ring<T, Allocator>::data() noexcept
 	{
 		size_t last = first_ + size_;
@@ -247,7 +249,7 @@ namespace aeh
 		};
 	}
 
-	template <std::move_constructible T, typename Allocator>
+	template <std::move_constructible T, std_allocator<T> Allocator>
 	constexpr std::pair<std::span<T const>, std::span<T const>> ring<T, Allocator>::data() const noexcept
 	{
 		size_t last = first_ + size_;
