@@ -7,6 +7,8 @@
 #include <glm/gtc/constants.hpp>
 #include "glm/gtc/quaternion.hpp"
 #include <type_traits>
+#include <concepts>
+#include <iterator>
 
 constexpr auto pi = glm::pi<float>();
 constexpr auto half_pi = glm::half_pi<float>();
