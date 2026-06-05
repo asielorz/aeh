@@ -12,7 +12,7 @@ namespace aeh::in
 		constexpr uint16_t controller_mask = binary_literal(0110'0000'0000'0000);
 		constexpr uint16_t index_mask = binary_literal(0000'0000'0000'1111);
 		constexpr uint16_t controller_input_is_axis_mask = binary_literal(0001'0000'0000'0000);
-		constexpr uint16_t control_is_controller_input_mask = binary_literal(0001'0000'0000'0000);
+		constexpr uint16_t control_is_controller_input_mask = binary_literal(1000'0000'0000'0000);
 
 		auto controller_index(Controller controller) noexcept -> uint16_t
 		{
