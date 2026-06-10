@@ -43,6 +43,7 @@ else() # Development, running directly from cmake
 	add_conan_bool_option_to_list(conan_options ${AEH_BUILD_TESTS} "with_unit_tests")
 
 	conan_run(
+		REVISIONS_ENABLED
 		OPTIONS
 			${conan_options}
 		EXTRA_SETTINGS

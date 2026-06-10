@@ -38,22 +38,22 @@ class AehConan(conans.ConanFile):
 
     def requirements(self):
         if self.options.with_unit_tests:
-            self.requires("catch2/3.1.0")
+            self.requires("catch2/3.1.0#d3c77e41b5a7a2d0207f924176ee5818")
         
         if self.options.with_glm:
-            self.requires("glm/0.9.9.8")
+            self.requires("glm/0.9.9.8#066beab93048a0dc791188715074be42")
 
         if self.options.with_imgui:
             if not self.options.with_sdl2:
                 raise conans.errors.ConanInvalidConfiguration("ImGui requires SDL2")
 
-            self.requires("imgui/1.79")
+            self.requires("imgui/1.79#8d6c71b9a7e7ee1e620ba486499cec9c")
 
         if self.options.with_sdl2:
-            self.requires("sdl/2.24.0")
-            self.requires("opengl/system")
+            self.requires("sdl/2.24.0#698e8e777564b649c5238e9fc5e69577")
+            self.requires("opengl/system#4df6fecde4084386beded3ed0e56e4ea")
 
-        self.requires("portable-file-dialogs/0.1.0")
+        self.requires("portable-file-dialogs/0.1.0#94186f1cad9eb3e4e80c6a4c566c8c0b")
 
     def configure(self):
         required_cpp_std = "20"
