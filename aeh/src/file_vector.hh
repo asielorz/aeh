@@ -43,6 +43,7 @@ namespace aeh
 	template <typename T, is_filesystem_trait FilesystemTrait, is_load_trait<T> LoadTrait>
 	struct FileVector
 	{
+		using value_type = T;
 		using path_type = typename FilesystemTrait::path_type;
 
 		static auto load(FilesystemTrait filesystem_trait_ = {}, LoadTrait load_trait_ = {}) -> FileVector;
