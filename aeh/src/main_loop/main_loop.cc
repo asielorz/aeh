@@ -96,8 +96,11 @@ namespace
 namespace aeh::main_loop::detail
 {
 
-	bool update(SDL_Window * window, function_ref<void(SDL_Event const &)> demo_process_event)
+	bool update(SDL_Window * window, const Options & options, function_ref<void(SDL_Event const &)> demo_process_event)
 	{
+		if (options.input_lag_throtle.count() != 0)
+			std::this_thread::sleep_for(options.input_lag_throtle);
+
 		bool done = false;
 
 		SDL_Event event;

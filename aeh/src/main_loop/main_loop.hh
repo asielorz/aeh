@@ -28,6 +28,7 @@ namespace aeh::main_loop
 	struct Options
 	{
 		bool clear_every_frame = true;
+		std::chrono::microseconds input_lag_throtle = std::chrono::microseconds(0);
 	};
 
 	struct NewWindowOptions : Options

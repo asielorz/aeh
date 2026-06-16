@@ -3,7 +3,7 @@ namespace aeh::main_loop
 
 	namespace detail
 	{
-		bool update(SDL_Window * window, function_ref<void(SDL_Event const &)> demo_process_event);
+		bool update(SDL_Window * window, const Options & options, function_ref<void(SDL_Event const &)> demo_process_event);
 		RenderInput pre_render(SDL_Window * window, Options const & options);
 		void post_render(SDL_Window * window);
 		float cap_fps(std::chrono::steady_clock::time_point time_start) noexcept;
@@ -25,7 +25,7 @@ namespace aeh::main_loop
 			auto locals = main_loop::detail::call_start_frame(demo);
 
 			// Update
-			done = main_loop::detail::update(window,
+			done = main_loop::detail::update(window, options,
 				[&demo, &locals](SDL_Event const & ev) { main_loop::detail::call_process_event(demo, ev, locals); });
 
 			auto update_input = main_loop::UpdateInput(dt, window, done, exit_code);
