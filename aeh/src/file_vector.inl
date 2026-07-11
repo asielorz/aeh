@@ -10,9 +10,11 @@ namespace aeh
 		for (path_type const & filename : v.filesystem_trait.files())
 		{
 			auto file = v.filesystem_trait.open_to_read(filename);
-			debug_assert(static_cast<bool>(file));
+			if (!file)
+				continue;
 			std::optional<T> content = v.load_trait.load(*file);
-			debug_assert(content.has_value());
+			if(!content.has_value())
+				continue;
 			v.elements.push_back(std::move(*content));
 			v.filenames.push_back(filename);
 		}
