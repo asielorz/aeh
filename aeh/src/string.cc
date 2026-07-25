@@ -186,6 +186,52 @@ namespace aeh
 		return std::string(indentation_level, '\t');
 	}
 
+	static auto to_string_with_digit_separator_impl(std::string without, char digit_separator) -> std::string
+	{
+		size_t const separators_needed = (without.size() - 1) / 3;
+		if (separators_needed == 0)
+			return without;
+
+		std::string with;
+		with.resize(without.size() + separators_needed);
+
+		size_t without_i = 0;
+		size_t with_i = 0;
+		for (; without_i < without.size(); ++without_i)
+		{
+			with[with.size() - 1 - with_i] = without[without.size() - 1 - without_i];
+			with_i += 1;
+
+			if (without_i % 3 == 2)
+			{
+				with[with.size() - 1 - with_i] = digit_separator;
+				with_i += 1;
+			}
+		}
+
+		return with;
+	}
+
+	auto to_string_with_digit_separator(int32_t number, char digit_separator) -> std::string
+	{
+		return to_string_with_digit_separator_impl(std::to_string(number), digit_separator);
+	}
+
+	auto to_string_with_digit_separator(uint32_t number, char digit_separator) -> std::string
+	{
+		return to_string_with_digit_separator_impl(std::to_string(number), digit_separator);
+	}
+
+	auto to_string_with_digit_separator(int64_t number, char digit_separator) -> std::string
+	{
+		return to_string_with_digit_separator_impl(std::to_string(number), digit_separator);
+	}
+
+	auto to_string_with_digit_separator(uint64_t number, char digit_separator) -> std::string
+	{
+		return to_string_with_digit_separator_impl(std::to_string(number), digit_separator);
+	}
+
 	std::string_view parent_path(std::string_view path) noexcept
 	{
 		return path.substr(0, path.find_last_of("/\\"));

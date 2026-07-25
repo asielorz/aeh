@@ -46,6 +46,11 @@ namespace aeh
 
 	auto indent(int indentation_level) noexcept -> std::string;
 
+	auto to_string_with_digit_separator(int32_t number, char digit_separator = '.') -> std::string;
+	auto to_string_with_digit_separator(uint32_t number, char digit_separator = '.') -> std::string;
+	auto to_string_with_digit_separator(int64_t number, char digit_separator = '.') -> std::string;
+	auto to_string_with_digit_separator(uint64_t number, char digit_separator = '.') -> std::string;
+
 	//! For strings representing a path, returns the path of the directory that contains that path
 	std::string_view parent_path(std::string_view path) noexcept;
 	//! For strings that represent a path, returns the whole filename, including extension.
